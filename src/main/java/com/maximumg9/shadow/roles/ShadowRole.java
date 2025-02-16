@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ShadowRole extends Role {
 
-    private static final List<Ability.Factory> ABILITY_FACTORIES = List.of(TestAbility.FACTORY);
+    private static final List<Ability.Factory> ABILITY_FACTORIES = List.of();
 
     public ShadowRole(@Nullable Shadow shadow, @Nullable IndirectPlayer player) {
         super(shadow,player,ABILITY_FACTORIES);
