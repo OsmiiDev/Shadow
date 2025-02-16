@@ -4,6 +4,7 @@ import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.DebugCommand;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -22,10 +23,8 @@ public class Shadow {
         modifiedItems.put(Identifier.ofVanilla("nether_star"), NetherStarItem::new);
     }
 
-    public static final List<Consumer<CommandDispatcher<ServerCommandSource>>> commandRegistrars = new ArrayList<>();
-
-    static {
-        commandRegistrars.add(DebugCommand::register);
+    public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess) {
+        DebugCommand.register(dispatcher);
     }
 
     private final MinecraftServer server;

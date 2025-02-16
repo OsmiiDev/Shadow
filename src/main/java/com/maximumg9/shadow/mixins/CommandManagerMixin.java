@@ -17,6 +17,6 @@ public class CommandManagerMixin {
 
     @Inject(method = "<init>",at = @At(value = "INVOKE", target = "Lnet/minecraft/server/command/AdvancementCommand;register(Lcom/mojang/brigadier/CommandDispatcher;)V"))
     public void init(CommandManager.RegistrationEnvironment environment, CommandRegistryAccess commandRegistryAccess, CallbackInfo ci) {
-        Shadow.commandRegistrars.forEach((initializer) -> initializer.accept(this.dispatcher));
+        Shadow.registerCommands(this.dispatcher,commandRegistryAccess);
     }
 }
