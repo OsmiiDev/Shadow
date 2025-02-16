@@ -1,5 +1,7 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.screens.DecisionScreenHandler;
 import com.maximumg9.shadow.util.IndirectPlayer;
@@ -21,7 +23,9 @@ public class NetherStarItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(world instanceof ServerWorld) {
-            Role role = IndirectPlayer.get((ServerPlayerEntity) user).role;
+            Shadow shadow = ((ShadowProvider) world.getServer()).shadow$getShadow();
+
+            Role role = shadow.getIndirect((ServerPlayerEntity) user).role;
 
             user.openHandledScreen(new DecisionScreenHandler.Factory<>(
                     Text.literal("Ability Menu"),

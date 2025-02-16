@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 public class IndirectPlayer {
 
-    private IndirectPlayer(ServerPlayerEntity base) {
+    public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
         this.server = base.server;
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
@@ -34,11 +34,5 @@ public class IndirectPlayer {
 
     public boolean exists() {
         return getEntity().isPresent();
-    }
-
-    private static final HashMap<UUID,IndirectPlayer> indirectPlayers = new HashMap<>();
-
-    public static IndirectPlayer get(ServerPlayerEntity base) {
-        return indirectPlayers.computeIfAbsent(base.getUuid(),(uuid) -> new IndirectPlayer(base));
     }
 }

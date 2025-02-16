@@ -4,6 +4,7 @@ import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
 public interface Ability extends ItemRepresentable {
     String getID();
@@ -12,6 +13,6 @@ public interface Ability extends ItemRepresentable {
 
     @FunctionalInterface
     interface Factory {
-        Ability create(Shadow shadow, IndirectPlayer player);
+        Ability create(@Nullable Shadow shadow, @Nullable IndirectPlayer player);
     }
 }

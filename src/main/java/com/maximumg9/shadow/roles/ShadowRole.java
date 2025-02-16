@@ -6,6 +6,7 @@ import com.maximumg9.shadow.abilities.TestAbility;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class ShadowRole extends Role {
 
     private static final List<Ability.Factory> ABILITY_FACTORIES = List.of(TestAbility.FACTORY);
 
-    public ShadowRole(Shadow shadow, IndirectPlayer player) {
+    public ShadowRole(@Nullable Shadow shadow, @Nullable IndirectPlayer player) {
         super(shadow,player,ABILITY_FACTORIES);
     }
 

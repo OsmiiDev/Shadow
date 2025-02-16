@@ -7,16 +7,14 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 public class TestAbility implements Ability {
 
     public static final Ability.Factory FACTORY = TestAbility::new;
 
-    public TestAbility(Shadow shadow, IndirectPlayer player) {
+    public TestAbility(@Nullable Shadow shadow, @Nullable IndirectPlayer player) {
         this.shadow = shadow;
         this.player = player;
     }

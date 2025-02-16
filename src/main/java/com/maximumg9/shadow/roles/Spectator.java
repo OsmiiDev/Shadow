@@ -1,15 +1,15 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class Spectator extends Role {
-    public Spectator(Shadow shadow, IndirectPlayer player) {
+    public Spectator(@Nullable Shadow shadow, @Nullable IndirectPlayer player) {
         super(shadow, player, List.of());
     }
 
