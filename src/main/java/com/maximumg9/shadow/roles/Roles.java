@@ -12,19 +12,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 public enum Roles {
-    SPECTATOR(new Spectator(null,null).getRawName(), Spectator::new),
-    VILLAGER(new Villager(null,null).getRawName(), Villager::new),
-    SHADOW(new ShadowRole(null,null).getRawName(), ShadowRole::new);
+    SPECTATOR(Spectator::new),
+    VILLAGER(Villager::new),
+    SHADOW(ShadowRole::new),
+    TESTER("TEST ONLY", Tester::new, false);
 
     public final String name;
     public final RoleFactory factory;
+    public final boolean normallyVisibile;
 
-    Roles(String name, RoleFactory factory) {
+    Roles(RoleFactory factory) {
+        this(factory.makeRole(null,null).getRawName(),factory,true);
+    }
+
+    Roles(String name, RoleFactory factory, boolean normallyVisibile) {
         this.name = name;
         this.factory = factory;
+        this.normallyVisibile = normallyVisibile;
     }
 
     public static CompletableFuture<Suggestions> suggest(CommandContext<?> ctx, SuggestionsBuilder builder) {
