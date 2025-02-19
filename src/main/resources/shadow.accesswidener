@@ -3,3 +3,5 @@ accessible field net/minecraft/item/Item requiredFeatures Lnet/minecraft/resourc
 mutable field net/minecraft/item/Item requiredFeatures Lnet/minecraft/resource/featuretoggle/FeatureSet;
 accessible field net/minecraft/item/Item registryEntry Lnet/minecraft/registry/entry/RegistryEntry$Reference;
 mutable field net/minecraft/item/Item registryEntry Lnet/minecraft/registry/entry/RegistryEntry$Reference;
+accessible field net/minecraft/util/math/random/CheckedRandom seed Ljava/util/concurrent/atomic/AtomicLong;
+mutable field net/minecraft/util/math/random/CheckedRandom seed Ljava/util/concurrent/atomic/AtomicLong;
