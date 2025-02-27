@@ -15,7 +15,7 @@ public enum Roles {
     SPECTATOR(Spectator::new),
     VILLAGER(Villager::new),
     SHADOW(ShadowRole::new),
-    TESTER("TEST ONLY", Tester::new, false);
+    TESTER("TEST_ONLY", Tester::new, false);
 
     public final String name;
     public final RoleFactory factory;

@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.Proxy;
+import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin implements ShadowProvider {
@@ -30,5 +31,10 @@ public abstract class MinecraftServerMixin implements ShadowProvider {
     @Inject(method="<init>",at=@At("CTOR_HEAD"))
     public void init(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, ApiServices apiServices, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory, CallbackInfo ci) {
         this.shadow = new Shadow((MinecraftServer) (Object) this);
+    }
+
+    @Inject(method="tick", at=@At("HEAD"))
+    public void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        this.shadow.tick();
     }
 }

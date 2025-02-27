@@ -1,6 +1,7 @@
 package com.maximumg9.shadow.util;
 
 
+import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Role;
@@ -22,11 +23,13 @@ public class IndirectPlayer {
         this.server = base.server;
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
         this.role = new Spectator(shadow,this);
+        this.participating = shadow.phase != GamePhase.PLAYING;
     }
 
     private final UUID playerUUID;
     private final MinecraftServer server;
     public Role role;
+    public boolean participating;
 
     public Optional<ServerPlayerEntity> getEntity() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));

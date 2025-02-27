@@ -106,6 +106,9 @@ public class LocationCommand {
                 ),
         true
         );
+
+        shadow.phase = GamePhase.LOCATION_SELECTED;
+
         return 1;
     }
 
