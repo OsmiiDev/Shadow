@@ -43,7 +43,9 @@ public class LocationCommand {
                             MinecraftServer server = ctx.getSource().getServer();
                             Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-                            shadow.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
+                            shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
+                            shadow.saveAsync();
+
                             return 1;
                         })
                 )
@@ -53,12 +55,14 @@ public class LocationCommand {
                                 MinecraftServer server = ctx.getSource().getServer();
                                 Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-                                if(shadow.phase != GamePhase.NOT_PLAYING) return -1;
+                                if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
 
-                                shadow.playedStrongholdPositions.add(shadow.strongholdChunkPosition);
+                                shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
 
-                                shadow.strongholdChunkPosition = null;
-                                shadow.currentLocation = null;
+                                shadow.state.strongholdChunkPosition = null;
+                                shadow.state.currentLocation = null;
+
+                                shadow.saveAsync();
 
                                 return findAndGotoLocation(ctx);
                             })
@@ -75,7 +79,7 @@ public class LocationCommand {
         MinecraftServer server = src.getServer();
         Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-        if(shadow.phase != GamePhase.NOT_PLAYING) return -1;
+        if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
 
         if(frames == null) {
             src.sendError(
@@ -91,9 +95,9 @@ public class LocationCommand {
         int x = world.getRandom().nextBetween(frames.getMinX(),frames.getMaxX());
         int z = world.getRandom().nextBetween(frames.getMinZ(),frames.getMaxZ());
 
-        shadow.currentLocation = new BlockPos(x,0,z);
+        shadow.state.currentLocation = new BlockPos(x,0,z);
 
-        Vec3d teleportPos = shadow.currentLocation.toBottomCenterPos();
+        Vec3d teleportPos = shadow.state.currentLocation.toBottomCenterPos();
 
         arrangePlayersInCircle(world,teleportPos,server.getPlayerManager().getPlayerList());
 
@@ -107,7 +111,9 @@ public class LocationCommand {
         true
         );
 
-        shadow.phase = GamePhase.LOCATION_SELECTED;
+        shadow.state.phase = GamePhase.LOCATION_SELECTED;
+
+        shadow.saveAsync();
 
         return 1;
     }
@@ -141,7 +147,7 @@ public class LocationCommand {
                 )
         );
 
-        placementPositions.removeAll(shadow.playedStrongholdPositions);
+        placementPositions.removeAll(shadow.state.playedStrongholdPositions);
 
         ChunkPos startChunkPos = placementPositions.getFirst();
 
@@ -158,7 +164,9 @@ public class LocationCommand {
                 (biome) -> true
         );
 
-        shadow.strongholdChunkPosition = startChunkPos;
+        shadow.state.strongholdChunkPosition = startChunkPos;
+
+        shadow.saveAsync();
 
         FakeStructureWorldAccess fakeStructureWorldAccess = new FakeStructureWorldAccess(world);
 

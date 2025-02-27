@@ -1,8 +1,10 @@
 package com.maximumg9.shadow.util;
 
+import net.minecraft.util.math.MathHelper;
+
 public class TimeUtil {
     public static String ticksToText(int ticks, boolean leadingZeros) {
-        return secondToText(ticks/20, leadingZeros);
+        return secondToText(MathHelper.ceil(ticks/20.0), leadingZeros);
     }
 
     public static String padLeft(String original, char padding, int desiredLength) {

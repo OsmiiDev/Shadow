@@ -19,16 +19,16 @@ public class Tester extends Role {
 
     @Override
     public Faction getFaction() {
-        return Faction.SPECTATOR;
+        return Faction.NEUTRAL;
     }
 
     @Override
     public String getRawName() {
-        return "Spectator";
+        return "Tester";
     }
 
     @Override
     public TextColor getColor() {
-        return TextColor.fromFormatting(Formatting.GRAY);
+        return TextColor.fromFormatting(Formatting.YELLOW);
     }
 }

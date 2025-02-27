@@ -32,7 +32,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
     public void restrictMovementOnLocationSelect(PlayerMoveC2SPacket packet, CallbackInfo ci) {
         Shadow shadow = ((ShadowProvider) this.player.server).shadow$getShadow();
 
-        if(shadow.phase != GamePhase.LOCATION_SELECTED) return;
+        if(shadow.state.phase != GamePhase.LOCATION_SELECTED) return;
         if(!this.player.hasPermissionLevel(2)) return;
         if(this.player.isInCreativeMode() || this.player.isSpectator()) return;
 

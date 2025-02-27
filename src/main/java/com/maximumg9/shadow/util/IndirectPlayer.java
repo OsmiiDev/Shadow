@@ -23,7 +23,7 @@ public class IndirectPlayer {
         this.server = base.server;
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
         this.role = new Spectator(shadow,this);
-        this.participating = shadow.phase != GamePhase.PLAYING;
+        this.participating = shadow.state.phase != GamePhase.PLAYING;
     }
 
     private final UUID playerUUID;

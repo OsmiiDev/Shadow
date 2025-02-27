@@ -41,7 +41,7 @@ public class StartCommand {
         MinecraftServer server = ctx.getSource().getServer();
         Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-        if(shadow.phase != GamePhase.LOCATION_SELECTED) return false;
+        if(shadow.state.phase != GamePhase.LOCATION_SELECTED) return false;
 
         return true;
     }
@@ -91,7 +91,8 @@ class StartTicker implements Tickable {
 
     @Override
     public void onEnd() {
-        shadow.phase = GamePhase.PLAYING;
+        shadow.state.phase = GamePhase.PLAYING;
+        shadow.saveAsync();
     }
 
     @Override

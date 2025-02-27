@@ -46,7 +46,7 @@ public enum Roles {
     }
 
     @NotNull
-    public static RoleFactory getRole(CommandContext<?> ctx, String name) {
+    public static Roles getRole(CommandContext<?> ctx, String name) {
         String roleName = StringArgumentType.getString(ctx, name);
 
         List<Roles> possibleRoles = Arrays.stream(values()).filter((role) -> role.name.equals(roleName)).toList();
@@ -55,6 +55,6 @@ public enum Roles {
             throw new IllegalStateException("Roles are broken, multiple roles with same name");
         }
 
-        return possibleRoles.getFirst().factory;
+        return possibleRoles.getFirst();
     }
 }
