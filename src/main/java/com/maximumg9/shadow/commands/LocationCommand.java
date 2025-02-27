@@ -289,14 +289,19 @@ public class LocationCommand {
         int minZ = MathHelper.floor(bb.minY);
         int maxZ = MathHelper.floor(bb.maxZ);
 
+        world.getChunk(minX/16,minZ/16);
+
         int highest = world.getTopY(heightMap, minX, minZ);
 
         if(minX != maxX) {
+            world.getChunk(maxX/16,minZ/16);
             highest = world.getTopY(heightMap, maxX, minZ);
         }
         if(minZ != maxZ) {
+            world.getChunk(minX/16,maxZ/16);
             highest = world.getTopY(heightMap, minX, maxZ);
             if(minX != maxX) {
+                world.getChunk(maxX/16,maxZ/16);
                 highest = world.getTopY(heightMap, maxX, maxZ);
             }
         }
