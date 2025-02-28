@@ -41,7 +41,7 @@ public class DebugCommand {
                                                 ctx.getSource().sendFeedback(() ->
                                                     Text.literal("Set ")
                                                         .append(player.getName())
-                                                        .append(Text.literal("'s role to "))
+                                                        .append(Text.literal("'s Role to "))
                                                         .append(indirectPlayer.role.getName()),
                                                     true);
 
@@ -63,7 +63,7 @@ public class DebugCommand {
                                     shadow.state.phase = phase;
                                     shadow.saveAsync();
 
-                                    ctx.getSource().sendFeedback(() -> Text.of("Set game phase to " + phase.name()), true);
+                                    ctx.getSource().sendFeedback(() -> Text.of("Set Game Phase to " + phase.name()), true);
 
                                     return 1;
                                 })
