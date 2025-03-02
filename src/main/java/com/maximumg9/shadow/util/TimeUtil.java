@@ -2,24 +2,17 @@ package com.maximumg9.shadow.util;
 
 import net.minecraft.util.math.MathHelper;
 
+import static com.maximumg9.shadow.util.MiscUtil.padLeft;
+
 public class TimeUtil {
     public static String ticksToText(int ticks, boolean leadingZeros) {
         return secondToText(MathHelper.ceil(ticks/20.0), leadingZeros);
     }
 
-    public static String padLeft(String original, char padding, int desiredLength) {
-        if(original.length() >= desiredLength) return original;
-        StringBuilder builder = new StringBuilder(original);
-        for (int i = 0; i < desiredLength - builder.length(); i++) {
-            builder.insert(0, padding);
-        }
-        return builder.toString();
-    }
-
     public static String secondToText(int seconds, boolean leadingZeros) {
         if(leadingZeros)
             return
-                padLeft(String.valueOf(seconds/60),'0',2) +
+                padLeft(String.valueOf(seconds/60),' ',2) +
                 ":" +
                 padLeft(String.valueOf(seconds % 60),'0',2);
 

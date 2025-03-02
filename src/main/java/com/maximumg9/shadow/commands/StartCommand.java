@@ -4,14 +4,13 @@ import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.Tickable;
 import com.maximumg9.shadow.ducks.ShadowProvider;
+import com.maximumg9.shadow.roles.RoleManager;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
-import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -41,9 +40,7 @@ public class StartCommand {
         MinecraftServer server = ctx.getSource().getServer();
         Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-        if(shadow.state.phase != GamePhase.LOCATION_SELECTED) return false;
-
-        return true;
+        return shadow.state.phase == GamePhase.LOCATION_SELECTED;
     }
 
     public static int start(CommandContext<ServerCommandSource> ctx) {
@@ -54,6 +51,9 @@ public class StartCommand {
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
             ServerPlayerEntity entity = player.getEntity().get();
+
+            player.clearPlayerData();
+
             ItemStack eyeStack = new ItemStack(Items.ENDER_EYE);
 
             EnderEyeItem.EnderEyeData data = new EnderEyeItem.EnderEyeData(player.participating,true);
@@ -77,13 +77,11 @@ class StartTicker implements Tickable {
 
     @Override
     public void tick() {
-        TitleFadeS2CPacket titleFadeS2CPacket = new TitleFadeS2CPacket(0, 20, 20);
-        TitleS2CPacket title = new TitleS2CPacket(Text.literal(TimeUtil.ticksToText(this.ticksLeft,false)));
-
-        for(IndirectPlayer player : this.shadow.getOnlinePlayers()) {
-            ServerPlayerEntity entity = player.getEntity().get();
-            entity.networkHandler.sendPacket(titleFadeS2CPacket);
-            entity.networkHandler.sendPacket(title);
+        if(ticksLeft % 20 == 0) {
+            for(IndirectPlayer player : this.shadow.getOnlinePlayers()) {
+                player.setTitleTimes(5,10,5);
+                player.sendTitle(Text.literal(TimeUtil.ticksToText(this.ticksLeft,false)));
+            }
         }
 
         ticksLeft--;
@@ -93,6 +91,26 @@ class StartTicker implements Tickable {
     public void onEnd() {
         shadow.state.phase = GamePhase.PLAYING;
         shadow.saveAsync();
+
+        try {
+            shadow.roleManager.pickRoles();
+        } catch (RoleManager.TooManyPlayersException e) {
+            shadow.getOnlinePlayers().forEach((player) -> {
+                player.sendMessage(Text.literal("Too many players to start game, consider increasing role slot count in config"));
+            });
+            return;
+        }
+
+
+        shadow.getOnlinePlayers().forEach((player) -> {
+            player.getEntity().get().getInventory().clear();
+
+            player.clearPlayerData();
+
+            player.setTitleTimes(10,40,10);
+            if(player.role == null) throw new IllegalStateException("Null role accidentally chosen");
+            player.sendTitle(player.role.getFaction().name);
+        });
     }
 
     @Override

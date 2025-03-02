@@ -2,12 +2,9 @@ package com.maximumg9.shadow;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonWriter;
 import com.maximumg9.shadow.abilities.NetherStarItem;
-import com.maximumg9.shadow.commands.DebugCommand;
-import com.maximumg9.shadow.commands.EnderEyeItem;
-import com.maximumg9.shadow.commands.LocationCommand;
-import com.maximumg9.shadow.commands.StartCommand;
+import com.maximumg9.shadow.commands.*;
+import com.maximumg9.shadow.roles.RoleManager;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
@@ -17,8 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.random.Random;
 
 import java.io.*;
 import java.util.*;
@@ -38,10 +34,13 @@ public class Shadow implements Tickable {
         DebugCommand.register(dispatcher);
         LocationCommand.register(dispatcher);
         StartCommand.register(dispatcher);
+        RoleCommand.register(dispatcher);
     }
 
     private final MinecraftServer server;
     public Config config = new Config();
+    public RoleManager roleManager = new RoleManager(this);
+    public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
     private final HashMap<UUID,IndirectPlayer> indirectPlayers = new HashMap<>();
 
@@ -64,7 +63,21 @@ public class Shadow implements Tickable {
         } catch(IOException e) {
             LogUtils.getLogger().warn("Failed to save data");
         }
+    }
 
+    public List<IndirectPlayer> getAllPlayers() {
+        getOnlinePlayers();
+        return this.indirectPlayers.values().stream().toList();
+    }
+
+    public void cancelGame() {
+        this.state.phase = GamePhase.NOT_PLAYING;
+        this.state.currentLocation = null;
+        this.state.strongholdChunkPosition = null;
+
+        for(IndirectPlayer player : getAllPlayers()) {
+            player.role = null;
+        }
     }
 
     public IndirectPlayer getIndirect(ServerPlayerEntity base) {
@@ -153,9 +166,5 @@ public class Shadow implements Tickable {
                 GameState.class
         );
         reader.close();
-    }
-
-    public void removeTickables(Class<? extends Tickable> tickableClass) {
-        this.tickables.removeIf((tickable -> tickable.getClass() == tickableClass));
     }
 }

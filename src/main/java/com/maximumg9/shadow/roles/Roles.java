@@ -14,21 +14,18 @@ import java.util.concurrent.CompletableFuture;
 public enum Roles {
     SPECTATOR(Spectator::new),
     VILLAGER(Villager::new),
-    SHADOW(ShadowRole::new),
-    TESTER("TEST_ONLY", Tester::new, false);
+    SHADOW(ShadowRole::new);
 
     public final String name;
     public final RoleFactory factory;
-    public final boolean normallyVisibile;
 
     Roles(RoleFactory factory) {
-        this(factory.makeRole(null,null).getRawName(),factory,true);
+        this(factory.makeRole(null,null).getRawName(),factory);
     }
 
-    Roles(String name, RoleFactory factory, boolean normallyVisibile) {
+    Roles(String name, RoleFactory factory) {
         this.name = name;
         this.factory = factory;
-        this.normallyVisibile = normallyVisibile;
     }
 
     public static CompletableFuture<Suggestions> suggest(CommandContext<?> ctx, SuggestionsBuilder builder) {

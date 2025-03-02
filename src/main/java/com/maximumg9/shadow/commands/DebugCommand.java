@@ -3,7 +3,6 @@ package com.maximumg9.shadow.commands;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
-import com.maximumg9.shadow.roles.RoleFactory;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
@@ -11,6 +10,8 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+
+import java.util.Objects;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static net.minecraft.command.argument.EntityArgumentType.player;
@@ -38,11 +39,15 @@ public class DebugCommand {
 
                                                 indirectPlayer.role = role.factory.makeRole(shadow, indirectPlayer);
 
+
                                                 ctx.getSource().sendFeedback(() ->
                                                     Text.literal("Set ")
                                                         .append(player.getName())
                                                         .append(Text.literal("'s Role to "))
-                                                        .append(indirectPlayer.role.getName()),
+                                                        .append(
+                                                            Objects.requireNonNull(indirectPlayer.role)
+                                                                .getName()
+                                                        ),
                                                     true);
 
                                                 return 1;

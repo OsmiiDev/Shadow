@@ -55,6 +55,10 @@ public class LocationCommand {
                                 MinecraftServer server = ctx.getSource().getServer();
                                 Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
+                                if(shadow.state.phase == GamePhase.LOCATION_SELECTED) {
+                                    shadow.state.phase = GamePhase.NOT_PLAYING;
+                                }
+
                                 if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
 
                                 shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
