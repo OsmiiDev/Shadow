@@ -13,8 +13,11 @@ import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -43,6 +46,7 @@ public class Shadow implements Tickable {
     public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
     private final HashMap<UUID,IndirectPlayer> indirectPlayers = new HashMap<>();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public GameState state = new GameState();
 
@@ -52,17 +56,22 @@ public class Shadow implements Tickable {
         try {
             this.loadSync();
         } catch (FileNotFoundException e) {
-            LogUtils.getLogger().warn("Failed to load data, creating file");
+            LOGGER.warn("Failed to load data, creating file");
             this.state = new GameState();
         } catch (IOException e) {
-            LogUtils.getLogger().warn("Exception while loading data");
+            LOGGER.warn("Exception while loading data");
         }
 
         try {
             this.saveSync();
         } catch(IOException e) {
-            LogUtils.getLogger().warn("Failed to save data");
+            LOGGER.warn("Failed to save data");
         }
+    }
+
+    public void ERROR(String message) {
+        this.getServer().getPlayerManager().broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)),false);
+        LOGGER.error(message);
     }
 
     public List<IndirectPlayer> getAllPlayers() {
@@ -70,14 +79,25 @@ public class Shadow implements Tickable {
         return this.indirectPlayers.values().stream().toList();
     }
 
+    public void clearEyes() {
+        for(Eye eye : this.state.eyes) {
+            eye.destroy(this);
+        }
+        this.state.eyes.clear();
+    }
+
     public void cancelGame() {
         this.state.phase = GamePhase.NOT_PLAYING;
         this.state.currentLocation = null;
         this.state.strongholdChunkPosition = null;
 
+        this.clearEyes();
+
         for(IndirectPlayer player : getAllPlayers()) {
             player.role = null;
         }
+
+        this.saveAsync();
     }
 
     public IndirectPlayer getIndirect(ServerPlayerEntity base) {
@@ -118,6 +138,8 @@ public class Shadow implements Tickable {
     AtomicReference<Deque<Thread>> saveThreadQueue = new AtomicReference<>(new ArrayDeque<>());
 
     public void saveAsync() {
+        LOGGER.info("Saving async...");
+
         GameState stateCopy = this.state.clone();
         Thread thread = new Thread(() -> {
             try {
@@ -129,7 +151,7 @@ public class Shadow implements Tickable {
                 );
                 writer.close();
             } catch (IOException e) {
-                LogUtils.getLogger().error("Error while saving data async", e);
+                LOGGER.error("Error while saving data async", e);
             }
             this.saveThreadQueue.getAndUpdate((deque) -> {
                 Thread nextThread = deque.pollFirst();

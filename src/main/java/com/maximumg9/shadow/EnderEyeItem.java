@@ -1,4 +1,4 @@
-package com.maximumg9.shadow.commands;
+package com.maximumg9.shadow;
 
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.ItemData;

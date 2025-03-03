@@ -7,6 +7,7 @@ import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.roles.Spectator;
 import net.minecraft.entity.attribute.AttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -82,9 +83,7 @@ public class IndirectPlayer {
         player.getHungerManager().setSaturationLevel(5f);
         AttributeContainer attributes = player.getAttributes();
 
-        attributes.custom.values().forEach((attributeInstance) -> {
-            attributeInstance.clearModifiers();
-        });
+        attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);
     }
 
     public boolean exists() {

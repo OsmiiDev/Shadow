@@ -23,6 +23,7 @@ public class DebugCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$debug")
+                .requires((source) -> source.hasPermissionLevel(3))
                 .then(
                     literal("setRole")
                         .then(

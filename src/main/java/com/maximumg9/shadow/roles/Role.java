@@ -30,6 +30,8 @@ public abstract class Role {
 
     public abstract TextColor getColor();
 
+    public void init() {}
+
     public IndirectPlayer getPlayer() {
         return this.player;
     }

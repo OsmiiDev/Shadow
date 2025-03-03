@@ -12,6 +12,7 @@ public class GameState implements Cloneable {
     public BlockPos currentLocation = null;
     public ChunkPos strongholdChunkPosition = null;
     public List<ChunkPos> playedStrongholdPositions = new ArrayList<>();
+    public List<Eye> eyes = new ArrayList<>();
 
     @Override
     public GameState clone() {
@@ -21,6 +22,8 @@ public class GameState implements Cloneable {
             clone.currentLocation = this.currentLocation;
             clone.strongholdChunkPosition = this.strongholdChunkPosition;
             clone.playedStrongholdPositions = this.playedStrongholdPositions;
+            clone.eyes = this.eyes;
+
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

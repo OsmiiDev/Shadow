@@ -18,6 +18,7 @@ public class RoleCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$roles")
+                .requires((source) -> source.hasPermissionLevel(3))
                 .then(
                     literal("weight")
                         .then(

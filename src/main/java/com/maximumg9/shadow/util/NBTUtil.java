@@ -9,7 +9,9 @@ import java.util.function.UnaryOperator;
 
 public class NBTUtil {
     public static NbtCompound getCustomData(ItemStack stack) {
-        return stack.get(DataComponentTypes.CUSTOM_DATA).copyNbt();
+        NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
+        if(component == null) return new NbtCompound();
+        return component.copyNbt();
     }
 
     public static void applyToStackCustomData(ItemStack stack, UnaryOperator<NbtCompound> operator) {

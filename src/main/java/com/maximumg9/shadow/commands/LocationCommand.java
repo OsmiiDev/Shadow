@@ -37,14 +37,14 @@ public class LocationCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$location")
+                .requires((source) -> source.hasPermissionLevel(3))
                 .then(
                     literal("force")
                         .executes((ctx) -> {
                             MinecraftServer server = ctx.getSource().getServer();
                             Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-                            shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
-                            shadow.saveAsync();
+                            shadow.cancelGame();
 
                             return 1;
                         })
@@ -57,9 +57,10 @@ public class LocationCommand {
 
                                 if(shadow.state.phase == GamePhase.LOCATION_SELECTED) {
                                     shadow.state.phase = GamePhase.NOT_PLAYING;
+                                } else {
+                                    ctx.getSource().sendError(Text.literal("Cannot skip if there is no location is as of yet selected"));
+                                    return -1;
                                 }
-
-                                if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
 
                                 shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
 
@@ -79,33 +80,41 @@ public class LocationCommand {
         BlockBox frames = findLocation(ctx);
 
         ServerCommandSource src = ctx.getSource();
-        ServerWorld world = src.getWorld();
+        ServerWorld overworld = src.getServer().getOverworld();
         MinecraftServer server = src.getServer();
         Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
         if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
 
         if(frames == null) {
-            src.sendError(
-                Text.literal(
-                        "Portal frames not found"
-                ).styled((style) -> style.withColor(Formatting.RED))
-            );
+            shadow.ERROR("Portal frames not found");
             return -1;
         }
 
         frames = frames.expand(shadow.config.worldBorderSize / 2, 0, shadow.config.worldBorderSize / 2);
 
-        int x = world.getRandom().nextBetween(frames.getMinX(),frames.getMaxX());
-        int z = world.getRandom().nextBetween(frames.getMinZ(),frames.getMaxZ());
+        int x = overworld.getRandom().nextBetween(frames.getMinX(),frames.getMaxX());
+        int z = overworld.getRandom().nextBetween(frames.getMinZ(),frames.getMaxZ());
 
         shadow.state.currentLocation = new BlockPos(x,0,z);
-
         Vec3d teleportPos = shadow.state.currentLocation.toBottomCenterPos();
 
-        arrangePlayersInCircle(world,teleportPos,server.getPlayerManager().getPlayerList());
+        arrangePlayersInCircle(overworld,teleportPos,server.getPlayerManager().getPlayerList());
 
         clearPortalEyes();
+
+        overworld.getWorldBorder().setCenter(shadow.state.currentLocation.getX(),shadow.state.currentLocation.getZ());
+        overworld.getWorldBorder().setSize(shadow.config.worldBorderSize);
+
+        ServerWorld nether = src.getServer().getWorld(ServerWorld.NETHER);
+
+        if(nether == null) {
+            shadow.ERROR("Nether does not exist");
+            return -1;
+        }
+
+        nether.getWorldBorder().setCenter(shadow.state.currentLocation.getX()/8.0,shadow.state.currentLocation.getX()/8.0);
+        nether.getWorldBorder().setSize(shadow.config.worldBorderSize);
 
         src.sendFeedback(
             () ->
@@ -134,11 +143,7 @@ public class LocationCommand {
         StructurePlacement strongholdPlacement = world.getRegistryManager().get(RegistryKeys.STRUCTURE_SET).get(StructureSetKeys.STRONGHOLDS).placement();
 
         if(!(strongholdPlacement instanceof ConcentricRingsStructurePlacement)) {
-            src.sendError(
-                    Text.literal(
-                            "Strongholds are not in concentric rings (maybe you have a mod or datapack that modifies stronghold generation?)"
-                    ).styled((style) -> style.withColor(Formatting.RED))
-            );
+            shadow.ERROR("Strongholds are not in concentric rings (maybe you have a mod or datapack that modifies stronghold generation?)");
             return null;
         }
 
@@ -180,20 +185,11 @@ public class LocationCommand {
                 .toList();
 
         if(portalRooms.isEmpty()) {
-            src.sendError(
-                    Text.literal(
-                            "Stronghold somehow has NO PORTAL ROOMS??"
-                    ).styled((style) -> style.withColor(Formatting.RED))
-            );
+            shadow.ERROR("Stronghold somehow has NO PORTAL ROOMS??");
             return null;
         }
         if(portalRooms.size() > 1) {
-            src.sendError(
-                    Text.literal(
-                            "Stronghold somehow has MORE THAN ONE PORTAL ROOM? Picking only first"
-                    ).styled((style) -> style.withColor(Formatting.RED))
-            );
-            return null;
+            shadow.ERROR("Stronghold somehow has MORE THAN ONE PORTAL ROOM? Picking only first");
         }
 
         StrongholdGenerator.PortalRoom portalRoom = portalRooms.getFirst();
@@ -263,6 +259,7 @@ public class LocationCommand {
     }
 
     public static void clearPortalEyes() {
+        // TODO
     }
 
     public static void arrangePlayersInCircle(ServerWorld world, Vec3d centerPos, List<ServerPlayerEntity> players) {

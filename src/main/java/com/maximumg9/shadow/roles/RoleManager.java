@@ -1,6 +1,7 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
@@ -15,10 +16,7 @@ import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class RoleManager {
 
@@ -70,6 +68,8 @@ public class RoleManager {
                     originalItem
                 )
             );
+        } else {
+            ((ShadowProvider) Objects.requireNonNull(player.getServer())).shadow$getShadow().ERROR("Could not open book for player:" + player.getNameForScoreboard());
         }
     }
 
@@ -80,12 +80,15 @@ public class RoleManager {
         );
     }
 
-    public void pickRoles() {
+    public boolean pickRoles() {
         clearRoles();
 
         List<IndirectPlayer> onlinePlayers = shadow.getOnlinePlayers();
 
-        if(onlinePlayers.size() > this.roleSlots.length) throw new TooManyPlayersException("Shadow cannot handle more than " + this.roleSlots.length + " players");
+        if(onlinePlayers.size() > this.roleSlots.length) {
+            shadow.ERROR("More players than role slots, consider increasing the number of role slots in the config");
+            return false;
+        }
 
         for (int i = 0; i < onlinePlayers.size(); i++) {
             IndirectPlayer player = onlinePlayers.get(i);
@@ -94,12 +97,7 @@ public class RoleManager {
                 .pickRandomRole(shadow.random)
                 .factory.makeRole(shadow, player);
         }
-    }
-
-    public static class TooManyPlayersException extends IllegalStateException {
-        public TooManyPlayersException(String s) {
-            super(s);
-        }
+        return true;
     }
 
     public void showRoleBook(ServerPlayerEntity player) {

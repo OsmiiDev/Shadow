@@ -9,3 +9,5 @@ accessible field net/minecraft/util/math/random/CheckedRandom seed Ljava/util/co
 mutable field net/minecraft/util/math/random/CheckedRandom seed Ljava/util/concurrent/atomic/AtomicLong;
 
 accessible field net/minecraft/entity/attribute/AttributeContainer custom Ljava/util/Map;
+
+accessible method net/minecraft/entity/decoration/DisplayEntity$ItemDisplayEntity setItemStack (Lnet/minecraft/item/ItemStack;)V
