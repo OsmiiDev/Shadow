@@ -109,7 +109,7 @@ class StartTicker implements Tickable {
     public void onEnd() {
         shadow.state.phase = GamePhase.PLAYING;
 
-        if(!shadow.roleManager.pickRoles()) return;
+        if(!shadow.config.roleManager.pickRoles()) return;
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
             player.getEntity().get().getInventory().clear();

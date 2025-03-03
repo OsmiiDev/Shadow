@@ -3,8 +3,10 @@ package com.maximumg9.shadow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maximumg9.shadow.abilities.NetherStarItem;
-import com.maximumg9.shadow.commands.*;
-import com.maximumg9.shadow.roles.RoleManager;
+import com.maximumg9.shadow.commands.DebugCommand;
+import com.maximumg9.shadow.commands.LocationCommand;
+import com.maximumg9.shadow.commands.RoleCommand;
+import com.maximumg9.shadow.commands.StartCommand;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
@@ -41,8 +43,7 @@ public class Shadow implements Tickable {
     }
 
     private final MinecraftServer server;
-    public Config config = new Config();
-    public RoleManager roleManager = new RoleManager(this);
+    public Config config = new Config(this);
     public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
     private final HashMap<UUID,IndirectPlayer> indirectPlayers = new HashMap<>();

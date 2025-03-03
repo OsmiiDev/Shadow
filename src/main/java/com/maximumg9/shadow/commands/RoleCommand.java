@@ -39,7 +39,7 @@ public class RoleCommand {
                     if(!src.isExecutedByPlayer()) {return -1;}
 
                     Shadow shadow = ((ShadowProvider)src.getServer()).shadow$getShadow();
-                    shadow.roleManager.showRoleBook(src.getPlayer());
+                    shadow.config.roleManager.showRoleBook(src.getPlayer());
 
                     ctx.getSource().sendFeedback(
                         () -> Text.literal("Opened Role Book"),
@@ -58,7 +58,7 @@ public class RoleCommand {
         Roles role = Roles.getRole(ctx,"role");
         int newWeight = getInteger(ctx,"newWeight");
 
-        shadow.roleManager.getSlot(slotID).setWeight(role,newWeight);
+        shadow.config.roleManager.getSlot(slotID).setWeight(role,newWeight);
 
         ctx.getSource().sendFeedback(
             () -> Text.literal(
