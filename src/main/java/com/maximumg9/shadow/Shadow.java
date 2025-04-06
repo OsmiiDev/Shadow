@@ -3,10 +3,7 @@ package com.maximumg9.shadow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maximumg9.shadow.abilities.NetherStarItem;
-import com.maximumg9.shadow.commands.DebugCommand;
-import com.maximumg9.shadow.commands.LocationCommand;
-import com.maximumg9.shadow.commands.RoleCommand;
-import com.maximumg9.shadow.commands.StartCommand;
+import com.maximumg9.shadow.commands.*;
 import com.maximumg9.shadow.util.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
@@ -40,13 +37,13 @@ public class Shadow implements Tickable {
         LocationCommand.register(dispatcher);
         StartCommand.register(dispatcher);
         RoleCommand.register(dispatcher);
+        CancelCommand.register(dispatcher);
     }
 
     private final MinecraftServer server;
     public Config config = new Config(this);
     public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
-    private final HashMap<UUID,IndirectPlayer> indirectPlayers = new HashMap<>();
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public GameState state = new GameState();
@@ -77,7 +74,7 @@ public class Shadow implements Tickable {
 
     public List<IndirectPlayer> getAllPlayers() {
         getOnlinePlayers();
-        return this.indirectPlayers.values().stream().toList();
+        return this.state.indirectPlayers.values().stream().toList();
     }
 
     public void clearEyes() {
@@ -88,11 +85,9 @@ public class Shadow implements Tickable {
     }
 
     public void cancelGame() {
-        this.state.phase = GamePhase.NOT_PLAYING;
-        this.state.currentLocation = null;
-        this.state.strongholdChunkPosition = null;
-
         this.clearEyes();
+
+        this.state = new GameState(this.state);
 
         for(IndirectPlayer player : getAllPlayers()) {
             player.role = null;
@@ -101,13 +96,14 @@ public class Shadow implements Tickable {
         this.saveAsync();
     }
 
-    public IndirectPlayer getIndirect(ServerPlayerEntity base) {
-        return indirectPlayers.computeIfAbsent(base.getUuid(),(uuid) -> new IndirectPlayer(base));
+    public IndirectPlayer getIndirect(ServerPlayerEntity player) {
+        return this.state.getIndirect(player);
     }
 
     public List<IndirectPlayer> getOnlinePlayers() {
-        return this.server.getPlayerManager().getPlayerList().stream().map(this::getIndirect).toList();
+        return this.server.getPlayerManager().getPlayerList().stream().map((player) -> this.state.getIndirect(player)).toList();
     }
+
 
     public MinecraftServer getServer() {return this.server;}
 

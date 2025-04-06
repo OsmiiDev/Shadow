@@ -4,15 +4,19 @@ import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.FakeStructureWorldAccess;
+import com.maximumg9.shadow.util.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.logging.LogUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Properties;
 import net.minecraft.structure.StrongholdGenerator;
 import net.minecraft.structure.StructureSetKeys;
 import net.minecraft.structure.StructureStart;
@@ -55,17 +59,7 @@ public class LocationCommand {
                                 MinecraftServer server = ctx.getSource().getServer();
                                 Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-                                if(shadow.state.phase == GamePhase.LOCATION_SELECTED) {
-                                    shadow.state.phase = GamePhase.NOT_PLAYING;
-                                } else {
-                                    ctx.getSource().sendError(Text.literal("Cannot skip if there is no location is as of yet selected"));
-                                    return -1;
-                                }
-
-                                shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
-
-                                shadow.state.strongholdChunkPosition = null;
-                                shadow.state.currentLocation = null;
+                                shadow.cancelGame();
 
                                 shadow.saveAsync();
 
@@ -91,6 +85,8 @@ public class LocationCommand {
             return -1;
         }
 
+        clearPortalEyes(overworld, frames);
+
         frames = frames.expand(shadow.config.worldBorderSize / 2, 0, shadow.config.worldBorderSize / 2);
 
         int x = overworld.getRandom().nextBetween(frames.getMinX(),frames.getMaxX());
@@ -100,8 +96,6 @@ public class LocationCommand {
         Vec3d teleportPos = shadow.state.currentLocation.toBottomCenterPos();
 
         arrangePlayersInCircle(overworld,teleportPos,server.getPlayerManager().getPlayerList());
-
-        clearPortalEyes();
 
         overworld.getWorldBorder().setCenter(shadow.state.currentLocation.getX(),shadow.state.currentLocation.getZ());
         overworld.getWorldBorder().setSize(shadow.config.worldBorderSize);
@@ -125,6 +119,10 @@ public class LocationCommand {
         );
 
         shadow.state.phase = GamePhase.LOCATION_SELECTED;
+
+        for(IndirectPlayer player : shadow.getOnlinePlayers()) {
+            player.frozen = true;
+        }
 
         shadow.saveAsync();
 
@@ -258,8 +256,20 @@ public class LocationCommand {
         return possibleBox.orElse(null);
     }
 
-    public static void clearPortalEyes() {
-        // TODO
+    public static void clearPortalEyes(ServerWorld world, BlockBox portalBoundingBox) {
+        for (BlockPos current : BlockPos.iterate(
+                portalBoundingBox.getMinX(),
+                portalBoundingBox.getMinY(),
+                portalBoundingBox.getMinZ(),
+                portalBoundingBox.getMaxX(),
+                portalBoundingBox.getMaxY(),
+                portalBoundingBox.getMaxZ()
+        )) {
+            BlockState currentBlockState = world.getBlockState(current);
+            if (currentBlockState.isOf(Blocks.END_PORTAL_FRAME)) {
+                world.setBlockState(current, currentBlockState.with(Properties.EYE, false));
+            }
+        }
     }
 
     public static void arrangePlayersInCircle(ServerWorld world, Vec3d centerPos, List<ServerPlayerEntity> players) {

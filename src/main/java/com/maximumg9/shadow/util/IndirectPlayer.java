@@ -36,6 +36,7 @@ public class IndirectPlayer {
     @Nullable
     public Role role;
     public boolean participating;
+    public boolean frozen;
 
     public Optional<ServerPlayerEntity> getEntity() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
