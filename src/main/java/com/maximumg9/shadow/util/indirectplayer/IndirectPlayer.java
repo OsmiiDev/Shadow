@@ -1,6 +1,7 @@
-package com.maximumg9.shadow.util;
+package com.maximumg9.shadow.util.indirectplayer;
 
 
+import com.google.gson.annotations.Expose;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
@@ -8,6 +9,8 @@ import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.roles.Spectator;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -27,15 +30,31 @@ public class IndirectPlayer {
         this.playerUUID = base.getUuid();
         this.server = base.server;
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
-        this.role = new Spectator(shadow,this);
+        this.role = new Spectator(this);
         this.participating = shadow.state.phase != GamePhase.PLAYING;
     }
 
-    private final UUID playerUUID;
-    private final MinecraftServer server;
+    IndirectPlayer(MinecraftServer server, UUID uuid) {
+        this.server = server;
+        this.playerUUID = uuid;
+    }
+
+    IndirectPlayer(IndirectPlayer src) {
+        this.playerUUID = src.playerUUID;
+        this.server = src.server;
+        this.role = src.role;
+        this.participating = src.participating;
+        this.frozen = src.frozen;
+    }
+    @Expose
+    final UUID playerUUID;
+    final MinecraftServer server;
     @Nullable
+    @Expose
     public Role role;
+    @Expose
     public boolean participating;
+    @Expose
     public boolean frozen;
 
     public Optional<ServerPlayerEntity> getEntity() {
@@ -50,6 +69,30 @@ public class IndirectPlayer {
         TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
 
         player.get().networkHandler.sendPacket(packet);
+    }
+
+    static IndirectPlayer load(MinecraftServer server, NbtCompound nbt) {
+        IndirectPlayer player = new IndirectPlayer(server, nbt.getUuid("playerUUID"));
+        player.frozen = nbt.getBoolean("frozen");
+        player.participating = nbt.getBoolean("participating");
+        if(nbt.contains("role", NbtElement.COMPOUND_TYPE)) {
+            player.role = Role.load(nbt.getCompound("role"), player);
+        } else {
+            player.role = null;
+        }
+
+        return null;
+    }
+
+    NbtCompound save(NbtCompound nbt) {
+        nbt.putUuid("playerUUID",this.playerUUID);
+        nbt.putBoolean("frozen",this.frozen);
+        nbt.putBoolean("participating", this.participating);
+
+        if(this.role != null) {
+            nbt.put("role", this.role.writeNbt(new NbtCompound()));
+        }
+        return nbt;
     }
 
     public void sendTitle(Text title) {

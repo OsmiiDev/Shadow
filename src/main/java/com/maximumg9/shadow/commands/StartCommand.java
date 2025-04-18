@@ -2,7 +2,7 @@ package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.*;
 import com.maximumg9.shadow.ducks.ShadowProvider;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.dimension.DimensionType;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -112,9 +113,9 @@ class StartTicker implements Tickable {
         if(!shadow.config.roleManager.pickRoles()) return;
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            player.getEntity().get().getInventory().clear();
 
             player.clearPlayerData();
+            player.frozen = false;
 
             player.setTitleTimes(10,40,10);
             if(player.role == null) {
@@ -147,36 +148,41 @@ class StartTicker implements Tickable {
 
         ServerWorld nether = this.shadow.getServer().getWorld(ServerWorld.NETHER);
 
-        for (int i = 0; i < this.shadow.config.netherEyes; i++) {
+        double netherScaleFactor = DimensionType.getCoordinateScaleFactor(overworld.getDimension(),nether.getDimension());
+
+        for (int i = 0; i < this.shadow.config.netherRoofEyes; i++) {
             int radius = this.shadow.config.worldBorderSize/2;
 
-            int x = center.getX() + this.shadow.random.nextBetween(-radius,radius);
-            int z = center.getZ() + this.shadow.random.nextBetween(-radius,radius);
+            int x = (int) (center.getX() * netherScaleFactor) + this.shadow.random.nextBetween(-radius,radius);
+            int z = (int) (center.getZ() * netherScaleFactor) + this.shadow.random.nextBetween(-radius,radius);
 
             spawnEye(nether,new BlockPos(x,nether.getLogicalHeight() + 1,z));
         }
 
-        for (int i = 0; i < this.shadow.config.netherRoofEyes; i++) {
+        for (int i = 0; i < this.shadow.config.netherEyes; i++) {
             int radius = this.shadow.config.worldBorderSize/2;
 
             BlockPos.Mutable pos = new BlockPos.Mutable();
 
             while(true) {
-                int x = center.getX() + this.shadow.random.nextBetween(-radius,radius);
+                int x = (int) (center.getX() * netherScaleFactor) + this.shadow.random.nextBetween(-radius,radius);
                 int y = this.shadow.random.nextBetween(NETHER_LAVA_HEIGHT, nether.getHeight());
-                int z = center.getZ() + this.shadow.random.nextBetween(-radius,radius);
+                int z = (int) (center.getZ() * netherScaleFactor) + this.shadow.random.nextBetween(-radius,radius);
 
                 pos.set(x,y,z);
 
                 BlockState state;
 
-                while((state = nether.getBlockState(pos.move(Direction.DOWN))).isAir()) {}
+                while((state = nether.getBlockState(pos)).isAir()) {pos.move(Direction.DOWN);}
 
                 pos.move(Direction.UP);
 
+                BlockState currentState = nether.getBlockState(pos);
+
                 if(
                         state.getFluidState().getBlockState().getBlock() != Blocks.LAVA &&
-                                state.getBlock() != Blocks.FIRE
+                        state.getBlock() != Blocks.FIRE &&
+                        currentState.isAir()
                 ) {
                     break;
                 }

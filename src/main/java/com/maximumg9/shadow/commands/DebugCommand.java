@@ -4,7 +4,7 @@ import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Roles;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -38,7 +38,7 @@ public class DebugCommand {
 
                                                 IndirectPlayer indirectPlayer = shadow.getIndirect(player);
 
-                                                indirectPlayer.role = role.factory.makeRole(shadow, indirectPlayer);
+                                                indirectPlayer.role = role.factory.makeRole(indirectPlayer);
 
 
                                                 ctx.getSource().sendFeedback(() ->

@@ -4,7 +4,7 @@ import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.FakeStructureWorldAccess;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.logging.LogUtils;
@@ -15,6 +15,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.structure.StrongholdGenerator;
@@ -50,6 +51,8 @@ public class LocationCommand {
 
                             shadow.cancelGame();
 
+                            shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
+
                             return 1;
                         })
                 )
@@ -58,6 +61,8 @@ public class LocationCommand {
                             .executes((ctx) -> {
                                 MinecraftServer server = ctx.getSource().getServer();
                                 Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+
+                                shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
 
                                 shadow.cancelGame();
 
@@ -71,12 +76,12 @@ public class LocationCommand {
     }
 
     public static int findAndGotoLocation(CommandContext<ServerCommandSource> ctx) {
-        BlockBox frames = findLocation(ctx);
-
         ServerCommandSource src = ctx.getSource();
         ServerWorld overworld = src.getServer().getOverworld();
         MinecraftServer server = src.getServer();
         Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+
+        BlockBox frames = findLocation(ctx);
 
         if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
 
@@ -131,14 +136,14 @@ public class LocationCommand {
 
     // Returns BlockBox containing all portal frames
     public static BlockBox findLocation(CommandContext<ServerCommandSource> ctx) {
-        ServerWorld world = ctx.getSource().getWorld();
-        MinecraftServer server = world.getServer();
-        Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
         ServerCommandSource src = ctx.getSource();
+        MinecraftServer server = src.getServer();
+        ServerWorld overworld = server.getOverworld();
+        Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-        RegistryEntry.Reference<Structure> strongholdStructure = world.getRegistryManager().get(RegistryKeys.STRUCTURE).getEntry(StructureKeys.STRONGHOLD).get();
+        RegistryEntry.Reference<Structure> strongholdStructure = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE).getEntry(StructureKeys.STRONGHOLD).get();
 
-        StructurePlacement strongholdPlacement = world.getRegistryManager().get(RegistryKeys.STRUCTURE_SET).get(StructureSetKeys.STRONGHOLDS).placement();
+        StructurePlacement strongholdPlacement = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE_SET).get(StructureSetKeys.STRONGHOLDS).placement();
 
         if(!(strongholdPlacement instanceof ConcentricRingsStructurePlacement)) {
             shadow.ERROR("Strongholds are not in concentric rings (maybe you have a mod or datapack that modifies stronghold generation?)");
@@ -147,7 +152,7 @@ public class LocationCommand {
 
         List<ChunkPos> placementPositions = new ArrayList<>(
                 Objects.requireNonNull(
-                        world
+                        overworld
                                 .getChunkManager()
                                 .getStructurePlacementCalculator()
                                 .getPlacementPositions((ConcentricRingsStructurePlacement) strongholdPlacement)
@@ -159,15 +164,15 @@ public class LocationCommand {
         ChunkPos startChunkPos = placementPositions.getFirst();
 
         StructureStart start = strongholdStructure.value().createStructureStart(
-                world.getRegistryManager(),
-                world.getChunkManager().getChunkGenerator(),
-                world.getChunkManager().getChunkGenerator().getBiomeSource(),
-                world.getChunkManager().getNoiseConfig(),
-                world.getStructureTemplateManager(),
-                world.getSeed(),
+                overworld.getRegistryManager(),
+                overworld.getChunkManager().getChunkGenerator(),
+                overworld.getChunkManager().getChunkGenerator().getBiomeSource(),
+                overworld.getChunkManager().getNoiseConfig(),
+                overworld.getStructureTemplateManager(),
+                overworld.getSeed(),
                 startChunkPos,
                 0,
-                world,
+                overworld,
                 (biome) -> true
         );
 
@@ -175,7 +180,7 @@ public class LocationCommand {
 
         shadow.saveAsync();
 
-        FakeStructureWorldAccess fakeStructureWorldAccess = new FakeStructureWorldAccess(world);
+        FakeStructureWorldAccess fakeStructureWorldAccess = new FakeStructureWorldAccess(overworld);
 
         List<StrongholdGenerator.PortalRoom> portalRooms = start.getChildren().stream()
                 .filter((piece) -> piece instanceof StrongholdGenerator.PortalRoom)
@@ -199,7 +204,7 @@ public class LocationCommand {
         ChunkRandom random = new ChunkRandom(new Xoroshiro128PlusPlusRandom(RandomSeed.getSeed()));
 
         List<Structure> generationStepStructures =
-                world
+                overworld
                         .getRegistryManager()
                         .get(RegistryKeys.STRUCTURE)
                         .stream()
@@ -219,11 +224,11 @@ public class LocationCommand {
 
         portalRoom.getBoundingBox().streamChunkPos().forEach(
             chunkPos -> {
-                ChunkSectionPos bottomSection = ChunkSectionPos.from(chunkPos, world.getBottomSectionCoord());
+                ChunkSectionPos bottomSection = ChunkSectionPos.from(chunkPos, overworld.getBottomSectionCoord());
 
                 BlockPos lv3 = bottomSection.getMinPos();
 
-                long popSeed = random.setPopulationSeed(world.getSeed(), lv3.getX(), lv3.getZ());
+                long popSeed = random.setPopulationSeed(overworld.getSeed(), lv3.getX(), lv3.getZ());
 
                 int generationStep = strongholdStructure.value().getFeatureGenerationStep().ordinal();
 
@@ -231,10 +236,10 @@ public class LocationCommand {
 
                 portalRoom.generate(
                         fakeStructureWorldAccess,
-                        world.getStructureAccessor(),
-                        world.getChunkManager().getChunkGenerator(),
+                        overworld.getStructureAccessor(),
+                        overworld.getChunkManager().getChunkGenerator(),
                         random,
-                        new BlockBox(chunkPos.getStartX(), world.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), world.getTopY(), chunkPos.getEndZ()),
+                        new BlockBox(chunkPos.getStartX(), overworld.getBottomY(), chunkPos.getStartZ(), chunkPos.getEndX(), overworld.getTopY(), chunkPos.getEndZ()),
                         chunkPos,
                         firstChildBottomCenter
                 );
@@ -288,6 +293,8 @@ public class LocationCommand {
             double x = xOffset + centerPos.x;
             double z = zOffset + centerPos.z;
 
+
+
             int y = getTopYForBoundingBox(world,player.getBoundingBox(player.getPose()).offset(x,0,z), Heightmap.Type.MOTION_BLOCKING);
 
             player.teleport(world,x,y,z,currentAngle * MathHelper.PI/180,0);
@@ -300,20 +307,32 @@ public class LocationCommand {
         int minZ = MathHelper.floor(bb.minY);
         int maxZ = MathHelper.floor(bb.maxZ);
 
+        world.getChunkManager().addTicket(ChunkTicketType.UNKNOWN,new ChunkPos(minX/16,minZ/16),2,new ChunkPos(minX/16,minZ/16));
+
+        world.getChunkManager().updateChunks();
+
         world.getChunk(minX/16,minZ/16);
 
         int highest = world.getTopY(heightMap, minX, minZ);
+        int nhighest = 0;
 
         if(minX != maxX) {
-            world.getChunk(maxX/16,minZ/16);
-            highest = world.getTopY(heightMap, maxX, minZ);
+            nhighest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);;
+            if(nhighest > highest) {
+                highest = nhighest;
+            }
         }
         if(minZ != maxZ) {
-            world.getChunk(minX/16,maxZ/16);
-            highest = world.getTopY(heightMap, minX, maxZ);
+            nhighest = world.getChunk(minX/16,maxZ/16).sampleHeightmap(heightMap,minX,maxZ);
+            if(nhighest > highest) {
+                highest = nhighest;
+            }
+
             if(minX != maxX) {
-                world.getChunk(maxX/16,maxZ/16);
-                highest = world.getTopY(heightMap, maxX, maxZ);
+                nhighest = world.getChunk(maxX/16,maxZ/16).sampleHeightmap(heightMap,minX,maxZ);
+                if(nhighest > highest) {
+                    highest = nhighest;
+                }
             }
         }
 

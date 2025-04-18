@@ -46,7 +46,7 @@ public class RoleSlot {
         for (int i = 0; i < this.weights.length; i++) {
             Roles role = roles[i];
 
-            Text name = role.factory.makeRole(null,null).getName();
+            Text name = role.factory.makeRole(null).getName();
 
             int iFrickingLoveLambdasBro = i;
 

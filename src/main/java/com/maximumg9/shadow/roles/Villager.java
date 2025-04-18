@@ -1,7 +1,8 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
@@ -10,8 +11,8 @@ import java.util.List;
 
 public class Villager extends Role {
 
-    public Villager(@Nullable Shadow shadow,@Nullable IndirectPlayer player) {
-        super(shadow, player, List.of());
+    public Villager(@Nullable IndirectPlayer player) {
+        super(player, List.of());
     }
 
     @Override
@@ -26,5 +27,21 @@ public class Villager extends Role {
     @Override
     public TextColor getColor() {
         return TextColor.fromFormatting(Formatting.GREEN);
+    }
+
+    public static final RoleFactory<Villager> FACTORY = new Factory();
+    private static class Factory implements RoleFactory<Villager> {
+        @Override
+        public Villager makeRole(@Nullable IndirectPlayer player) {
+            return new Villager(player);
+        }
+
+        public Villager fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
+            Villager role = new Villager(player);
+
+            role.readNbt(nbt);
+
+            return role;
+        }
     }
 }

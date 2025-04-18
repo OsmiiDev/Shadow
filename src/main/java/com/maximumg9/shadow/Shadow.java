@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.*;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
 import net.minecraft.command.CommandRegistryAccess;
@@ -40,8 +41,10 @@ public class Shadow implements Tickable {
         CancelCommand.register(dispatcher);
     }
 
+    private static final File INDIRECT_PLAYERS_FILE = new File("shadow-indirect-players.nbt");
     private final MinecraftServer server;
     public Config config = new Config(this);
+    public IndirectPlayerManager indirectPlayerManager;
     public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -50,6 +53,7 @@ public class Shadow implements Tickable {
 
     public Shadow(MinecraftServer server) {
         this.server = server;
+        this.indirectPlayerManager = new IndirectPlayerManager(INDIRECT_PLAYERS_FILE, server);
 
         try {
             this.loadSync();
@@ -72,9 +76,9 @@ public class Shadow implements Tickable {
         LOGGER.error(message);
     }
 
-    public List<IndirectPlayer> getAllPlayers() {
+    public Collection<IndirectPlayer> getAllPlayers() {
         getOnlinePlayers();
-        return this.state.indirectPlayers.values().stream().toList();
+        return this.indirectPlayerManager.getAllPlayers();
     }
 
     public void clearEyes() {
@@ -89,19 +93,17 @@ public class Shadow implements Tickable {
 
         this.state = new GameState(this.state);
 
-        for(IndirectPlayer player : getAllPlayers()) {
-            player.role = null;
-        }
+        this.config.roleManager.clearRoles();
 
         this.saveAsync();
     }
 
     public IndirectPlayer getIndirect(ServerPlayerEntity player) {
-        return this.state.getIndirect(player);
+        return this.indirectPlayerManager.getIndirect(player);
     }
 
     public List<IndirectPlayer> getOnlinePlayers() {
-        return this.server.getPlayerManager().getPlayerList().stream().map((player) -> this.state.getIndirect(player)).toList();
+        return this.server.getPlayerManager().getPlayerList().stream().map((player) -> this.indirectPlayerManager.getIndirect(player)).toList();
     }
 
 
@@ -123,7 +125,7 @@ public class Shadow implements Tickable {
         }
     }
 
-    private static final File DATA_FILE = new File("shadow-data.json");
+    private static final File STATE_FILE = new File("shadow-state.json");
 
     private static final Gson DATA_GSON;
 
@@ -138,15 +140,10 @@ public class Shadow implements Tickable {
         LOGGER.info("Saving async...");
 
         GameState stateCopy = this.state.clone();
+        IndirectPlayerManager playerManagerCopy = new IndirectPlayerManager(this.indirectPlayerManager);
         Thread thread = new Thread(() -> {
             try {
-                FileWriter writer = new FileWriter(DATA_FILE);
-                DATA_GSON.toJson(
-                        stateCopy,
-                        GameState.class,
-                        writer
-                );
-                writer.close();
+                this.save(stateCopy, playerManagerCopy);
             } catch (IOException e) {
                 LOGGER.error("Error while saving data async", e);
             }
@@ -168,22 +165,30 @@ public class Shadow implements Tickable {
         });
     }
 
-    public void saveSync() throws IOException {
-        FileWriter writer = new FileWriter(DATA_FILE);
+    private void save(GameState state,IndirectPlayerManager playerManager) throws IOException {
+        FileWriter writer = new FileWriter(STATE_FILE);
         DATA_GSON.toJson(
-            this.state,
-            GameState.class,
-            writer
+                state,
+                GameState.class,
+                writer
         );
         writer.close();
+
+        playerManager.save();
+    }
+
+    public void saveSync() throws IOException {
+        save(this.state,this.indirectPlayerManager);
     }
 
     public void loadSync() throws IOException {
-        FileReader reader = new FileReader(DATA_FILE);
+        FileReader reader = new FileReader(STATE_FILE);
         this.state = DATA_GSON.fromJson(
                 reader,
                 GameState.class
         );
         reader.close();
+
+        this.indirectPlayerManager.load();
     }
 }

@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.roles;
 
+import com.maximumg9.shadow.Shadow;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -12,18 +13,18 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public enum Roles {
-    SPECTATOR(Spectator::new),
-    VILLAGER(Villager::new),
-    SHADOW(ShadowRole::new);
+    SPECTATOR(Spectator.FACTORY),
+    VILLAGER(Villager.FACTORY),
+    SHADOW(ShadowRole.FACTORY);
 
     public final String name;
-    public final RoleFactory factory;
+    public final RoleFactory<?> factory;
 
-    Roles(RoleFactory factory) {
-        this(factory.makeRole(null,null).getRawName(),factory);
+    Roles(RoleFactory<?> factory) {
+        this(factory.makeRole(null).getRawName(),factory);
     }
 
-    Roles(String name, RoleFactory factory) {
+    Roles(String name, RoleFactory<?> factory) {
         this.name = name;
         this.factory = factory;
     }
@@ -42,16 +43,23 @@ public enum Roles {
         return builder.buildFuture();
     }
 
-    @NotNull
-    public static Roles getRole(CommandContext<?> ctx, String name) {
-        String roleName = StringArgumentType.getString(ctx, name);
-
+    public static Roles getRole(String roleName) {
         List<Roles> possibleRoles = Arrays.stream(values()).filter((role) -> role.name.equals(roleName)).toList();
 
-        if(possibleRoles.size() != 1) {
-            throw new IllegalStateException("Roles are broken, multiple roles with same name");
+        if(possibleRoles.isEmpty()) {
+            throw new IllegalArgumentException("no role with such name");
+        }
+
+        if(possibleRoles.size() > 1) {
+            throw new IllegalStateException("Roles are broken, multiple roles with same argumentName");
         }
 
         return possibleRoles.getFirst();
+    }
+
+    @NotNull
+    public static Roles getRole(CommandContext<?> ctx, String argumentName) {
+        String roleName = StringArgumentType.getString(ctx, argumentName);
+        return getRole(roleName);
     }
 }

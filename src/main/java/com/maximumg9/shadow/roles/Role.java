@@ -1,8 +1,8 @@
 package com.maximumg9.shadow.roles;
 
-import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.abilities.Ability;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 
@@ -11,9 +11,16 @@ import java.util.List;
 
 public abstract class Role {
 
-    Role(Shadow shadow, IndirectPlayer player, List<Ability.Factory> abilityFactories) {
+    Role(IndirectPlayer player, List<Ability.Factory> abilityFactories) {
         this.player = player;
-        abilityFactories.forEach((factory) -> abilities.add(factory.create(shadow,player)));
+        abilityFactories.forEach((factory) -> abilities.add(factory.create(player)));
+    }
+
+    public static Role load(NbtCompound nbt, IndirectPlayer player) {
+        String roleName = nbt.getString("name");
+        Roles role = Roles.getRole(roleName);
+
+        return role.factory.fromNBT(nbt, player);
     }
 
     private final IndirectPlayer player;
@@ -29,6 +36,13 @@ public abstract class Role {
     public abstract String getRawName();
 
     public abstract TextColor getColor();
+
+    public NbtCompound writeNbt(NbtCompound nbt) {
+        nbt.putString("role",this.getRawName());
+        return nbt;
+    }
+
+    public void readNbt(NbtCompound nbt) {}
 
     public void init() {}
 

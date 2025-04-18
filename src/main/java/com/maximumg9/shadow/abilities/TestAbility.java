@@ -1,7 +1,7 @@
 package com.maximumg9.shadow.abilities;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -14,12 +14,10 @@ public class TestAbility implements Ability {
 
     public static final Ability.Factory FACTORY = TestAbility::new;
 
-    public TestAbility(@Nullable Shadow shadow, @Nullable IndirectPlayer player) {
-        this.shadow = shadow;
+    public TestAbility(@Nullable IndirectPlayer player) {
         this.player = player;
     }
 
-    private final Shadow shadow;
     private final IndirectPlayer player;
 
     @Override

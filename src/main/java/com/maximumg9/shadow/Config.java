@@ -10,7 +10,7 @@ public class Config {
     public int netherRoofEyes = 8;
 
     public Config(Shadow shadow) {
-        this.roleManager = new RoleManager(shadow);
+        this.roleManager = new RoleManager(shadow,this);
     }
 
     public RoleManager roleManager;

@@ -1,8 +1,9 @@
 package com.maximumg9.shadow.roles;
 
+import com.maximumg9.shadow.Config;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,8 +25,8 @@ public class RoleManager {
 
     private transient final Shadow shadow;
 
-    public RoleManager(Shadow shadow) {
-        roleSlots = new RoleSlot[shadow.config.roleSlotCount];
+    public RoleManager(Shadow shadow, Config config) {
+        roleSlots = new RoleSlot[config.roleSlotCount];
 
         for (int i = 0; i < roleSlots.length; i++) {
             roleSlots[i] = new RoleSlot(i);
@@ -95,7 +96,7 @@ public class RoleManager {
 
             player.role = this.roleSlots[i]
                 .pickRandomRole(shadow.random)
-                .factory.makeRole(shadow, player);
+                .factory.makeRole(player);
         }
         return true;
     }

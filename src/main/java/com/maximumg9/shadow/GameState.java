@@ -1,6 +1,6 @@
 package com.maximumg9.shadow;
 
-import com.maximumg9.shadow.util.IndirectPlayer;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -17,7 +17,6 @@ public class GameState implements Cloneable {
     public ChunkPos strongholdChunkPosition = null;
     public List<ChunkPos> playedStrongholdPositions = new ArrayList<>();
     public List<Eye> eyes = new ArrayList<>();
-    HashMap<UUID, IndirectPlayer> indirectPlayers = new HashMap<>();
 
     public GameState() {}
 
@@ -25,19 +24,6 @@ public class GameState implements Cloneable {
     @SuppressWarnings("CopyConstructorMissesField")
     public GameState(GameState lastState) {
         this.playedStrongholdPositions = lastState.playedStrongholdPositions;
-
-        lastState.indirectPlayers.entrySet().forEach((entry) -> {
-            IndirectPlayer iPlayer = entry.getValue();
-
-            if(iPlayer.exists()) {
-                iPlayer.role = null;
-                this.indirectPlayers.put(entry.getKey(),iPlayer);
-            }
-        });
-    }
-
-    IndirectPlayer getIndirect(ServerPlayerEntity base) {
-        return this.indirectPlayers.computeIfAbsent(base.getUuid(),(uuid) -> new IndirectPlayer(base));
     }
 
     @SuppressWarnings("unchecked")
@@ -50,8 +36,6 @@ public class GameState implements Cloneable {
             clone.strongholdChunkPosition = this.strongholdChunkPosition;
             clone.playedStrongholdPositions = this.playedStrongholdPositions;
             clone.eyes = this.eyes;
-
-            clone.indirectPlayers = (HashMap<UUID, IndirectPlayer>) this.indirectPlayers.clone();
 
             return clone;
         } catch (CloneNotSupportedException e) {
