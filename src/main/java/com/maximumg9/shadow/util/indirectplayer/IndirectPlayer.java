@@ -33,6 +33,7 @@ public class IndirectPlayer {
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
         this.role = new Spectator(this);
         this.participating = shadow.state.phase != GamePhase.PLAYING;
+        this.name = base.getName();
     }
 
     IndirectPlayer(MinecraftServer server, UUID uuid) {
@@ -46,6 +47,7 @@ public class IndirectPlayer {
         this.role = src.role;
         this.participating = src.participating;
         this.frozen = src.frozen;
+        this.name = src.name;
     }
     @Expose
     final UUID playerUUID;
@@ -57,6 +59,14 @@ public class IndirectPlayer {
     public boolean participating;
     @Expose
     public boolean frozen;
+    private Text name = Text.literal("Unknown");
+
+    public Text getName() {
+        if(this.exists()) {
+            this.name = this.getEntity().get().getName();
+        }
+        return this.name;
+    }
 
     public Optional<ServerPlayerEntity> getEntity() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
