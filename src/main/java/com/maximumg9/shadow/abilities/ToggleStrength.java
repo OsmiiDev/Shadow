@@ -10,7 +10,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.text.Text;
 
 public class ToggleStrength implements Ability {
-    private static ItemStack ITEM_STACK = PotionContentsComponent.createStack(Items.POTION, Potions.LONG_STRENGTH);
+    private static final ItemStack ITEM_STACK = PotionContentsComponent.createStack(Items.POTION, Potions.LONG_STRENGTH);
 
     private final IndirectPlayer player;
 
@@ -33,6 +33,8 @@ public class ToggleStrength implements Ability {
     @Override
     public void apply() {
         hasStrength = !hasStrength;
+
+        if(this.player.getEntity().isEmpty()) return;
 
         if(hasStrength) {
             this.player.getEntity().get().addStatusEffect(
@@ -58,9 +60,7 @@ public class ToggleStrength implements Ability {
 
     @Override
     public void deInit() {
-        if(this.player.exists()) {
-            this.player.getEntity().get().removeStatusEffect(StatusEffects.STRENGTH);
-        }
+        this.player.getEntity().ifPresent((player) -> player.removeStatusEffect(StatusEffects.STRENGTH));
     }
 
     @Override

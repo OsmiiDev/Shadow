@@ -51,7 +51,6 @@ public class IndirectPlayerManager {
         for(int i=0;i<list.size();i++) {
             NbtCompound indirectPlayerData = list.getCompound(i);
             IndirectPlayer player = IndirectPlayer.load(this.server, indirectPlayerData);
-            assert player != null;
             this.indirectPlayers.put(player.playerUUID, player);
         }
     }

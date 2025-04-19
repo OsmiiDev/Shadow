@@ -19,7 +19,7 @@ import net.minecraft.world.tick.BasicTickScheduler;
 import org.jetbrains.annotations.Nullable;
 
 public class FakeChunk extends Chunk {
-    private Chunk backing;
+    private final Chunk backing;
 
     public FakeChunk(Chunk backingChunk, Registry<Biome> biomeRegistry) {
         super(backingChunk.getPos(), backingChunk.getUpgradeData(), backingChunk.getHeightLimitView(), biomeRegistry, backingChunk.getInhabitedTime(), backingChunk.getSectionArray(), backingChunk.getBlendingData());

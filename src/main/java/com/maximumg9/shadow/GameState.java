@@ -1,14 +1,10 @@
 package com.maximumg9.shadow;
 
-import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class GameState implements Cloneable {
     public GamePhase phase = GamePhase.NOT_PLAYING;
@@ -26,7 +22,6 @@ public class GameState implements Cloneable {
         this.playedStrongholdPositions = lastState.playedStrongholdPositions;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public GameState clone() {
         try {

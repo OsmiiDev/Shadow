@@ -10,7 +10,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.featuretoggle.FeatureSet;
@@ -227,7 +226,7 @@ public class FakeStructureWorldAccess implements StructureWorldAccess {
 
     @Override
     public RegistryEntry<Biome> getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ) {
-        return this.getGeneratorStoredBiome(biomeX, biomeY, biomeZ);
+        return this.backing.getGeneratorStoredBiome(biomeX, biomeY, biomeZ);
     }
 
     @Override

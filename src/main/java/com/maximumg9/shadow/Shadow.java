@@ -47,7 +47,7 @@ public class Shadow implements Tickable {
 
     private static final File INDIRECT_PLAYERS_FILE = new File("shadow-indirect-players.nbt");
     private final MinecraftServer server;
-    public Config config = new Config(this);
+    public final Config config = new Config(this);
     public IndirectPlayerManager indirectPlayerManager;
     public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
@@ -136,16 +136,14 @@ public class Shadow implements Tickable {
 
         MutableText winnersText = Text.literal("Winners are:").styled(style -> style.withColor(Formatting.GOLD));
 
-        winners.forEach((winner) -> {
-            winner
-                .getEntity()
-                .ifPresent(
-                    serverPlayerEntity ->
-                        winnersText.append(
-                            serverPlayerEntity.getName()
-                        )
-                );
-        });
+        winners.forEach((winner) -> winner
+            .getEntity()
+            .ifPresent(
+                serverPlayerEntity ->
+                    winnersText.append(
+                        serverPlayerEntity.getName()
+                    )
+            ));
 
         cancelGame();
     }
@@ -190,7 +188,7 @@ public class Shadow implements Tickable {
         DATA_GSON = builder.create();
     }
 
-    AtomicReference<Deque<Thread>> saveThreadQueue = new AtomicReference<>(new ArrayDeque<>());
+    final AtomicReference<Deque<Thread>> saveThreadQueue = new AtomicReference<>(new ArrayDeque<>());
 
     public void saveAsync() {
         LOGGER.info("Saving async...");

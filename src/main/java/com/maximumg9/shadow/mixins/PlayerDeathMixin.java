@@ -39,6 +39,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
         super(world, pos, yaw, gameProfile);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Inject(method = "onDeath",at=@At("HEAD"))
     public void onDeath(DamageSource damageSource, CallbackInfo ci) {
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
@@ -76,25 +77,27 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
     public void onSpawn(CallbackInfo ci) {
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
         IndirectPlayer iPlayer = shadow.getIndirect((ServerPlayerEntity) (Object) this);
-        if(iPlayer.role.getFaction() == Faction.SPECTATOR) {
-            this.changeGameMode(GameMode.SPECTATOR);
+        if(iPlayer.role != null) {
+            if(iPlayer.role.getFaction() == Faction.SPECTATOR) {
+                this.changeGameMode(GameMode.SPECTATOR);
+            }
         }
     }
 
     @Unique
     public void checkWin(Shadow shadow) {
-        long villagers = shadow.getOnlinePlayers().stream().filter((player) -> player.role.getFaction() == Faction.VILLAGER).count();
-        long shadows = shadow.getOnlinePlayers().stream().filter((player) -> player.role.getFaction() == Faction.SHADOW).count();
+        long villagers = shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.VILLAGER).count();
+        long shadows = shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).count();
 
         if(villagers == 0 && shadows == 0) {
             shadow.endGame(List.of(),null,null);
         }
 
         if(villagers == 0) {
-            shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> player.role.getFaction() == Faction.SHADOW).toList(), Faction.SHADOW, null);
+            shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).toList(), Faction.SHADOW, null);
         }
         if(shadows == 0) {
-            shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> player.role.getFaction() == Faction.VILLAGER).toList(), Faction.VILLAGER, null);
+            shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.VILLAGER).toList(), Faction.VILLAGER, null);
         }
     }
 }

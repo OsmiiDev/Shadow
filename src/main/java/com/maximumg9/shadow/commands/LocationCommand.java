@@ -16,16 +16,18 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.structure.StrongholdGenerator;
+import net.minecraft.structure.StructureSet;
 import net.minecraft.structure.StructureSetKeys;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.*;
-import net.minecraft.util.math.random.*;
+import net.minecraft.util.math.random.ChunkRandom;
+import net.minecraft.util.math.random.RandomSeed;
+import net.minecraft.util.math.random.Xoroshiro128PlusPlusRandom;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.gen.chunk.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.gen.chunk.placement.StructurePlacement;
@@ -34,7 +36,10 @@ import net.minecraft.world.gen.structure.StructureKeys;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -160,9 +165,23 @@ public class LocationCommand {
         ServerWorld overworld = server.getOverworld();
         Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
 
-        RegistryEntry.Reference<Structure> strongholdStructure = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE).getEntry(StructureKeys.STRONGHOLD).get();
+        Optional<RegistryEntry.Reference<Structure>> strongholdStructure = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE).getEntry(StructureKeys.STRONGHOLD);
 
-        StructurePlacement strongholdPlacement = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE_SET).get(StructureSetKeys.STRONGHOLDS).placement();
+        if(strongholdStructure.isEmpty()) {
+            shadow.ERROR("Strongholds aren't generating (maybe you have a mod or datapack that modifies stronghold generation?)");
+            return null;
+        }
+
+        StructureSet strongholds = overworld
+                .getRegistryManager()
+                .get(RegistryKeys.STRUCTURE_SET)
+                .get(StructureSetKeys.STRONGHOLDS);
+
+        if(strongholds == null) {
+            shadow.ERROR("Strongholds aren't generating (maybe you have a mod or datapack that modifies stronghold generation?)");
+            return null;
+        }
+        StructurePlacement strongholdPlacement = strongholds.placement();
 
         if(!(strongholdPlacement instanceof ConcentricRingsStructurePlacement)) {
             shadow.ERROR("Strongholds are not in concentric rings (maybe you have a mod or datapack that modifies stronghold generation?)");
@@ -182,7 +201,7 @@ public class LocationCommand {
 
         ChunkPos startChunkPos = placementPositions.getFirst();
 
-        StructureStart start = strongholdStructure.value().createStructureStart(
+        StructureStart start = strongholdStructure.get().value().createStructureStart(
                 overworld.getRegistryManager(),
                 overworld.getChunkManager().getChunkGenerator(),
                 overworld.getChunkManager().getChunkGenerator().getBiomeSource(),
@@ -228,10 +247,10 @@ public class LocationCommand {
                         .get(RegistryKeys.STRUCTURE)
                         .stream()
                         .filter(
-                                structureType -> structureType.getFeatureGenerationStep() == strongholdStructure.value().getFeatureGenerationStep()
+                                structureType -> structureType.getFeatureGenerationStep() == strongholdStructure.get().value().getFeatureGenerationStep()
                         ).toList();
 
-        int index = generationStepStructures.indexOf(strongholdStructure.value());
+        int index = generationStepStructures.indexOf(strongholdStructure.get().value());
 
         Instant startTime = Instant.now();
 
@@ -249,7 +268,7 @@ public class LocationCommand {
 
                 long popSeed = random.setPopulationSeed(overworld.getSeed(), lv3.getX(), lv3.getZ());
 
-                int generationStep = strongholdStructure.value().getFeatureGenerationStep().ordinal();
+                int generationStep = strongholdStructure.get().value().getFeatureGenerationStep().ordinal();
 
                 random.setDecoratorSeed(popSeed, index, generationStep);
 
@@ -325,7 +344,7 @@ public class LocationCommand {
         int maxZ = MathHelper.floor(bb.maxZ);
 
         int highest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);
-        int nhighest = 0;
+        int nhighest;
 
         if(minX != maxX) {
             nhighest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);

@@ -90,7 +90,7 @@ public class IndirectPlayer {
             player.role = null;
         }
 
-        return null;
+        return player;
     }
 
     NbtCompound save(NbtCompound nbt) {
@@ -146,9 +146,5 @@ public class IndirectPlayer {
         AttributeContainer attributes = player.getAttributes();
 
         attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);
-    }
-
-    public boolean exists() {
-        return getEntity().isPresent();
     }
 }

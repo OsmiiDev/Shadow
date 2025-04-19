@@ -11,7 +11,7 @@ public class InventoryLie implements Inventory {
 
     public final int size;
 
-    public List<ItemStack> items;
+    public final List<ItemStack> items;
 
     public InventoryLie(int size) {
         this.size = size;

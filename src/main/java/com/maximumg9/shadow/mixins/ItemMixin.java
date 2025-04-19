@@ -1,9 +1,7 @@
 package com.maximumg9.shadow.mixins;
 
-import com.maximumg9.shadow.Shadow;
 import net.minecraft.item.Item;
 import net.minecraft.registry.DefaultedRegistry;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

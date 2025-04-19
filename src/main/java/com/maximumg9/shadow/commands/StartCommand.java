@@ -87,7 +87,7 @@ public class StartCommand {
 }
 
 class StartTicker implements Tickable {
-    Shadow shadow;
+    final Shadow shadow;
     int ticksLeft = 10 * 20;
 
     StartTicker(Shadow shadow) {
@@ -122,9 +122,12 @@ class StartTicker implements Tickable {
         MutableText otherShadowText = Text.literal("The other shadows are: ").styled((style -> style.withColor(Formatting.RED)));
 
         shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).forEachOrdered(
-                (player) -> {
-                    otherShadowText.append(player.getName()).styled((style -> style.withColor(Formatting.GOLD))).append(Text.literal(",")).styled((style) -> style.withColor(Formatting.RED));
-                }
+            (player) ->
+                otherShadowText
+                    .append(player.getName())
+                        .styled((style -> style.withColor(Formatting.GOLD)))
+                    .append(Text.literal(","))
+                        .styled((style) -> style.withColor(Formatting.RED))
         );
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
@@ -182,6 +185,11 @@ class StartTicker implements Tickable {
         }
 
         ServerWorld nether = this.shadow.getServer().getWorld(ServerWorld.NETHER);
+
+        if(nether == null) {
+            shadow.ERROR("The nether does not exist");
+            return;
+        }
 
         double netherScaleFactor = DimensionType.getCoordinateScaleFactor(overworld.getDimension(),nether.getDimension());
 
