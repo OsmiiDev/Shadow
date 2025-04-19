@@ -9,6 +9,8 @@ public interface Ability extends ItemRepresentable {
     String getID();
     IndirectPlayer getPlayer();
     void apply();
+    void init();
+    void deInit();
 
     @FunctionalInterface
     interface Factory {
