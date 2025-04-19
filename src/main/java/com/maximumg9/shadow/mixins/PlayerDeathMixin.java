@@ -44,6 +44,8 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
     public void onDeath(DamageSource damageSource, CallbackInfo ci) {
         Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
 
+        IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
+
         GameRules.BooleanRule showDeathMessage = this.getWorld().getGameRules().get(GameRules.SHOW_DEATH_MESSAGES);
         if(shadow.state.phase == GamePhase.PLAYING) {
             showDeathMessage.set(false,this.server);
@@ -63,15 +65,12 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
             this.server.getPlayerManager().broadcast(name, false);
 
-            checkWin(shadow);
+            player.role = new Spectator(player);
 
+            checkWin(shadow);
         } else {
             showDeathMessage.set(true,this.server);
         }
-
-        IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
-
-        player.role = new Spectator(player);
     }
 
     @Inject(method="onSpawn",at=@At("TAIL"))
