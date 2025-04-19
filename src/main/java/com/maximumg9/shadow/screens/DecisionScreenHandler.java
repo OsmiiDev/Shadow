@@ -4,7 +4,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -22,11 +21,11 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
     public final HashMap<Integer,V> decisionResultHashMap = new HashMap<>();
 
-    public final Consumer<V> resultCallback;
+    @Nullable public final Consumer<V> resultCallback;
 
     private final SimpleInventory inventory;
 
-    protected DecisionScreenHandler(int syncId, Consumer<V> resultCallback, List<V> values) {
+    protected DecisionScreenHandler(int syncId,@Nullable  Consumer<V> resultCallback, List<V> values) {
         super(ScreenHandlerType.GENERIC_9X1, syncId);
         this.resultCallback = resultCallback;
 
@@ -57,7 +56,9 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         if(player instanceof ServerPlayerEntity sPlayer) {
             V value = decisionResultHashMap.get(slotIndex);
             sPlayer.closeHandledScreen();
-            this.resultCallback.accept(value);
+            if(this.resultCallback != null) {
+                this.resultCallback.accept(value);
+            }
         }
     }
 
