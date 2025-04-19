@@ -76,7 +76,7 @@ public class Shadow implements Tickable {
     }
 
     public void ERROR(String message) {
-        this.getServer().getPlayerManager().broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)),false);
+        this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));
         LOGGER.error(message);
     }
 
@@ -137,9 +137,14 @@ public class Shadow implements Tickable {
         MutableText winnersText = Text.literal("Winners are:").styled(style -> style.withColor(Formatting.GOLD));
 
         winners.forEach((winner) -> {
-            if(winner.exists()) {
-                winnersText.append(winner.getEntity().get().getName());
-            }
+            winner
+                .getEntity()
+                .ifPresent(
+                    serverPlayerEntity ->
+                        winnersText.append(
+                            serverPlayerEntity.getName()
+                        )
+                );
         });
 
         cancelGame();

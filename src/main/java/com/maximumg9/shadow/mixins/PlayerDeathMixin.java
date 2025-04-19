@@ -7,7 +7,6 @@ import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Spectator;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Team;
@@ -63,7 +62,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
                     ).getName()
                 );
 
-            this.server.getPlayerManager().broadcast(name, false);
+            shadow.broadcast(name);
 
             player.role = new Spectator(player);
 
