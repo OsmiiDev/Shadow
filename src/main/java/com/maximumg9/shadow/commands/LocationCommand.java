@@ -2,6 +2,7 @@ package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.Tickable;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.FakeStructureWorldAccess;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -61,14 +62,18 @@ public class LocationCommand {
                             .executes((ctx) -> {
                                 MinecraftServer server = ctx.getSource().getServer();
                                 Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+                                try {
+                                    shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
 
-                                shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
+                                    shadow.cancelGame();
 
-                                shadow.cancelGame();
+                                    shadow.saveAsync();
 
-                                shadow.saveAsync();
-
-                                return findAndGotoLocation(ctx);
+                                    return findAndGotoLocation(ctx);
+                                } catch (Exception e) {
+                                    shadow.ERROR(e.toString());
+                                }
+                                return 0;
                             })
                     )
                 .executes(LocationCommand::findAndGotoLocation)
@@ -125,11 +130,25 @@ public class LocationCommand {
 
         shadow.state.phase = GamePhase.LOCATION_SELECTED;
 
-        for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            player.frozen = true;
-        }
-
         shadow.saveAsync();
+
+        shadow.addTickable(new Tickable() {
+            private int left = 5;
+            @Override
+            public void tick() {
+                left--;
+                if(left == 0) {
+                    for(IndirectPlayer player : shadow.getOnlinePlayers()) {
+                        player.frozen = true;
+                    }
+                }
+            }
+
+            @Override
+            public boolean shouldEnd() {
+                return left <= 0;
+            }
+        });
 
         return 1;
     }
@@ -293,8 +312,6 @@ public class LocationCommand {
             double x = xOffset + centerPos.x;
             double z = zOffset + centerPos.z;
 
-
-
             int y = getTopYForBoundingBox(world,player.getBoundingBox(player.getPose()).offset(x,0,z), Heightmap.Type.MOTION_BLOCKING);
 
             player.teleport(world,x,y,z,currentAngle * MathHelper.PI/180,0);
@@ -307,17 +324,11 @@ public class LocationCommand {
         int minZ = MathHelper.floor(bb.minY);
         int maxZ = MathHelper.floor(bb.maxZ);
 
-        world.getChunkManager().addTicket(ChunkTicketType.UNKNOWN,new ChunkPos(minX/16,minZ/16),2,new ChunkPos(minX/16,minZ/16));
-
-        world.getChunkManager().updateChunks();
-
-        world.getChunk(minX/16,minZ/16);
-
-        int highest = world.getTopY(heightMap, minX, minZ);
+        int highest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);
         int nhighest = 0;
 
         if(minX != maxX) {
-            nhighest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);;
+            nhighest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);
             if(nhighest > highest) {
                 highest = nhighest;
             }
