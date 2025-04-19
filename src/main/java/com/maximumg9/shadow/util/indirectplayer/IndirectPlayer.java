@@ -62,9 +62,7 @@ public class IndirectPlayer {
     private Text name = Text.literal("Unknown");
 
     public Text getName() {
-        if(this.exists()) {
-            this.name = this.getEntity().get().getName();
-        }
+        this.getEntity().ifPresent((psPlayer) -> this.name = psPlayer.getName());
         return this.name;
     }
 

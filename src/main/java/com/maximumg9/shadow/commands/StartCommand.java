@@ -3,8 +3,8 @@ package com.maximumg9.shadow.commands;
 import com.maximumg9.shadow.*;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Faction;
-import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.TimeUtil;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.block.BlockState;
@@ -67,7 +67,9 @@ public class StartCommand {
         shadow.addTickable(new StartTicker(shadow));
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            ServerPlayerEntity entity = player.getEntity().get();
+            Optional<ServerPlayerEntity> psPlayer = player.getEntity();
+            assert psPlayer.isPresent();
+            ServerPlayerEntity entity = psPlayer.get();
 
             player.clearPlayerData();
 
@@ -117,33 +119,33 @@ class StartTicker implements Tickable {
 
         if(!shadow.config.roleManager.pickRoles()) return;
 
-        MutableText otherShadows = Text.literal("The other shadows are: ").styled((style -> style.withColor(Formatting.RED)));
+        MutableText otherShadowText = Text.literal("The other shadows are: ").styled((style -> style.withColor(Formatting.RED)));
 
-        shadow.getOnlinePlayers().stream().filter((player) -> player.role.getFaction() == Faction.SHADOW).forEachOrdered(
+        shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).forEachOrdered(
                 (player) -> {
-                    otherShadows.append(player.getName()).styled((style -> style.withColor(Formatting.GOLD))).append(Text.literal(",")).styled((style) -> style.withColor(Formatting.RED));
+                    otherShadowText.append(player.getName()).styled((style -> style.withColor(Formatting.GOLD))).append(Text.literal(",")).styled((style) -> style.withColor(Formatting.RED));
                 }
         );
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            player.clearPlayerData();
-
-            giveDefaultItems(player);
-
-            player.role.giveItems();
-
-            player.frozen = false;
-
-            player.setTitleTimes(10,40,10);
             if(player.role == null) {
                 shadow.ERROR("Null role chosen");
                 shadow.cancelGame();
                 return;
             }
+
+            player.clearPlayerData();
+
+            giveDefaultItems(player);
+            player.role.giveItems();
+
+            player.frozen = false;
+
+            player.setTitleTimes(10,40,10);
             player.sendTitle(player.role.getFaction().name);
 
             if(player.role.getFaction() == Faction.SHADOW) {
-                player.sendMessage(otherShadows);
+                player.sendMessage(otherShadowText);
             }
         }
 
