@@ -5,9 +5,11 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CommandManagerMixin",
+    "DragonDeathMixin",
     "ItemMixin",
     "ItemsMixin",
     "MinecraftServerMixin",
+    "PlayerDeathMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin"
   ],

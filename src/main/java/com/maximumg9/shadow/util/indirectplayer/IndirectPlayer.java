@@ -11,6 +11,7 @@ import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -101,6 +102,15 @@ public class IndirectPlayer {
         if(player.isEmpty()) { return; }
 
         TitleS2CPacket packet = new TitleS2CPacket(title);
+
+        player.get().networkHandler.sendPacket(packet);
+    }
+    public void sendSubtitle(Text subtitle) {
+        Optional<ServerPlayerEntity> player = getEntity();
+
+        if(player.isEmpty()) { return; }
+
+        SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
 
         player.get().networkHandler.sendPacket(packet);
     }

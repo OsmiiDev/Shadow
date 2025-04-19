@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.*;
+import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;
 import com.mojang.brigadier.CommandDispatcher;
@@ -13,10 +14,12 @@ import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -96,6 +99,53 @@ public class Shadow implements Tickable {
         this.config.roleManager.clearRoles();
 
         this.saveAsync();
+    }
+
+    public void endGame(List<IndirectPlayer> winners, @Nullable Faction winningFaction, @Nullable Faction secondaryWinningFaction) {
+        MutableText titleText;
+
+        if(winningFaction == null) {
+            winningFaction = secondaryWinningFaction;
+            secondaryWinningFaction = null;
+        }
+
+        if(winningFaction == null) {
+            titleText = Text.literal("Tie Game");
+        } else {
+            titleText = winningFaction.name.copy();
+            titleText.append(" Win");
+        }
+
+        MutableText subtitleText;
+
+        if(secondaryWinningFaction != null) {
+            subtitleText = Text.literal("& ");
+            subtitleText.append(secondaryWinningFaction.name);
+        } else {
+            subtitleText = null;
+        }
+
+        this.getOnlinePlayers().forEach((player) -> {
+            player.setTitleTimes(10,40,10);
+            player.sendTitle(titleText);
+            if(subtitleText != null) {
+                player.sendSubtitle(subtitleText);
+            }
+        });
+
+        MutableText winnersText = Text.literal("Winners are:").styled(style -> style.withColor(Formatting.GOLD));
+
+        winners.forEach((winner) -> {
+            if(winner.exists()) {
+                winnersText.append(winner.getEntity().get().getName());
+            }
+        });
+
+        cancelGame();
+    }
+
+    public void broadcast(Text text) {
+        this.server.getPlayerManager().broadcast(text, false);
     }
 
     public IndirectPlayer getIndirect(ServerPlayerEntity player) {
