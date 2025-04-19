@@ -34,8 +34,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         Shadow shadow = ((ShadowProvider) this.player.server).shadow$getShadow();
 
         if(!shadow.getIndirect(this.player).frozen) return;
-        if(!this.player.hasPermissionLevel(2)) return;
-        if(this.player.isInCreativeMode() || this.player.isSpectator()) return;
+        if(this.player.hasPermissionLevel(2) && (this.player.isInCreativeMode() || this.player.isSpectator())) return;
 
         double x = clampHorizontal(packet.getX(this.player.getX()));
         double y = clampVertical(packet.getY(this.player.getY()));
