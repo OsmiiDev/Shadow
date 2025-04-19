@@ -42,6 +42,8 @@ public abstract class Role {
         return nbt;
     }
 
+    public void giveItems() {}
+
     public void readNbt(NbtCompound nbt) {}
 
     public void init() {}

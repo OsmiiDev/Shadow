@@ -2,6 +2,7 @@ package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.*;
 import com.maximumg9.shadow.ducks.ShadowProvider;
+import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -11,12 +12,14 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -24,6 +27,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.dimension.DimensionType;
+
+import java.util.Optional;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -112,21 +117,49 @@ class StartTicker implements Tickable {
 
         if(!shadow.config.roleManager.pickRoles()) return;
 
-        for(IndirectPlayer player : shadow.getOnlinePlayers()) {
+        MutableText otherShadows = Text.literal("The other shadows are: ").styled((style -> style.withColor(Formatting.RED)));
 
+        shadow.getOnlinePlayers().stream().filter((player) -> player.role.getFaction() == Faction.SHADOW).forEachOrdered(
+                (player) -> {
+                    otherShadows.append(player.getName()).styled((style -> style.withColor(Formatting.GOLD))).append(Text.literal(",")).styled((style) -> style.withColor(Formatting.RED));
+                }
+        );
+
+        for(IndirectPlayer player : shadow.getOnlinePlayers()) {
             player.clearPlayerData();
+
+            giveDefaultItems(player);
+
+            player.role.giveItems();
+
             player.frozen = false;
 
             player.setTitleTimes(10,40,10);
             if(player.role == null) {
-                shadow.ERROR("Null role accidentally chosen");
+                shadow.ERROR("Null role chosen");
                 shadow.cancelGame();
                 return;
             }
             player.sendTitle(player.role.getFaction().name);
+
+            if(player.role.getFaction() == Faction.SHADOW) {
+                player.sendMessage(otherShadows);
+            }
         }
 
         shadow.saveAsync();
+    }
+
+    private void giveDefaultItems(IndirectPlayer player) {
+        Optional<ServerPlayerEntity> psPlayer = player.getEntity();
+
+        if(psPlayer.isPresent()) {
+            PlayerInventory inventory = psPlayer.get().getInventory();
+
+            inventory.insertStack(shadow.config.food.foodGiver.apply(shadow.config.foodAmount));
+
+            inventory.insertStack(Items.NETHER_STAR.getDefaultStack());
+        }
     }
 
     private static final int NETHER_LAVA_HEIGHT = 32;

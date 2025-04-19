@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.*;
+import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;

@@ -1,6 +1,6 @@
 package com.maximumg9.shadow.roles;
 
-import com.maximumg9.shadow.Config;
+import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
