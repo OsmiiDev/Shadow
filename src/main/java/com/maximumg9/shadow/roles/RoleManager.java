@@ -84,7 +84,14 @@ public class RoleManager {
     public boolean pickRoles() {
         clearRoles();
 
-        List<IndirectPlayer> onlinePlayers = shadow.getOnlinePlayers();
+        List<IndirectPlayer> onlinePlayers = new ArrayList<>(
+                shadow.getOnlinePlayers().stream()
+                        .filter((player -> player.participating))
+                        .unordered()
+                        .toList()
+        );
+
+        Collections.shuffle(onlinePlayers);
 
         if(onlinePlayers.size() > this.roleSlots.length) {
             shadow.ERROR("More players than role slots, consider increasing the number of role slots in the config");

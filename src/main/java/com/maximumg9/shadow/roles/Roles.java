@@ -1,6 +1,5 @@
 package com.maximumg9.shadow.roles;
 
-import com.maximumg9.shadow.Shadow;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -47,11 +46,11 @@ public enum Roles {
         List<Roles> possibleRoles = Arrays.stream(values()).filter((role) -> role.name.equals(roleName)).toList();
 
         if(possibleRoles.isEmpty()) {
-            throw new IllegalArgumentException("no role with such name");
+            throw new IllegalArgumentException("no role with name: " + roleName);
         }
 
         if(possibleRoles.size() > 1) {
-            throw new IllegalStateException("Roles are broken, multiple roles with same argumentName");
+            throw new IllegalStateException("Roles are broken, multiple roles with same name: " + roleName);
         }
 
         return possibleRoles.getFirst();

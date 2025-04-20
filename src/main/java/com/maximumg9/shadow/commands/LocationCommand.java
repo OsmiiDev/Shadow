@@ -28,6 +28,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.ChunkRandom;
 import net.minecraft.util.math.random.RandomSeed;
 import net.minecraft.util.math.random.Xoroshiro128PlusPlusRandom;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.gen.chunk.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.gen.chunk.placement.StructurePlacement;
@@ -54,10 +55,14 @@ public class LocationCommand {
                         .executes((ctx) -> {
                             MinecraftServer server = ctx.getSource().getServer();
                             Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+                            try {
+                                shadow.cancelGame();
 
-                            shadow.cancelGame();
-
-                            shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
+                                shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
+                            } catch (Throwable t) {
+                                LogUtils.getLogger().error("error while forcing a location", t);
+                                shadow.ERROR(t.toString());
+                            }
 
                             return 1;
                         })
@@ -75,8 +80,9 @@ public class LocationCommand {
                                     shadow.saveAsync();
 
                                     return findAndGotoLocation(ctx);
-                                } catch (Exception e) {
-                                    shadow.ERROR(e.toString());
+                                } catch (Throwable t) {
+                                    LogUtils.getLogger().error("error while forcing a location", t);
+                                    shadow.ERROR(t.toString());
                                 }
                                 return 0;
                             })
@@ -137,6 +143,11 @@ public class LocationCommand {
 
         shadow.saveAsync();
 
+        for(IndirectPlayer player : shadow.getOnlinePlayers()) {
+            player.getEntity().get().changeGameMode(GameMode.ADVENTURE);
+        }
+
+        // delaying freezing seems to fix some bug related to people not being frozen correctly?
         shadow.addTickable(new Tickable() {
             private int left = 5;
             @Override
@@ -333,7 +344,7 @@ public class LocationCommand {
 
             int y = getTopYForBoundingBox(world,player.getBoundingBox(player.getPose()).offset(x,0,z), Heightmap.Type.MOTION_BLOCKING);
 
-            player.teleport(world,x,y,z,currentAngle * MathHelper.PI/180,0);
+            player.teleport(world,x,y + 0.2,z,currentAngle * MathHelper.PI/180,0);
         }
     }
 

@@ -25,6 +25,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -135,6 +136,12 @@ class StartTicker implements Tickable {
                 shadow.ERROR("Null role chosen");
                 shadow.cancelGame();
                 return;
+            }
+
+            if(player.role.getFaction() == Faction.SPECTATOR) {
+                player.getEntity().get().changeGameMode(GameMode.SPECTATOR);
+            } else {
+                player.getEntity().get().changeGameMode(GameMode.SURVIVAL);
             }
 
             player.clearPlayerData();

@@ -40,7 +40,8 @@ public class IndirectPlayerManager {
     }
 
     public void load() throws IOException {
-        NbtIo.readCompressed(this.saveFile, new NbtSizeTracker(0xffffffffffffL,256));
+        NbtCompound nbt = NbtIo.readCompressed(this.saveFile, new NbtSizeTracker(0xffffffffffffL,256));
+        this.readNbt(nbt);
     }
 
     private void readNbt(NbtCompound nbt) {

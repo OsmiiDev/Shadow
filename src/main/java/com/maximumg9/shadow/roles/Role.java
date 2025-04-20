@@ -8,6 +8,7 @@ import net.minecraft.text.TextColor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Role {
 
@@ -18,6 +19,7 @@ public abstract class Role {
 
     public static Role load(NbtCompound nbt, IndirectPlayer player) {
         String roleName = nbt.getString("name");
+        if(Objects.equals(roleName, "")) return null;
         Roles role = Roles.getRole(roleName);
 
         return role.factory.fromNBT(nbt, player);

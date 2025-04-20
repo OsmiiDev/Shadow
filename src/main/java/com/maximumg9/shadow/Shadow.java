@@ -76,8 +76,8 @@ public class Shadow implements Tickable {
     }
 
     public void ERROR(String message) {
-        this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));
         LOGGER.error(message);
+        this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));
     }
 
     public Collection<IndirectPlayer> getAllPlayers() {
@@ -93,13 +93,18 @@ public class Shadow implements Tickable {
     }
 
     public void cancelGame() {
-        this.clearEyes();
+        try {
+            this.clearEyes();
 
-        this.state = new GameState(this.state);
+            this.state = new GameState(this.state);
 
-        this.config.roleManager.clearRoles();
+            this.config.roleManager.clearRoles();
 
-        this.saveAsync();
+            this.saveAsync();
+        } catch (Throwable t) {
+            LogUtils.getLogger().error("error while cancelling",t);
+        }
+
     }
 
     public void endGame(List<IndirectPlayer> winners, @Nullable Faction winningFaction, @Nullable Faction secondaryWinningFaction) {
