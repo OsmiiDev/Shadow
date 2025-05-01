@@ -224,7 +224,7 @@ public class Shadow implements Tickable {
         });
     }
 
-    private void save(GameState state,IndirectPlayerManager playerManager) throws IOException {
+    private static void save(GameState state,IndirectPlayerManager playerManager) throws IOException {
         FileWriter writer = new FileWriter(STATE_FILE);
         DATA_GSON.toJson(
                 state,
