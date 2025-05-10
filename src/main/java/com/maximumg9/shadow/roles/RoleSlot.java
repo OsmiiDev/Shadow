@@ -1,10 +1,12 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.util.MiscUtil;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.random.Random;
 
 import java.util.Arrays;
@@ -16,6 +18,11 @@ public class RoleSlot {
 
     public RoleSlot(int index) {
         this.index = index;
+        reset();
+    }
+
+    public void reset() {
+        Arrays.fill(weights, 0);
         this.weights[Roles.VILLAGER.ordinal()] = 1;
     }
 
@@ -36,6 +43,37 @@ public class RoleSlot {
         i--;
 
         return Roles.values()[i];
+    }
+
+    public void readNbt(NbtCompound nbt) {
+        int index = nbt.getInt("index");
+
+        if(index != this.index) throw new IllegalStateException("Indexes in saved role slots do not match (maybe they weren't saved correctly?)");
+        NbtCompound weights = nbt.getCompound("weights");
+
+        weights.getKeys().stream()
+            .map(
+                (roleName) ->
+                    new Pair<>(
+                        Roles.getRole(roleName),
+                        weights.getInt(roleName)
+                    )
+            ).forEach((weightPair) -> {
+                this.weights[weightPair.getLeft().ordinal()] = weightPair.getRight();
+            });
+    }
+
+    public NbtCompound writeNbt(NbtCompound nbt) {
+        NbtCompound weights = new NbtCompound();
+
+        for (int i = 0; i < this.weights.length; i++) {
+            weights.putInt(Roles.values()[i].name, this.weights[i]);
+        }
+
+        nbt.put("weights", weights);
+        nbt.putInt("index", this.index);
+
+        return nbt;
     }
 
     public Text getText() {

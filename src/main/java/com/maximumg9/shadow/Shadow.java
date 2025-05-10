@@ -46,8 +46,9 @@ public class Shadow implements Tickable {
     }
 
     private static final File INDIRECT_PLAYERS_FILE = new File("shadow-indirect-players.nbt");
+    public static final File CONFIG_FILE = new File("config.nbt");
     private final MinecraftServer server;
-    public final Config config = new Config(this);
+    public final Config config = new Config(this, CONFIG_FILE.toPath());
     public IndirectPlayerManager indirectPlayerManager;
     public final Random random = Random.create();
     private final List<Tickable> tickables = new ArrayList<>();
@@ -200,9 +201,11 @@ public class Shadow implements Tickable {
 
         GameState stateCopy = this.state.clone();
         IndirectPlayerManager playerManagerCopy = new IndirectPlayerManager(this.indirectPlayerManager);
+        Config configCopy = this.config.copy(this);
+
         Thread thread = new Thread(() -> {
             try {
-                this.save(stateCopy, playerManagerCopy);
+                save(stateCopy, playerManagerCopy, configCopy);
             } catch (IOException e) {
                 LOGGER.error("Error while saving data async", e);
             }
@@ -224,7 +227,7 @@ public class Shadow implements Tickable {
         });
     }
 
-    private static void save(GameState state,IndirectPlayerManager playerManager) throws IOException {
+    private static void save(GameState state, IndirectPlayerManager playerManager, Config config) throws IOException {
         FileWriter writer = new FileWriter(STATE_FILE);
         DATA_GSON.toJson(
                 state,
@@ -234,10 +237,11 @@ public class Shadow implements Tickable {
         writer.close();
 
         playerManager.save();
+        config.save();
     }
 
     public void saveSync() throws IOException {
-        save(this.state,this.indirectPlayerManager);
+        save(this.state,this.indirectPlayerManager, this.config);
     }
 
     public void loadSync() throws IOException {
@@ -249,5 +253,6 @@ public class Shadow implements Tickable {
         reader.close();
 
         this.indirectPlayerManager.load();
+        this.config.load();
     }
 }

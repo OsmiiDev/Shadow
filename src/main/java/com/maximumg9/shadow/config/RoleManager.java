@@ -1,8 +1,8 @@
-package com.maximumg9.shadow.roles;
+package com.maximumg9.shadow.config;
 
-import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
+import com.maximumg9.shadow.roles.RoleSlot;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.WrittenBookItem;
+import net.minecraft.nbt.*;
 import net.minecraft.network.packet.s2c.play.OpenWrittenBookS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,10 +21,9 @@ import net.minecraft.util.Hand;
 import java.util.*;
 
 public class RoleManager {
-
     private final RoleSlot[] roleSlots;
 
-    private transient final Shadow shadow;
+    private final Shadow shadow;
 
     public RoleManager(Shadow shadow, Config config) {
         roleSlots = new RoleSlot[config.roleSlotCount];
@@ -32,6 +32,33 @@ public class RoleManager {
             roleSlots[i] = new RoleSlot(i);
         }
         this.shadow = shadow;
+    }
+
+    void readNbt(NbtCompound nbt) {
+        NbtList list = nbt.getList("roleSlots", NbtElement.COMPOUND_TYPE);
+
+        int length = Math.min(list.size(), roleSlots.length);
+
+        for(int i=0; i<length; i++) {
+            this.roleSlots[i].readNbt(list.getCompound(i));
+        }
+        for(int i=length; i< roleSlots.length; i++) {
+            this.roleSlots[i].reset();
+        }
+    }
+
+    NbtCompound writeNbt(NbtCompound nbt) {
+        NbtList list = new NbtList();
+        list.addAll(
+            Arrays.stream(this.roleSlots)
+                .map(
+                    (slot) -> slot.writeNbt(new NbtCompound())
+                ).toList()
+        );
+
+        nbt.put("roleSlots", list);
+
+        return nbt;
     }
 
     public RoleSlot getSlot(int id) {
