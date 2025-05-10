@@ -33,6 +33,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
     @org.spongepowered.asm.mixin.Shadow
     @Final public MinecraftServer server;
 
+    @SuppressWarnings("UnusedReturnValue")
     @org.spongepowered.asm.mixin.Shadow public abstract boolean changeGameMode(GameMode gameMode);
 
     public PlayerDeathMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {

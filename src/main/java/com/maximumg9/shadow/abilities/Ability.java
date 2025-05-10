@@ -1,6 +1,5 @@
 package com.maximumg9.shadow.abilities;
 
-import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import org.jetbrains.annotations.Nullable;

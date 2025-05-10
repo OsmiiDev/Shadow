@@ -8,7 +8,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,9 +36,9 @@ public class ItemsMixin {
         Item.Settings settings = new Item.Settings();
 
         item.getComponents()
-                .forEach((component) -> {
-            addComponent(settings,component);
-        });
+                .forEach((component) ->
+                        addComponent(settings,component)
+                );
 
         settings.recipeRemainder(item.getRecipeRemainder());
 

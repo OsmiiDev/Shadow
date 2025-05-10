@@ -2,10 +2,8 @@ package com.maximumg9.shadow.config;
 
 import com.maximumg9.shadow.Shadow;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtException;
 import net.minecraft.nbt.NbtIo;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;

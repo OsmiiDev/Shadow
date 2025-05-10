@@ -1,7 +1,5 @@
 package com.maximumg9.shadow;
 
-import com.maximumg9.shadow.roles.RoleFactory;
-import com.maximumg9.shadow.roles.Roles;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;

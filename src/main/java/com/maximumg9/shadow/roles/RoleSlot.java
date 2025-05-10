@@ -58,9 +58,9 @@ public class RoleSlot {
                         Roles.getRole(roleName),
                         weights.getInt(roleName)
                     )
-            ).forEach((weightPair) -> {
-                this.weights[weightPair.getLeft().ordinal()] = weightPair.getRight();
-            });
+            ).forEach((weightPair) ->
+                        this.weights[weightPair.getLeft().ordinal()] = weightPair.getRight()
+            );
     }
 
     public NbtCompound writeNbt(NbtCompound nbt) {
