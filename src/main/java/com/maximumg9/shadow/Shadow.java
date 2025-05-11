@@ -19,6 +19,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -194,8 +195,6 @@ public class Shadow implements Tickable {
         DATA_GSON = builder.create();
     }
 
-    final AtomicReference<Deque<Thread>> saveThreadQueue = new AtomicReference<>(new ArrayDeque<>());
-
     public void saveAsync() {
         LOGGER.info("Saving async...");
 
@@ -203,28 +202,15 @@ public class Shadow implements Tickable {
         IndirectPlayerManager playerManagerCopy = new IndirectPlayerManager(this.indirectPlayerManager);
         Config configCopy = this.config.copy(this);
 
-        Thread thread = new Thread(() -> {
-            try {
-                save(stateCopy, playerManagerCopy, configCopy);
-            } catch (IOException e) {
-                LOGGER.error("Error while saving data async", e);
-            }
-            this.saveThreadQueue.getAndUpdate((deque) -> {
-                Thread nextThread = deque.pollFirst();
-                if(nextThread != null) {
-                    nextThread.start();
+        Util.getIoWorkerExecutor().submit(
+            () -> {
+                try {
+                    save(stateCopy, playerManagerCopy, configCopy);
+                } catch (IOException e) {
+                    LOGGER.error("Error while saving data async", e);
                 }
-                return deque;
-            });
-        });
-        this.saveThreadQueue.getAndUpdate((deque) -> {
-            if(deque.isEmpty()) {
-                thread.start();
-            } else {
-                deque.add(thread);
             }
-            return deque;
-        });
+        );
     }
 
     private static void save(GameState state, IndirectPlayerManager playerManager, Config config) throws IOException {
