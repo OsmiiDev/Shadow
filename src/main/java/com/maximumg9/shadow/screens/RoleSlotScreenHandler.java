@@ -77,7 +77,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
         }
         if(this.page > 0) {
             ItemStack nextPageStack = Items.SPECTRAL_ARROW.getDefaultStack();
-            nextPageStack.set(DataComponentTypes.ITEM_NAME, NEXT_PAGE_TEXT);
+            nextPageStack.set(DataComponentTypes.ITEM_NAME, LAST_PAGE_TEXT);
             this.inventory.setStack(9 + 8,nextPageStack);
         }
 
