@@ -1,6 +1,5 @@
 package com.maximumg9.shadow;
 
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.ItemData;
 import com.maximumg9.shadow.util.NBTUtil;
 import net.minecraft.component.DataComponentTypes;
@@ -14,6 +13,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
+
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 public class EnderEyeItem extends net.minecraft.item.EnderEyeItem {
     public EnderEyeItem(Settings settings) {
@@ -32,8 +33,7 @@ public class EnderEyeItem extends net.minecraft.item.EnderEyeItem {
         EnderEyeData newData = new EnderEyeData(!data.participating,true);
         newData.write(item);
 
-        ((ShadowProvider) world.getServer())
-            .shadow$getShadow()
+        getShadow(world.getServer())
             .getIndirect((ServerPlayerEntity) user)
             .participating = newData.participating;
 

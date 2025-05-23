@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Objects;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
+
 @Mixin(EnderDragonEntity.class)
 public class DragonDeathMixin extends MobEntity {
     protected DragonDeathMixin(EntityType<? extends MobEntity> entityType, World world) {
@@ -20,7 +22,7 @@ public class DragonDeathMixin extends MobEntity {
 
     @Override
     public void onDeath(DamageSource damageSource) {
-        Shadow shadow = ((ShadowProvider) Objects.requireNonNull(this.getServer())).shadow$getShadow();
+        Shadow shadow = getShadow(Objects.requireNonNull(this.getServer()));
 
         shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> {
             assert player.role != null;

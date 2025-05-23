@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -12,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 @SuppressWarnings("SameReturnValue")
 @Mixin(ServerPlayNetworkHandler.class)
@@ -32,7 +33,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method="onPlayerMove",at=@At("HEAD"), cancellable = true)
     public void restrictMovementOnLocationSelect(PlayerMoveC2SPacket packet, CallbackInfo ci) {
-        Shadow shadow = ((ShadowProvider) this.player.server).shadow$getShadow();
+        Shadow shadow = getShadow(this.player.server);
 
         if(!shadow.getIndirect(this.player).frozen) return;
         if(this.player.hasPermissionLevel(2) && (this.player.isInCreativeMode() || this.player.isSpectator())) return;
@@ -56,7 +57,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Redirect(method="onPlayerMove",at=@At(value="INVOKE",target="Lnet/minecraft/server/network/ServerPlayerEntity;getAbilities()Lnet/minecraft/entity/player/PlayerAbilities;"))
     public PlayerAbilities getAbilities(ServerPlayerEntity instance) {
-        Shadow shadow = ((ShadowProvider) instance.server).shadow$getShadow();
+        Shadow shadow = getShadow(instance.server);
 
         PlayerAbilities abilities = instance.getAbilities();
         if(shadow.getIndirect(instance).frozen) {

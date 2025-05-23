@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 
 import java.util.Objects;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static net.minecraft.command.argument.EntityArgumentType.player;
 import static net.minecraft.server.command.CommandManager.argument;
@@ -34,7 +35,7 @@ public class DebugCommand {
                                             .executes( (ctx) -> {
                                                 ServerPlayerEntity player = EntityArgumentType.getPlayer(ctx,"player");
                                                 Roles role = Roles.getRole(ctx,"role");
-                                                Shadow shadow = ((ShadowProvider) ctx.getSource().getServer()).shadow$getShadow();
+                                                Shadow shadow = getShadow(ctx.getSource().getServer());
 
                                                 IndirectPlayer indirectPlayer = shadow.getIndirect(player);
 
@@ -64,7 +65,7 @@ public class DebugCommand {
                                 .suggests(GamePhase::suggest)
                                 .executes( (ctx) -> {
                                     GamePhase phase = GamePhase.getPhase(ctx,"phase");
-                                    Shadow shadow = ((ShadowProvider) ctx.getSource().getServer()).shadow$getShadow();
+                                    Shadow shadow = getShadow(ctx.getSource().getServer());
 
                                     shadow.state.phase = phase;
                                     shadow.saveAsync();

@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class LocationCommand {
@@ -54,7 +55,7 @@ public class LocationCommand {
                     literal("force")
                         .executes((ctx) -> {
                             MinecraftServer server = ctx.getSource().getServer();
-                            Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+                            Shadow shadow = getShadow(server);
                             try {
                                 shadow.cancelGame();
 
@@ -71,7 +72,7 @@ public class LocationCommand {
                         literal("skip")
                             .executes((ctx) -> {
                                 MinecraftServer server = ctx.getSource().getServer();
-                                Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+                                Shadow shadow = getShadow(server);
                                 try {
                                     shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
 
@@ -95,7 +96,7 @@ public class LocationCommand {
         ServerCommandSource src = ctx.getSource();
         ServerWorld overworld = src.getServer().getOverworld();
         MinecraftServer server = src.getServer();
-        Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+        Shadow shadow = getShadow(server);
 
         BlockBox frames = findLocation(ctx);
 
@@ -174,7 +175,7 @@ public class LocationCommand {
         ServerCommandSource src = ctx.getSource();
         MinecraftServer server = src.getServer();
         ServerWorld overworld = server.getOverworld();
-        Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+        Shadow shadow = getShadow(server);
 
         Optional<RegistryEntry.Reference<Structure>> strongholdStructure = overworld.getRegistryManager().get(RegistryKeys.STRUCTURE).getEntry(StructureKeys.STRONGHOLD);
 

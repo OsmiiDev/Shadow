@@ -28,6 +28,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 import java.util.Objects;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
+
 @Mixin(ServerPlayerEntity.class)
 public abstract class PlayerDeathMixin extends PlayerEntity {
     @org.spongepowered.asm.mixin.Shadow
@@ -43,7 +45,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "onDeath",at=@At("HEAD"))
     public void onDeath(DamageSource damageSource, CallbackInfo ci) {
-        Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
+        Shadow shadow = getShadow(this.server);
 
         IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
 
@@ -76,7 +78,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
     @Inject(method="onSpawn",at=@At("TAIL"))
     public void onSpawn(CallbackInfo ci) {
-        Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
+        Shadow shadow = getShadow(this.server);
         IndirectPlayer iPlayer = shadow.getIndirect((ServerPlayerEntity) (Object) this);
         if(iPlayer.role != null) {
             if(iPlayer.role.getFaction() == Faction.SPECTATOR) {

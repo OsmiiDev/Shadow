@@ -14,6 +14,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
+
 public class NetherStarItem extends Item {
     public NetherStarItem(Item.Settings settings) {
         super(settings);
@@ -22,7 +24,7 @@ public class NetherStarItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(world instanceof ServerWorld) {
-            Shadow shadow = ((ShadowProvider) world.getServer()).shadow$getShadow();
+            Shadow shadow = getShadow(world.getServer());
 
             Role role = shadow.getIndirect((ServerPlayerEntity) user).role;
 
@@ -30,7 +32,11 @@ public class NetherStarItem extends Item {
 
             user.openHandledScreen(new DecisionScreenHandler.Factory<>(
                     Text.literal("Ability Menu"),
-                    Ability::apply,
+                    (ability, clicker) -> {
+                        if(ability != null) {
+                            ability.apply();
+                        }
+                    },
                     role.getAbilities()
             ));
         }

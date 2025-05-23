@@ -1,22 +1,14 @@
 package com.maximumg9.shadow.config;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.RoleSlot;
+import com.maximumg9.shadow.screens.DecisionScreenHandler;
+import com.maximumg9.shadow.screens.RoleSlotScreenHandler;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.WrittenBookContentComponent;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.WrittenBookItem;
+import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.*;
-import net.minecraft.network.packet.s2c.play.OpenWrittenBookS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
 
 import java.util.*;
 
@@ -65,42 +57,6 @@ public class RoleManager {
         return roleSlots[id];
     }
 
-    private static void openBook(ServerPlayerEntity player, ItemStack book) {
-        if(book.getItem() instanceof WrittenBookItem) {
-            PlayerInventory inventory = player.getInventory();
-
-            ItemStack originalItem = inventory.getMainHandStack();
-
-            int slot = inventory.main.size() + inventory.selectedSlot;
-
-            int sync = player.currentScreenHandler.syncId;
-
-            player.networkHandler.sendPacket(
-                new ScreenHandlerSlotUpdateS2CPacket(
-                    0,
-                    sync,
-                    slot,
-                    book
-                )
-            );
-            player.networkHandler.sendPacket(
-                new OpenWrittenBookS2CPacket(
-                    Hand.MAIN_HAND
-                )
-            );
-            player.networkHandler.sendPacket(
-                new ScreenHandlerSlotUpdateS2CPacket(
-                    0,
-                    sync,
-                    slot,
-                    originalItem
-                )
-            );
-        } else {
-            ((ShadowProvider) Objects.requireNonNull(player.getServer())).shadow$getShadow().ERROR("Could not open book for player:" + player.getNameForScoreboard());
-        }
-    }
-
     public void clearRoles() {
         shadow.getAllPlayers().forEach(
             (player) ->
@@ -135,31 +91,23 @@ public class RoleManager {
         return true;
     }
 
-    public void showRoleBook(ServerPlayerEntity player) {
-        ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
+    public void showRoleListIndex(ServerPlayerEntity player, boolean editable) {
+        player.openHandledScreen(new DecisionScreenHandler.Factory<>(
+                Text.literal("Pick a Role Slot to edit"),
+                editable ? this::openRoleMenu : (slot, clicker) -> {},
+                Arrays.asList(this.roleSlots)
+        ));
+    }
 
-        ArrayList<RawFilteredPair<Text>> pages = new ArrayList<>(Arrays.stream(this.roleSlots).map((slot) -> {
-            Text slotText = slot.getText();
+    private void openRoleMenu(RoleSlot slot, ServerPlayerEntity clicker) {
+        if(slot == null) return;
 
-            return new RawFilteredPair<>(slotText, Optional.empty());
-        }).toList());
+        clicker.openHandledScreen(new RoleSlotScreenHandler.Factory(
+                slot.getName(),
+                slot
+        ));
 
-        Text addSlot = Text.literal("");
-
-        pages.add(new RawFilteredPair<>(addSlot, Optional.empty()));
-
-        book.set(
-            DataComponentTypes.WRITTEN_BOOK_CONTENT,
-            new WrittenBookContentComponent(
-                    new RawFilteredPair<>("title", Optional.empty()),
-                    "author",
-                    0,
-                    pages,
-                    true
-            )
-        );
-
-        openBook(player,book);
+        LogUtils.getLogger().info(slot.toString());
     }
 
 }

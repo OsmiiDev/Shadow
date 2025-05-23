@@ -1,6 +1,11 @@
 package com.maximumg9.shadow.roles;
 
+import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.MiscUtil;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
@@ -9,9 +14,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.random.Random;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RoleSlot {
+public class RoleSlot implements ItemRepresentable {
     private final int[] weights = new int[Roles.values().length];
 
     private final int index;
@@ -26,12 +32,20 @@ public class RoleSlot {
         this.weights[Roles.VILLAGER.ordinal()] = 1;
     }
 
-    public void setWeight(Roles role, int weight) {
-        weights[role.ordinal()] = weight;
+    public int weightSum() {
+        int sum = 0;
+        for(int weight : this.weights) {
+            sum += weight;
+        }
+        return sum;
     }
 
+    public void setWeight(Roles role, int weight) { weights[role.ordinal()] = weight; }
+
+    public int getWeight(Roles role) { return weights[role.ordinal()]; }
+
     public Roles pickRandomRole(Random random) {
-        int value = random.nextBetween(1, Arrays.stream(weights).sum());
+        int value = random.nextBetween(1, weightSum());
 
         int currentSum = weights[0];
         int i=0;
@@ -76,67 +90,27 @@ public class RoleSlot {
         return nbt;
     }
 
-    public Text getText() {
-        MutableText text = Text.literal("");
+    public Text getName() {
+        return Text.literal("Slot #" + (this.index + 1));
+    }
 
-        Roles[] roles = Roles.values();
+    @Override
+    public ItemStack getAsItem() {
+        ItemStack stack = new ItemStack(Items.STRUCTURE_VOID);
+        stack.set(DataComponentTypes.ITEM_NAME, getName());
+        ArrayList<Text> loreList = new ArrayList<>();
 
-        for (int i = 0; i < this.weights.length; i++) {
-            Roles role = roles[i];
-
-            Text name = role.factory.makeRole(null).getName();
-
-            int iFrickingLoveLambdasBro = i;
-
-            Text increaseText = Text.literal("+").styled(
-                (style) ->
-                    style
-                        .withColor(
-                            Formatting.GREEN
-                        )
-                        .withClickEvent(
-                            new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/$roles weight " +
-                                    index + " " +
-                                    role.name + " " +
-                                    (1 + this.weights[iFrickingLoveLambdasBro])
-                            )
-                        )
+        for(int i=0;i<this.weights.length;i++) {
+            loreList.add(
+                    Roles.values()[i]
+                            .factory.makeRole(null)
+                            .getName().copy()
+                            .styled((style) -> style.withItalic(false))
+                            .append(": " + this.weights[i])
             );
-
-            Text decreaseText = Text.literal("-").styled(
-                (style) ->
-                    style
-                        .withColor(
-                                Formatting.RED
-                        )
-                        .withClickEvent(
-                            new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/$roles weight " +
-                                    index + " " +
-                                    role.name + " " +
-                                    Math.max(0,this.weights[iFrickingLoveLambdasBro]-1)
-                            )
-                        )
-            );
-
-            text.append(increaseText)
-                .append(" ")
-                .append(
-                    MiscUtil.padLeft(
-                        String.valueOf(this.weights[i]),
-                        ' ',2
-                    )
-                )
-                .append(" ")
-                .append(decreaseText)
-                .append(" ")
-                .append(name)
-                .append("\n");
         }
 
-        return text;
+        stack.set(DataComponentTypes.LORE, new LoreComponent(loreList));
+        return stack;
     }
 }

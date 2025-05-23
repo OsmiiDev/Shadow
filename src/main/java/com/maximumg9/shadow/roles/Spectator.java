@@ -1,6 +1,9 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -35,6 +38,7 @@ public class Spectator extends Role {
             return new Spectator(player);
         }
 
+        @Override
         public Spectator fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
             Spectator role = new Spectator(player);
 
@@ -43,4 +47,12 @@ public class Spectator extends Role {
             return role;
         }
     }
+
+    private static final ItemStack ITEM = new ItemStack(Items.LIGHT);
+    static {
+        ITEM.set(DataComponentTypes.ITEM_NAME,new Spectator(null).getName());
+    }
+
+    @Override
+    public ItemStack getAsItem() { return ITEM.copy(); }
 }

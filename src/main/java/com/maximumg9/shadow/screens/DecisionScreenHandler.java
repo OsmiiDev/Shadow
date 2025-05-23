@@ -15,21 +15,42 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHandler {
 
     public final HashMap<Integer,V> decisionResultHashMap = new HashMap<>();
 
-    @Nullable public final Consumer<V> resultCallback;
+    @Nullable public final Callback<V> resultCallback;
 
     private final SimpleInventory inventory;
 
-    protected DecisionScreenHandler(int syncId,@Nullable  Consumer<V> resultCallback, List<V> values) {
-        super(ScreenHandlerType.GENERIC_9X1, syncId);
+    private final int inventorySize;
+
+    private static ScreenHandlerType<?> getTypeForSize(int size) {
+        if(size <= 9) {
+            return ScreenHandlerType.GENERIC_9X1;
+        } else if(size <= 9 * 2) {
+            return ScreenHandlerType.GENERIC_9X2;
+        } else if (size <= 9 * 3) {
+            return ScreenHandlerType.GENERIC_9X3;
+        } else if (size <= 9 * 4) {
+            return ScreenHandlerType.GENERIC_9X4;
+        } else if (size <= 9 * 5) {
+            return ScreenHandlerType.GENERIC_9X5;
+        } else if (size <= 9 * 6) {
+            return ScreenHandlerType.GENERIC_9X6;
+        } else {
+            throw new IllegalArgumentException("Cannot create an inventory with a size of more than" + (9 * 6));
+        }
+    }
+
+    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values) {
+        super(getTypeForSize(values.size()), syncId);
+
+        inventorySize = Math.ceilDiv(values.size(), 9) * 9;
         this.resultCallback = resultCallback;
 
-        this.inventory = new SimpleInventory(9);
+        this.inventory = new SimpleInventory(inventorySize);
 
         initSlots();
 
@@ -37,27 +58,29 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         for(V value : values) {
             this.getSlot(i).insertStack(value.getAsItem());
             decisionResultHashMap.put(i,value);
+            i++;
         }
     }
 
     public void initSlots() {
-        for(int k = 0; k < 9; ++k) {
+        for(int k = 0; k < inventorySize; ++k) {
             this.addSlot(new Slot(inventory, k, 0, 0));
         }
     }
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int slot) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
         if(player instanceof ServerPlayerEntity sPlayer) {
+            this.syncState();
             V value = decisionResultHashMap.get(slotIndex);
             sPlayer.closeHandledScreen();
             if(this.resultCallback != null) {
-                this.resultCallback.accept(value);
+                this.resultCallback.accept(value, sPlayer);
             }
         }
     }
@@ -69,11 +92,11 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
     public static class Factory<V extends ItemRepresentable> implements NamedScreenHandlerFactory {
 
-        public final Consumer<V> resultCallback;
+        public final Callback<V> resultCallback;
         private final Text name;
         private final List<V> values;
 
-        public Factory(Text name, Consumer<V> resultCallback, List<V> values) {
+        public Factory(Text name, Callback<V> resultCallback, List<V> values) {
             this.name = name;
             this.resultCallback = resultCallback;
             this.values = values;
@@ -88,5 +111,10 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
             return new DecisionScreenHandler<>(syncId, this.resultCallback, values);
         }
+    }
+
+    @FunctionalInterface
+    public interface Callback<V> {
+        void accept(@Nullable V value, ServerPlayerEntity player);
     }
 }

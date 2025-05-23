@@ -31,6 +31,7 @@ import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Optional;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class StartCommand {
@@ -56,14 +57,14 @@ public class StartCommand {
 
     public static boolean check(CommandContext<ServerCommandSource> ctx) {
         MinecraftServer server = ctx.getSource().getServer();
-        Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+        Shadow shadow = getShadow(server);
 
         return shadow.state.phase == GamePhase.LOCATION_SELECTED;
     }
 
     public static int start(CommandContext<ServerCommandSource> ctx) {
         MinecraftServer server = ctx.getSource().getServer();
-        Shadow shadow = ((ShadowProvider) server).shadow$getShadow();
+        Shadow shadow = getShadow(server);
 
         shadow.addTickable(new StartTicker(shadow));
 

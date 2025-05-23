@@ -7,6 +7,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class CancelCommand {
@@ -15,7 +16,7 @@ public class CancelCommand {
                 literal("$cancel")
                         .requires((source) -> source.hasPermissionLevel(3))
                         .executes((ctx) -> {
-                            Shadow shadow = ((ShadowProvider) ctx.getSource().getServer()).shadow$getShadow();
+                            Shadow shadow = getShadow(ctx.getSource().getServer());
                             try {
                                 shadow.cancelGame();
 

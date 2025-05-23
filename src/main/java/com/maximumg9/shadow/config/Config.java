@@ -1,8 +1,10 @@
 package com.maximumg9.shadow.config;
 
 import com.maximumg9.shadow.Shadow;
+import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtSizeTracker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,13 +59,14 @@ public class Config {
     }
 
     public void load() throws IOException {
-        NbtCompound compound = NbtIo.read(saveFile);
+        NbtCompound compound = NbtIo.readCompressed(saveFile, new NbtSizeTracker(0xffffffffffffL,256));
         if(compound == null) throw new FileNotFoundException("Could not find config file");
         this.readNbt(compound);
     }
 
     public void save() throws IOException {
-        NbtIo.writeCompressed(this.writeNbt(new NbtCompound()), saveFile);
+        NbtCompound data = this.writeNbt(new NbtCompound());
+        NbtIo.writeCompressed(data,this.saveFile);
     }
 
     private final Path saveFile;

@@ -4,7 +4,6 @@ package com.maximumg9.shadow.util.indirectplayer;
 import com.google.gson.annotations.Expose;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.roles.Spectator;
 import net.minecraft.entity.attribute.AttributeContainer;
@@ -22,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
+
 /**
  This is meant to represent a player who existed at some time, even if the player does not exist now
  */
@@ -30,7 +31,7 @@ public class IndirectPlayer {
     public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
         this.server = base.server;
-        Shadow shadow = ((ShadowProvider) this.server).shadow$getShadow();
+        Shadow shadow = getShadow(this.server);
         this.role = new Spectator(this);
         this.participating = shadow.state.phase != GamePhase.PLAYING;
         this.name = base.getName();

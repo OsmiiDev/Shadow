@@ -3,6 +3,9 @@ package com.maximumg9.shadow.roles;
 import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.abilities.ToggleStrength;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -18,27 +21,23 @@ public class ShadowRole extends Role {
     }
 
     @Override
-    public Faction getFaction() {
-        return Faction.SHADOW;
-    }
+    public Faction getFaction() { return Faction.SHADOW; }
 
     @Override
-    public String getRawName() {
-        return "Shadow";
-    }
+    public String getRawName() { return "Shadow"; }
 
     @Override
-    public TextColor getColor() {
-        return TextColor.fromFormatting(Formatting.RED);
-    }
+    public TextColor getColor() { return TextColor.fromFormatting(Formatting.RED); }
 
     public static final RoleFactory<ShadowRole> FACTORY = new Factory();
+
     private static class Factory implements RoleFactory<ShadowRole> {
         @Override
         public ShadowRole makeRole(@Nullable IndirectPlayer player) {
             return new ShadowRole(player);
         }
 
+        @Override
         public ShadowRole fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
             ShadowRole role = new ShadowRole(player);
 
@@ -47,4 +46,12 @@ public class ShadowRole extends Role {
             return role;
         }
     }
+
+    private static final ItemStack ITEM = new ItemStack(Items.NETHERITE_SWORD);
+    static {
+        ITEM.set(DataComponentTypes.ITEM_NAME,new ShadowRole(null).getName());
+    }
+
+    @Override
+    public ItemStack getAsItem() { return ITEM.copy(); }
 }

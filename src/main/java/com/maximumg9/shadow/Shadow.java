@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class Shadow implements Tickable {

@@ -1,6 +1,9 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -9,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class Villager extends Role {
+    @Override
+    public ItemStack getAsItem() { return ITEM.copy(); }
 
     public Villager(@Nullable IndirectPlayer player) {
         super(player, List.of());
@@ -35,6 +40,7 @@ public class Villager extends Role {
             return new Villager(player);
         }
 
+        @Override
         public Villager fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
             Villager role = new Villager(player);
 
@@ -42,5 +48,10 @@ public class Villager extends Role {
 
             return role;
         }
+    }
+
+    private static final ItemStack ITEM = new ItemStack(Items.EMERALD);
+    static {
+        ITEM.set(DataComponentTypes.ITEM_NAME,new Villager(null).getName());
     }
 }
