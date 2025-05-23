@@ -2,16 +2,24 @@ package com.maximumg9.shadow.util.indirectplayer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.maximumg9.shadow.GamePhase;
+import com.maximumg9.shadow.Tickable;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.collection.ArrayListDeque;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class IndirectPlayerManager {
+import static com.maximumg9.shadow.util.MiscUtil.getShadow;
+
+public class IndirectPlayerManager implements Tickable {
     private final Path saveFile;
 
     private final HashMap<UUID,IndirectPlayer> indirectPlayers = new HashMap<>();
@@ -70,6 +78,56 @@ public class IndirectPlayerManager {
         nbt.put("indirectPlayers", lv);
 
         return nbt;
+    }
+
+    private final ArrayListDeque<IndirectPlayerTask> tasks = new ArrayListDeque<>();
+
+    @Override
+    public void tick() {
+        for(IndirectPlayerTask task : tasks) {
+            boolean shouldEndTask = task.shouldEnd();
+            if(shouldEndTask) {
+                tasks.remove(task);
+                task.onEnd();
+            }
+        }
+    }
+
+    static class IndirectPlayerTask implements Tickable {
+        private final Consumer<ServerPlayerEntity> task;
+        private final Predicate<IndirectPlayer> disableCondition;
+        private final IndirectPlayer player;
+
+        public static final Function<GamePhase,Predicate<IndirectPlayer>> CANCEL_ON_PHASE_CHANGE =
+        (phase) -> (player) -> phase != getShadow(player.server).state.phase;
+        public static final Predicate<IndirectPlayer> ALWAYS_CANCEL = (p) -> true;
+        public static final Predicate<IndirectPlayer> NEVER_CANCEL = (p) -> false;
+
+        IndirectPlayerTask(IndirectPlayer player, Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {
+            this.player = player;
+            this.task = task;
+            this.disableCondition = cancelCondition;
+        }
+
+        @Override
+        public boolean shouldEnd() {
+            if(this.disableCondition.test(player)) return true;
+
+            Optional<ServerPlayerEntity> sPlayer = player.getEntity();
+            if(sPlayer.isPresent()) {
+                this.task.accept(sPlayer.get());
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public void tick() { }
+    }
+
+    void schedule(IndirectPlayerTask task) {
+        this.tasks.add(task);
     }
 
     public Collection<IndirectPlayer> getAllPlayers() {

@@ -20,6 +20,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
@@ -130,6 +132,25 @@ public class IndirectPlayer {
         if(player.isEmpty()) { return; }
 
         player.get().sendMessage(chatMessage);
+    }
+
+    public void scheduleOnLoad(Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {
+        Optional<ServerPlayerEntity> sPlayer = this.getEntity();
+
+        if(sPlayer.isPresent()) {
+            task.accept(sPlayer.get());
+            // Don't bother scheduling if it should already be cancelled
+        } else if(cancelCondition.test(this)) {
+            getShadow(server)
+                .indirectPlayerManager
+                .schedule(
+                    new IndirectPlayerManager.IndirectPlayerTask(
+                        this,
+                        task,
+                        cancelCondition
+                    )
+                );
+        }
     }
 
     public void clearPlayerData() {
