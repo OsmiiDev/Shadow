@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.command.ServerCommandSource;
@@ -18,7 +17,7 @@ public class CancelCommand {
                         .executes((ctx) -> {
                             Shadow shadow = getShadow(ctx.getSource().getServer());
                             try {
-                                shadow.cancelGame();
+                                shadow.resetState();
 
                                 ctx.getSource().sendFeedback(
                                         () -> Text.literal("Cancelled Game"),

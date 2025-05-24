@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -33,11 +34,8 @@ public class ToggleStrength implements Ability {
     @Override
     public void apply() {
         hasStrength = !hasStrength;
-
-        if(this.player.getEntity().isEmpty()) return;
-
         if(hasStrength) {
-            this.player.getEntity().get().addStatusEffect(
+            this.player.getPlayerOrThrow().addStatusEffect(
                     new StatusEffectInstance(
                             StatusEffects.STRENGTH,
                             -1,
@@ -46,10 +44,10 @@ public class ToggleStrength implements Ability {
                             true
                     )
             );
-            this.player.sendMessage(Text.literal("Turned Strength On!"));
+            this.player.sendMessageNow(Text.literal("Turned Strength On!"));
         } else {
-            this.player.getEntity().get().removeStatusEffect(StatusEffects.STRENGTH);
-            this.player.sendMessage(Text.literal("Turned Strength Off!"));
+            this.player.getPlayerOrThrow().removeStatusEffect(StatusEffects.STRENGTH);
+            this.player.sendMessageNow(Text.literal("Turned Strength Off!"));
         }
     }
 
@@ -60,7 +58,10 @@ public class ToggleStrength implements Ability {
 
     @Override
     public void deInit() {
-        this.player.getEntity().ifPresent((player) -> player.removeStatusEffect(StatusEffects.STRENGTH));
+        this.player.scheduleOnLoad(
+                (player) -> player.removeStatusEffect(StatusEffects.STRENGTH),
+                CancelPredicates.NEVER_CANCEL
+        );
     }
 
     @Override

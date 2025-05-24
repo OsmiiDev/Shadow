@@ -3,7 +3,6 @@ package com.maximumg9.shadow.commands;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.Tickable;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.util.FakeStructureWorldAccess;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
@@ -57,7 +56,7 @@ public class LocationCommand {
                             MinecraftServer server = ctx.getSource().getServer();
                             Shadow shadow = getShadow(server);
                             try {
-                                shadow.cancelGame();
+                                shadow.resetState();
 
                                 shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
                             } catch (Throwable t) {
@@ -76,7 +75,7 @@ public class LocationCommand {
                                 try {
                                     shadow.state.playedStrongholdPositions.add(shadow.state.strongholdChunkPosition);
 
-                                    shadow.cancelGame();
+                                    shadow.resetState();
 
                                     shadow.saveAsync();
 
@@ -145,7 +144,7 @@ public class LocationCommand {
         shadow.saveAsync();
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            player.getEntity().get().changeGameMode(GameMode.ADVENTURE);
+            player.getPlayerOrThrow().changeGameMode(GameMode.ADVENTURE);
         }
 
         // delaying freezing seems to fix some bug related to people not being frozen correctly?

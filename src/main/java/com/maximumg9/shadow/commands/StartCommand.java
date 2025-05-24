@@ -1,9 +1,9 @@
 package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.*;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.util.TimeUtil;
+import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -69,11 +69,9 @@ public class StartCommand {
         shadow.addTickable(new StartTicker(shadow));
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            Optional<ServerPlayerEntity> psPlayer = player.getEntity();
-            assert psPlayer.isPresent();
-            ServerPlayerEntity entity = psPlayer.get();
+            ServerPlayerEntity entity = player.getPlayerOrThrow();
 
-            player.clearPlayerData();
+            player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
 
             ItemStack eyeStack = new ItemStack(Items.ENDER_EYE);
 
@@ -96,8 +94,11 @@ class StartTicker implements Tickable {
         this.shadow = shadow;
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-            player.setTitleTimes(10,20,10);
-            player.sendTitle(Text.literal("Spawning Ender Eyes").styled((style) -> style.withColor(Formatting.DARK_GREEN)));
+            player.setTitleTimesNow(10,20,10);
+            player.sendTitleNow(
+                    Text.literal("Spawning Ender Eyes")
+                        .styled((style) -> style.withColor(Formatting.DARK_GREEN))
+            );
         }
 
         spawnEnderEyes();
@@ -107,8 +108,8 @@ class StartTicker implements Tickable {
     public void tick() {
         if(ticksLeft % 20 == 0) {
             for(IndirectPlayer player : this.shadow.getOnlinePlayers()) {
-                player.setTitleTimes(5,10,5);
-                player.sendTitle(Text.literal(TimeUtil.ticksToText(this.ticksLeft,false)));
+                player.setTitleTimesNow(5,10,5);
+                player.sendTitleNow(Text.literal(TimeUtil.ticksToText(this.ticksLeft,false)));
             }
         }
 
@@ -135,28 +136,28 @@ class StartTicker implements Tickable {
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
             if(player.role == null) {
                 shadow.ERROR("Null role chosen");
-                shadow.cancelGame();
+                shadow.resetState();
                 return;
             }
 
             if(player.role.getFaction() == Faction.SPECTATOR) {
-                player.getEntity().get().changeGameMode(GameMode.SPECTATOR);
+                player.getPlayerOrThrow().changeGameMode(GameMode.SPECTATOR);
             } else {
-                player.getEntity().get().changeGameMode(GameMode.SURVIVAL);
+                player.getPlayerOrThrow().changeGameMode(GameMode.SURVIVAL);
             }
 
-            player.clearPlayerData();
+            player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
 
             giveDefaultItems(player);
             player.role.giveItems();
 
             player.frozen = false;
 
-            player.setTitleTimes(10,40,10);
-            player.sendTitle(player.role.getFaction().name);
+            player.setTitleTimesNow(10,40,10);
+            player.sendTitleNow(player.role.getFaction().name);
 
             if(player.role.getFaction() == Faction.SHADOW) {
-                player.sendMessage(otherShadowText);
+                player.sendMessage(otherShadowText, CancelPredicates.cancelOnPhaseChange(shadow.state.phase));
             }
         }
 
@@ -164,15 +165,9 @@ class StartTicker implements Tickable {
     }
 
     private void giveDefaultItems(IndirectPlayer player) {
-        Optional<ServerPlayerEntity> psPlayer = player.getEntity();
+        player.giveItemNow(shadow.config.food.foodGiver.apply(shadow.config.foodAmount));
 
-        if(psPlayer.isPresent()) {
-            PlayerInventory inventory = psPlayer.get().getInventory();
-
-            inventory.insertStack(shadow.config.food.foodGiver.apply(shadow.config.foodAmount));
-
-            inventory.insertStack(Items.NETHER_STAR.getDefaultStack());
-        }
+        player.giveItemNow(Items.NETHER_STAR.getDefaultStack());
     }
 
     private static final int NETHER_LAVA_HEIGHT = 32;

@@ -5,9 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Role;
+import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.Spectator;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
@@ -16,6 +18,7 @@ import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -62,25 +65,53 @@ public class IndirectPlayer {
     public boolean participating;
     @Expose
     public boolean frozen;
-    private Text name = Text.literal("Unknown");
+    private Text name = null;
 
     public Text getName() {
-        this.getEntity().ifPresent((psPlayer) -> this.name = psPlayer.getName());
+        this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
+        if(name == null) this.name = Text.literal(playerUUID.toString());
         return this.name;
     }
 
-    public Optional<ServerPlayerEntity> getEntity() {
+    public ServerPlayerEntity getPlayerOrThrow() throws OfflinePlayerException {
+        if(Random.create().nextInt(100) == 0) throw new OfflinePlayerException();
+
+        return this.getPlayer()
+            .orElseThrow(OfflinePlayerException::new);
+    }
+
+    Optional<ServerPlayerEntity> getPlayer() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
     }
 
-    public void setTitleTimes(int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        Optional<ServerPlayerEntity> player = getEntity();
+    public void giveItem(ItemStack stack, Predicate<IndirectPlayer> cancelPredicate) {
+        scheduleOnLoad(
+                (player) -> player.getInventory().insertStack(stack),
+                cancelPredicate
+        );
+    }
 
-        if(player.isEmpty()) { return; }
+    public void giveItemNow(ItemStack stack) {
+        this.getPlayer()
+                .orElseThrow(OfflinePlayerException::new)
+                .getInventory()
+                .insertStack(stack);
+    }
 
+    public void setTitleTimes(int fadeInTicks, int stayTicks, int fadeOutTicks, Predicate<IndirectPlayer> cancelPredicate) {
+        TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
+        scheduleOnLoad(
+                (player) -> player.networkHandler.sendPacket(packet),
+                cancelPredicate
+        );
+    }
+
+    public void setTitleTimesNow(int fadeInTicks, int stayTicks, int fadeOutTicks) {
         TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
 
-        player.get().networkHandler.sendPacket(packet);
+        this.getPlayer()
+                .orElseThrow(OfflinePlayerException::new)
+                .networkHandler.sendPacket(packet);
     }
 
     static IndirectPlayer load(MinecraftServer server, NbtCompound nbt) {
@@ -107,40 +138,54 @@ public class IndirectPlayer {
         return nbt;
     }
 
-    public void sendTitle(Text title) {
-        Optional<ServerPlayerEntity> player = getEntity();
-
-        if(player.isEmpty()) { return; }
-
+    public void sendTitle(Text title, Predicate<IndirectPlayer> cancelCondition) {
         TitleS2CPacket packet = new TitleS2CPacket(title);
 
-        player.get().networkHandler.sendPacket(packet);
+        scheduleOnLoad(
+                (player) -> player.networkHandler.sendPacket(packet)
+                , cancelCondition);
     }
-    public void sendSubtitle(Text subtitle) {
-        Optional<ServerPlayerEntity> player = getEntity();
 
-        if(player.isEmpty()) { return; }
+    public void sendTitleNow(Text title) throws OfflinePlayerException {
+        TitleS2CPacket packet = new TitleS2CPacket(title);
+        ServerPlayerEntity player = this.getPlayer().orElseThrow(OfflinePlayerException::new);
+        player.networkHandler.sendPacket(packet);
+    }
 
+    public void sendSubtitle(Text subtitle, Predicate<IndirectPlayer> cancelCondition) {
         SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
 
-        player.get().networkHandler.sendPacket(packet);
+        scheduleOnLoad(
+            (player) -> player.networkHandler.sendPacket(packet)
+        , cancelCondition);
     }
 
-    public void sendMessage(Text chatMessage) {
-        Optional<ServerPlayerEntity> player = getEntity();
+    public void sendSubtitleNow(Text subtitle) throws OfflinePlayerException {
+        SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
+        this.getPlayer()
+            .orElseThrow(OfflinePlayerException::new)
+            .networkHandler.sendPacket(packet);
+    }
 
-        if(player.isEmpty()) { return; }
+    public void sendMessage(Text chatMessage, Predicate<IndirectPlayer> cancelCondition) {
+        scheduleOnLoad(
+            (player) -> player.sendMessage(chatMessage)
+            , cancelCondition);
+    }
 
-        player.get().sendMessage(chatMessage);
+    public void sendMessageNow(Text chatMessage) throws OfflinePlayerException {
+        this.getPlayer()
+                .orElseThrow(OfflinePlayerException::new)
+                .sendMessage(chatMessage);
     }
 
     public void scheduleOnLoad(Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {
-        Optional<ServerPlayerEntity> sPlayer = this.getEntity();
+        Optional<ServerPlayerEntity> sPlayer = this.getPlayer();
 
         if(sPlayer.isPresent()) {
             task.accept(sPlayer.get());
-            // Don't bother scheduling if it should already be cancelled
-        } else if(cancelCondition.test(this)) {
+
+        } else if(cancelCondition.test(this)) { // Don't bother scheduling if it should already be cancelled
             getShadow(server)
                 .indirectPlayerManager
                 .schedule(
@@ -153,20 +198,25 @@ public class IndirectPlayer {
         }
     }
 
-    public void clearPlayerData() {
-        Optional<ServerPlayerEntity> possiblePlayer = getEntity();
+    public class OfflinePlayerException extends IllegalStateException {
+        private OfflinePlayerException() {
+            super(IndirectPlayer.this.name.getLiteralString() + " could not execute the task as they are not online");
+        }
+    }
 
-        if(possiblePlayer.isEmpty()) { return; }
+    public void clearPlayerData(Predicate<IndirectPlayer> cancelCondition) {
+        scheduleOnLoad(
+            (player) -> {
+                player.getInventory().clear();
+                player.getEnderChestInventory().clear();
+                player.setHealth(player.getMaxHealth());
+                player.getHungerManager().setFoodLevel(20);
+                player.getHungerManager().setSaturationLevel(5f);
+                AttributeContainer attributes = player.getAttributes();
 
-        ServerPlayerEntity player = possiblePlayer.get();
-
-        player.getInventory().clear();
-        player.getEnderChestInventory().clear();
-        player.setHealth(player.getMaxHealth());
-        player.getHungerManager().setFoodLevel(20);
-        player.getHungerManager().setSaturationLevel(5f);
-        AttributeContainer attributes = player.getAttributes();
-
-        attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);
+                attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);
+            },
+            cancelCondition
+        );
     }
 }

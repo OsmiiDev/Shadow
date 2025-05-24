@@ -6,6 +6,7 @@ import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.*;
 import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.roles.Faction;
+import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;
 import com.mojang.brigadier.CommandDispatcher;
@@ -93,11 +94,17 @@ public class Shadow implements Tickable {
         this.state.eyes.clear();
     }
 
-    public void cancelGame() {
+    public void resetState() {
         try {
             this.clearEyes();
 
             this.state = new GameState(this.state);
+
+            this.indirectPlayerManager.getAllPlayers().forEach((player) -> {
+                player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
+                player.role = null;
+                player.frozen = false;
+            });
 
             this.config.roleManager.clearRoles();
 
@@ -132,26 +139,23 @@ public class Shadow implements Tickable {
             subtitleText = null;
         }
 
-        this.getOnlinePlayers().forEach((player) -> {
-            player.setTitleTimes(10,40,10);
-            player.sendTitle(titleText);
+        this.getAllPlayers().forEach((player) -> {
+            player.setTitleTimes(10,40,10, CancelPredicates.cancelOnPhaseChange(state.phase));
+            player.sendTitle(titleText, CancelPredicates.cancelOnPhaseChange(state.phase));
             if(subtitleText != null) {
-                player.sendSubtitle(subtitleText);
+                player.sendSubtitle(subtitleText, CancelPredicates.cancelOnPhaseChange(state.phase));
             }
         });
 
         MutableText winnersText = Text.literal("Winners are:").styled(style -> style.withColor(Formatting.GOLD));
 
-        winners.forEach((winner) -> winner
-            .getEntity()
-            .ifPresent(
-                serverPlayerEntity ->
-                    winnersText.append(
-                        serverPlayerEntity.getName()
-                    )
-            ));
+        winners.forEach((winner) ->
+            winnersText.append(
+                winner.getName()
+            )
+        );
 
-        cancelGame();
+        resetState();
     }
 
     public void broadcast(Text text) {

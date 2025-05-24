@@ -7,7 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 
 import java.util.function.UnaryOperator;
 
-public class NBTUtil {
+public abstract class NBTUtil {
     public static NbtCompound getCustomData(ItemStack stack) {
         NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
         if(component == null) return new NbtCompound();

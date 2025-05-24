@@ -4,7 +4,7 @@ import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.ducks.ShadowProvider;
 import net.minecraft.server.MinecraftServer;
 
-public class MiscUtil {
+public abstract class MiscUtil {
     public static String padLeft(String original, char padding, int desiredLength) {
         if(original.length() >= desiredLength) return original;
         StringBuilder builder = new StringBuilder(original);
