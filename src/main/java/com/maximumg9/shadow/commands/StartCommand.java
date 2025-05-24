@@ -37,13 +37,13 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class StartCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
-                literal("$start")
-                        .then(
-                            literal("force")
-                                    .executes(StartCommand::start)
-                        )
-                        .executes(StartCommand::checkAndStart
-                        )
+            literal("$start")
+                .then(
+                    literal("force")
+                            .executes(StartCommand::start)
+                )
+                .executes(StartCommand::checkAndStart
+                )
         );
     }
 
@@ -149,7 +149,7 @@ class StartTicker implements Tickable {
             player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
 
             giveDefaultItems(player);
-            player.role.giveItems();
+            player.role.init();
 
             player.frozen = false;
 

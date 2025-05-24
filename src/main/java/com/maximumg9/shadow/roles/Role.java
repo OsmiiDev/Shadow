@@ -2,7 +2,11 @@ package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.screens.ItemRepresentable;
+import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -45,11 +49,21 @@ public abstract class Role implements ItemRepresentable {
         return nbt;
     }
 
-    public void giveItems() {}
-
     public void readNbt(NbtCompound nbt) {}
 
     public void init() {
+        this.player.scheduleOnLoad(
+            (player) ->
+                player.addStatusEffect(
+                    new StatusEffectInstance(
+                        StatusEffects.HASTE,
+                        -1,1,
+                        false,false,
+                        true
+                    )
+                ),
+            CancelPredicates.NEVER_CANCEL
+        );
         this.abilities.forEach(Ability::init);
     }
 

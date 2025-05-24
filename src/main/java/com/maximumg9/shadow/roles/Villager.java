@@ -39,15 +39,6 @@ public class Villager extends Role {
         public Villager makeRole(@Nullable IndirectPlayer player) {
             return new Villager(player);
         }
-
-        @Override
-        public Villager fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
-            Villager role = new Villager(player);
-
-            role.readNbt(nbt);
-
-            return role;
-        }
     }
 
     private static final ItemStack ITEM = new ItemStack(Items.EMERALD);

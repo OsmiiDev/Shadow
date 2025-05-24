@@ -37,15 +37,6 @@ public class Spectator extends Role {
         public Spectator makeRole(@Nullable IndirectPlayer player) {
             return new Spectator(player);
         }
-
-        @Override
-        public Spectator fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
-            Spectator role = new Spectator(player);
-
-            role.readNbt(nbt);
-
-            return role;
-        }
     }
 
     private static final ItemStack ITEM = new ItemStack(Items.LIGHT);

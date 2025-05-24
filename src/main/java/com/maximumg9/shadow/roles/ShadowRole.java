@@ -36,15 +36,6 @@ public class ShadowRole extends Role {
         public ShadowRole makeRole(@Nullable IndirectPlayer player) {
             return new ShadowRole(player);
         }
-
-        @Override
-        public ShadowRole fromNBT(NbtCompound nbt, @Nullable IndirectPlayer player) {
-            ShadowRole role = new ShadowRole(player);
-
-            role.readNbt(nbt);
-
-            return role;
-        }
     }
 
     private static final ItemStack ITEM = new ItemStack(Items.NETHERITE_SWORD);
