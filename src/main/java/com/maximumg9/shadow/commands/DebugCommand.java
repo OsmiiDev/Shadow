@@ -2,7 +2,6 @@ package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
@@ -10,6 +9,9 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.world.Heightmap;
 
 import java.util.Objects;
 
@@ -75,6 +77,21 @@ public class DebugCommand {
                                     return 1;
                                 })
                         )
+                )
+                .then(
+                    literal("sampleHeightmap")
+                        .executes( (ctx) -> {
+                            BlockPos position = BlockPos.ofFloored(ctx.getSource().getPosition());
+
+                            int x = position.getX();
+                            int z = position.getZ();
+
+                            int sample = ctx.getSource().getWorld().getChunk(ChunkSectionPos.getSectionCoord(x),ChunkSectionPos.getSectionCoord(z)).sampleHeightmap(Heightmap.Type.MOTION_BLOCKING,x,z);
+
+                            ctx.getSource().sendFeedback(() -> Text.of("Heightmap gives: " + sample), true);
+
+                            return 1;
+                        })
                 )
         );
     }

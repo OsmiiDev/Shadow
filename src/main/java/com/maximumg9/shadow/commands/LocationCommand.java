@@ -145,26 +145,8 @@ public class LocationCommand {
 
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
             player.getPlayerOrThrow().changeGameMode(GameMode.ADVENTURE);
+            player.frozen = true;
         }
-
-        // delaying freezing seems to fix some bug related to people not being frozen correctly?
-        shadow.addTickable(new Tickable() {
-            private int left = 5;
-            @Override
-            public void tick() {
-                left--;
-                if(left == 0) {
-                    for(IndirectPlayer player : shadow.getOnlinePlayers()) {
-                        player.frozen = true;
-                    }
-                }
-            }
-
-            @Override
-            public boolean shouldEnd() {
-                return left <= 0;
-            }
-        });
 
         return 1;
     }
@@ -334,7 +316,7 @@ public class LocationCommand {
         float currentAngle = 0;
 
         for (ServerPlayerEntity player : players) {
-            currentAngle += angleIncrement;
+             currentAngle += angleIncrement;
 
             float xOffset = MathHelper.cos(currentAngle) * radius;
             float zOffset = MathHelper.sin(currentAngle) * radius;
@@ -342,40 +324,44 @@ public class LocationCommand {
             double x = xOffset + centerPos.x;
             double z = zOffset + centerPos.z;
 
-            int y = getTopYForBoundingBox(world,player.getBoundingBox(player.getPose()).offset(x,0,z), Heightmap.Type.MOTION_BLOCKING);
+            int y = 1 + getTopYForBoundingBox(world,player.getBoundingBox(player.getPose()).offset(x,0,z), Heightmap.Type.MOTION_BLOCKING);
 
-            player.teleport(world,x,y + 0.2,z,currentAngle * MathHelper.PI/180,0);
+            player.teleport(world,x,y,z,currentAngle * 180/MathHelper.PI,0);
         }
     }
 
     public static int getTopYForBoundingBox(ServerWorld world, Box bb, Heightmap.Type heightMap) {
         int minX = MathHelper.floor(bb.minX);
         int maxX = MathHelper.floor(bb.maxX);
-        int minZ = MathHelper.floor(bb.minY);
+        int minZ = MathHelper.floor(bb.minZ);
         int maxZ = MathHelper.floor(bb.maxZ);
 
-        int highest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);
+        LogUtils.getLogger().info("minX: {},maxX: {},minZ: {},maxZ: {}", bb.minX,bb.maxX,bb.minZ,bb.maxZ);
+
+        int highest = world.getChunk(ChunkSectionPos.getSectionCoord(minX),ChunkSectionPos.getSectionCoord(minZ)).sampleHeightmap(heightMap,minX,minZ);
         int nhighest;
 
         if(minX != maxX) {
-            nhighest = world.getChunk(maxX/16,minZ/16).sampleHeightmap(heightMap,minX,maxZ);
+            nhighest = world.getChunk(ChunkSectionPos.getSectionCoord(maxX),ChunkSectionPos.getSectionCoord(minZ)).sampleHeightmap(heightMap,maxX,minZ);
             if(nhighest > highest) {
                 highest = nhighest;
             }
         }
         if(minZ != maxZ) {
-            nhighest = world.getChunk(minX/16,maxZ/16).sampleHeightmap(heightMap,minX,maxZ);
+            nhighest = world.getChunk(ChunkSectionPos.getSectionCoord(minX),ChunkSectionPos.getSectionCoord(maxZ)).sampleHeightmap(heightMap,minX,maxZ);
             if(nhighest > highest) {
                 highest = nhighest;
             }
 
             if(minX != maxX) {
-                nhighest = world.getChunk(maxX/16,maxZ/16).sampleHeightmap(heightMap,minX,maxZ);
+                nhighest = world.getChunk(ChunkSectionPos.getSectionCoord(maxX),ChunkSectionPos.getSectionCoord(maxZ)).sampleHeightmap(heightMap,maxX,maxZ);
                 if(nhighest > highest) {
                     highest = nhighest;
                 }
             }
         }
+
+        LogUtils.getLogger().info("y: {}",highest);
 
         return highest;
     }

@@ -49,7 +49,13 @@ public abstract class Role implements ItemRepresentable {
 
     public void readNbt(NbtCompound nbt) {}
 
-    public void init() {}
+    public void init() {
+        this.abilities.forEach(Ability::init);
+    }
+
+    public void deInit() {
+        this.abilities.forEach(Ability::deInit);
+    }
 
     public IndirectPlayer getPlayer() {
         return this.player;

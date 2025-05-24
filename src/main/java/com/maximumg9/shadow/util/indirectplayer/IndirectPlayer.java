@@ -53,7 +53,7 @@ public class IndirectPlayer {
         this.role = src.role;
         this.participating = src.participating;
         this.frozen = src.frozen;
-        this.name = src.name;
+        this.name = src.getName();
     }
     @Expose
     final UUID playerUUID;
@@ -200,7 +200,7 @@ public class IndirectPlayer {
 
     public class OfflinePlayerException extends IllegalStateException {
         private OfflinePlayerException() {
-            super(IndirectPlayer.this.name.getLiteralString() + " could not execute the task as they are not online");
+            super(IndirectPlayer.this.getName().getLiteralString() + " could not execute the task as they are not online");
         }
     }
 
@@ -212,6 +212,8 @@ public class IndirectPlayer {
                 player.setHealth(player.getMaxHealth());
                 player.getHungerManager().setFoodLevel(20);
                 player.getHungerManager().setSaturationLevel(5f);
+                player.clearStatusEffects();
+
                 AttributeContainer attributes = player.getAttributes();
 
                 attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);

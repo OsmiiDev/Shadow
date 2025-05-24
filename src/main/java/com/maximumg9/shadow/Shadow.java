@@ -16,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -100,8 +101,13 @@ public class Shadow implements Tickable {
 
             this.state = new GameState(this.state);
 
+            for(ServerWorld serverWorld : this.server.getWorlds()) {
+                serverWorld.setTimeOfDay(0);
+            }
+
             this.indirectPlayerManager.getAllPlayers().forEach((player) -> {
                 player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
+                if(player.role != null) player.role.deInit();
                 player.role = null;
                 player.frozen = false;
             });

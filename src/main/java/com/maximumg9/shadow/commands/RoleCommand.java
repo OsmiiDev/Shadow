@@ -23,7 +23,7 @@ public class RoleCommand {
                     shadow.config.roleManager.showRoleListIndex(Objects.requireNonNull(src.getPlayer()),src.hasPermissionLevel(3));
 
                     ctx.getSource().sendFeedback(
-                        () -> Text.literal("Opened Role Book"),
+                        () -> Text.literal("Opened Role Menu"),
                         true
                     );
 
