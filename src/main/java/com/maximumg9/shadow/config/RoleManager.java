@@ -53,10 +53,6 @@ public class RoleManager {
         return nbt;
     }
 
-    public RoleSlot getSlot(int id) {
-        return roleSlots[id];
-    }
-
     public void clearRoles() {
         shadow.getAllPlayers().forEach(
             (player) ->

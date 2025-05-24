@@ -6,6 +6,7 @@ import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.*;
 import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.roles.Faction;
+import com.maximumg9.shadow.roles.Spectator;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;
@@ -23,6 +24,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -83,6 +85,19 @@ public class Shadow implements Tickable {
         this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));
     }
 
+    public void LOG(String message) {
+        LOGGER.error(message);
+        Text messageAsText = Text.literal(message).styled((style) -> style.withColor(Formatting.DARK_GRAY));
+        this.getOnlinePlayers().stream()
+                .filter(player ->
+                        player.role instanceof Spectator &&
+                        player.getPlayerOrThrow().hasPermissionLevel(4)
+                )
+                .forEach(
+                        (player) -> player.sendMessageNow(messageAsText)
+                );
+    }
+
     public Collection<IndirectPlayer> getAllPlayers() {
         getOnlinePlayers();
         return this.indirectPlayerManager.getAllPlayers();
@@ -122,6 +137,7 @@ public class Shadow implements Tickable {
     }
 
     public void endGame(List<IndirectPlayer> winners, @Nullable Faction winningFaction, @Nullable Faction secondaryWinningFaction) {
+        state.phase = GamePhase.WON;
         MutableText titleText;
 
         if(winningFaction == null) {
@@ -146,6 +162,7 @@ public class Shadow implements Tickable {
         }
 
         this.getAllPlayers().forEach((player) -> {
+            player.scheduleOnLoad((sPlayer) -> sPlayer.changeGameMode(GameMode.SPECTATOR), CancelPredicates.cancelOnPhaseChange(state.phase));
             player.setTitleTimes(10,40,10, CancelPredicates.cancelOnPhaseChange(state.phase));
             player.sendTitle(titleText, CancelPredicates.cancelOnPhaseChange(state.phase));
             if(subtitleText != null) {
@@ -162,6 +179,7 @@ public class Shadow implements Tickable {
         );
 
         resetState();
+        state.phase = GamePhase.WON;
     }
 
     public void broadcast(Text text) {

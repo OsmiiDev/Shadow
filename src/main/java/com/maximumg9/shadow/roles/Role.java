@@ -4,7 +4,6 @@ import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
@@ -64,15 +63,23 @@ public abstract class Role implements ItemRepresentable {
                 ),
             CancelPredicates.NEVER_CANCEL
         );
+        this.player.scheduleOnLoad(
+            (player) ->
+                player.addStatusEffect(
+                    new StatusEffectInstance(
+                        StatusEffects.FIRE_RESISTANCE,
+                        10 * 20,0,
+                        false,false,
+                        true
+                    )
+                ),
+            CancelPredicates.NEVER_CANCEL
+        );
         this.abilities.forEach(Ability::init);
     }
 
     public void deInit() {
         this.abilities.forEach(Ability::deInit);
-    }
-
-    public IndirectPlayer getPlayer() {
-        return this.player;
     }
 
     public Text getName() {

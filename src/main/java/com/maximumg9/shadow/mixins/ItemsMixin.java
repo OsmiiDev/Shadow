@@ -19,11 +19,6 @@ import java.util.function.Function;
 @Mixin(Items.class)
 public class ItemsMixin {
 
-    @org.spongepowered.asm.mixin.Shadow
-    public static Item register(RegistryKey<Item> key, Item item) {
-        throw new RuntimeException(new IllegalAccessException());
-    }
-
     @Inject(method="register(Lnet/minecraft/registry/RegistryKey;Lnet/minecraft/item/Item;)Lnet/minecraft/item/Item;",at=@At("HEAD"), cancellable = true)
     private static void register(RegistryKey<Item> key, Item item, CallbackInfoReturnable<Item> cir) {
         Function<Item.Settings, Item> modifiedItemConstructor = Shadow.modifiedItems.get(key.getValue());

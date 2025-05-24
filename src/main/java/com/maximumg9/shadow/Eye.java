@@ -1,11 +1,12 @@
 package com.maximumg9.shadow;
 
+import com.maximumg9.shadow.util.Delay;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 
 import java.util.UUID;
 
@@ -15,19 +16,34 @@ public record Eye(RegistryKey<World> worldKey, UUID item, UUID display, BlockPos
 
         if(world == null) return;
 
-        Chunk chunk = world.getChunk(position);
+        world.getChunkManager().setChunkForced(new ChunkPos(position), true);
 
-        Entity itemEntity = world.getEntity(item);
-        if(itemEntity != null) {
-            itemEntity.remove(Entity.RemovalReason.DISCARDED);
-            shadow.ERROR("Tried to remove eye item that doesn't exist @" + position.toShortString());
-        }
+        shadow.addTickable(Delay.of(() -> {
+            Entity itemEntity = world.getEntity(item);
+            if(itemEntity != null) {
+                itemEntity.remove(Entity.RemovalReason.DISCARDED);
+            } else {
+                shadow.LOG("Tried to remove eye item that doesn't exist @" + position.toShortString());
+            }
 
-        Entity displayEntity = world.getEntity(display);
-        if(displayEntity != null) {
-            displayEntity.remove(Entity.RemovalReason.DISCARDED);
-        } else {
-            shadow.ERROR("Tried to remove eye display that doesn't exist @" + position.toShortString());
-        }
+            Entity displayEntity = world.getEntity(display);
+            if(displayEntity != null) {
+                displayEntity.remove(Entity.RemovalReason.DISCARDED);
+            } else {
+                shadow.LOG("Tried to remove eye display that doesn't exist @" + position.toShortString());
+            }
+
+            world.getChunkManager().setChunkForced(new ChunkPos(position), false);
+        },5));
+    }
+
+    @Override
+    public String toString() {
+        return "Eye{" +
+                "worldKey=" + worldKey +
+                ", item=" + item +
+                ", display=" + display +
+                ", position=" + position +
+                '}';
     }
 }

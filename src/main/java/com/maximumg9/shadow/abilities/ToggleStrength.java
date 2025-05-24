@@ -67,6 +67,6 @@ public class ToggleStrength implements Ability {
 
     @Override
     public ItemStack getAsItem() {
-        return ITEM_STACK;
+        return ITEM_STACK.copy();
     }
 }

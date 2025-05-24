@@ -4,7 +4,6 @@ import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;

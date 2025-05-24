@@ -12,7 +12,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
@@ -28,8 +27,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.dimension.DimensionType;
-
-import java.util.Optional;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 import static net.minecraft.server.command.CommandManager.literal;

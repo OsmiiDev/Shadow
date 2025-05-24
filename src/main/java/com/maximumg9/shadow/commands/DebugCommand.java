@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.commands;
 
+import com.maximumg9.shadow.Eye;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Roles;
@@ -93,6 +94,19 @@ public class DebugCommand {
                             return 1;
                         })
                 )
+                    .then(
+                        literal("eyes")
+                            .executes( (ctx) -> {
+                                StringBuilder text = new StringBuilder("Eyes: ");
+                                for(Eye eye : getShadow(ctx.getSource().getServer()).state.eyes) {
+                                    text.append(eye.toString()).append(", ");
+                                }
+
+                                ctx.getSource().sendFeedback(() -> Text.literal(text.toString()), true);
+
+                                return 1;
+                            })
+                    )
         );
     }
 }

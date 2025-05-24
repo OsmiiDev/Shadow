@@ -2,7 +2,6 @@ package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.Tickable;
 import com.maximumg9.shadow.util.FakeStructureWorldAccess;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
@@ -10,6 +9,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.logging.LogUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -121,15 +122,11 @@ public class LocationCommand {
         overworld.getWorldBorder().setCenter(shadow.state.currentLocation.getX(),shadow.state.currentLocation.getZ());
         overworld.getWorldBorder().setSize(shadow.config.worldBorderSize);
 
-        ServerWorld nether = src.getServer().getWorld(ServerWorld.NETHER);
-
-        if(nether == null) {
-            shadow.ERROR("Nether does not exist");
-            return -1;
-        }
-
-        nether.getWorldBorder().setCenter(shadow.state.currentLocation.getX()/8.0,shadow.state.currentLocation.getX()/8.0);
-        nether.getWorldBorder().setSize(shadow.config.worldBorderSize);
+        overworld.iterateEntities().forEach((entity) -> {
+            if(entity.getType() != EntityType.PLAYER) {
+                entity.remove(Entity.RemovalReason.DISCARDED);
+            }
+        });
 
         src.sendFeedback(
             () ->
