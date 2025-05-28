@@ -29,7 +29,7 @@ public abstract class Role implements ItemRepresentable {
         return role.factory.fromNBT(nbt, player);
     }
 
-    private final IndirectPlayer player;
+    final IndirectPlayer player;
 
     private final List<Ability> abilities = new ArrayList<>();
 
@@ -48,32 +48,34 @@ public abstract class Role implements ItemRepresentable {
         return nbt;
     }
 
+    public void onNight() {
+        this.abilities.forEach(Ability::onNight);
+    }
+
+    public void onDay() {
+        this.abilities.forEach(Ability::onDay);
+    }
+
     public void readNbt(NbtCompound nbt) {}
 
     public void init() {
-        this.player.scheduleOnLoad(
-            (player) ->
-                player.addStatusEffect(
-                    new StatusEffectInstance(
-                        StatusEffects.HASTE,
-                        -1,1,
-                        false,false,
-                        true
-                    )
-                ),
+        this.player.giveEffect(
+            new StatusEffectInstance(
+                StatusEffects.HASTE,
+                -1,1,
+                false,false,
+                true
+            ),
             CancelPredicates.NEVER_CANCEL
         );
-        this.player.scheduleOnLoad(
-            (player) ->
-                player.addStatusEffect(
-                    new StatusEffectInstance(
-                        StatusEffects.FIRE_RESISTANCE,
-                        10 * 20,0,
-                        false,false,
-                        true
-                    )
-                ),
-            CancelPredicates.NEVER_CANCEL
+        this.player.giveEffect(
+            new StatusEffectInstance(
+                StatusEffects.FIRE_RESISTANCE,
+                10 * 20,0,
+                false,false,
+                true
+            ),
+            CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
         );
         this.abilities.forEach(Ability::init);
     }

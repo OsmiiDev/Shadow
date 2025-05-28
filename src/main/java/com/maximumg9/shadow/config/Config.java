@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.config;
 
 import com.maximumg9.shadow.Shadow;
-import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtSizeTracker;
@@ -18,6 +17,7 @@ public class Config {
     public int netherRoofEyes = 8;
     public Food food = Food.BREAD;
     public int foodAmount = 16;
+    public double additionalTimePerTickDuringNight = 1;
 
     public Config(Shadow shadow, Path saveFile) {
         this.roleManager = new RoleManager(shadow, this);

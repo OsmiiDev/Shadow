@@ -2,10 +2,12 @@ package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.abilities.ToggleStrength;
+import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +26,26 @@ public class ShadowRole extends Role {
 
     @Override
     public String getRawName() { return "Shadow"; }
+
+    @Override
+    public void onNight() {
+        this.player.sendSubtitle(
+            Text.literal("It is now night, your power grows, it's your opportunity to kill")
+                .styled((style) -> style.withColor(Formatting.GOLD)),
+            CancelPredicates.IS_DAY
+        );
+        super.onNight();
+    }
+
+    @Override
+    public void onDay() {
+        this.player.sendSubtitle(
+                Text.literal("It's now day")
+                        .styled((style) -> style.withColor(Formatting.YELLOW)),
+                CancelPredicates.IS_NIGHT
+        );
+        super.onDay();
+    }
 
     @Override
     public TextColor getColor() { return TextColor.fromFormatting(Formatting.RED); }

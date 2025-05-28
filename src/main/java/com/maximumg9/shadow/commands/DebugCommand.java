@@ -3,13 +3,17 @@ package com.maximumg9.shadow.commands;
 import com.maximumg9.shadow.Eye;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.Heightmap;
@@ -27,9 +31,9 @@ public class DebugCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$debug")
-                .requires((source) -> source.hasPermissionLevel(3))
                 .then(
                     literal("setRole")
+                        .requires((source) -> source.hasPermissionLevel(3))
                         .then(
                             argument("player", player())
                                 .then(
@@ -63,6 +67,7 @@ public class DebugCommand {
                 )
                 .then(
                     literal("setPhase")
+                        .requires((source) -> source.hasPermissionLevel(3))
                         .then(
                             argument("phase", string())
                                 .suggests(GamePhase::suggest)
@@ -81,6 +86,7 @@ public class DebugCommand {
                 )
                 .then(
                     literal("sampleHeightmap")
+                        .requires((source) -> source.hasPermissionLevel(3))
                         .executes( (ctx) -> {
                             BlockPos position = BlockPos.ofFloored(ctx.getSource().getPosition());
 
@@ -94,19 +100,50 @@ public class DebugCommand {
                             return 1;
                         })
                 )
-                    .then(
-                        literal("eyes")
-                            .executes( (ctx) -> {
-                                StringBuilder text = new StringBuilder("Eyes: ");
-                                for(Eye eye : getShadow(ctx.getSource().getServer()).state.eyes) {
-                                    text.append(eye.toString()).append(", ");
-                                }
+                .then(
+                    literal("currentRoles")
+                        .requires((source) -> {
+                            if(source.hasPermissionLevel(3)) {
+                                return true;
+                            }
+                            IndirectPlayer player = getShadow(source.getServer()).getIndirect(source.getPlayer());
+                            return player.role != null && player.role.getFaction() == Faction.SPECTATOR;
+                        })
+                        .executes((ctx) -> {
+                            Shadow shadow = getShadow(ctx.getSource().getServer());
 
-                                ctx.getSource().sendFeedback(() -> Text.literal(text.toString()), true);
+                            MutableText response = Text.literal("Roles: \n");
 
-                                return 1;
-                            })
-                    )
+                            shadow.indirectPlayerManager.getAllPlayers().forEach(
+                                    player ->
+                                            response
+                                            .append(player.getName())
+                                            .append(Text.literal(": ")).setStyle(Style.EMPTY)
+                                            .append(player.role != null ?
+                                                    player.role.getName() :
+                                                    Text.literal("null").styled((style) -> style.withColor(Formatting.GRAY))
+                                            )
+                            );
+
+                            ctx.getSource().sendFeedback(() -> response, true);
+
+                            return 1;
+                        })
+                )
+                .then(
+                    literal("eyes")
+                        .requires((source) -> source.hasPermissionLevel(3))
+                        .executes( (ctx) -> {
+                            StringBuilder text = new StringBuilder("Eyes: ");
+                            for(Eye eye : getShadow(ctx.getSource().getServer()).state.eyes) {
+                                text.append(eye.toString()).append(", ");
+                            }
+
+                            ctx.getSource().sendFeedback(() -> Text.literal(text.toString()), true);
+
+                            return 1;
+                        })
+                )
         );
     }
 }

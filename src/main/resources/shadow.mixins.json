@@ -11,7 +11,8 @@
     "MinecraftServerMixin",
     "PlayerDeathMixin",
     "ServerPlayerEntityMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "ServerPlayNetworkHandlerMixin",
+    "ServerWorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

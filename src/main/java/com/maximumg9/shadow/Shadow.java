@@ -80,6 +80,24 @@ public class Shadow implements Tickable {
         }
     }
 
+    public boolean isNight() {
+        return state.isNight;
+    }
+
+    public void setNight() {
+        this.state.isNight = true;
+        this.indirectPlayerManager.getAllPlayers().forEach((player) -> {
+            if(player.role != null) player.role.onNight();
+        });
+    }
+
+    public void setDay() {
+        this.state.isNight = false;
+        this.indirectPlayerManager.getAllPlayers().forEach((player) -> {
+            if(player.role != null) player.role.onDay();
+        });
+    }
+
     public void ERROR(String message) {
         LOGGER.error(message);
         this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));

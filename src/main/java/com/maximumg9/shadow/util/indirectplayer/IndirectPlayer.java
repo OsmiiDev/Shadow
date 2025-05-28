@@ -5,28 +5,31 @@ import com.google.gson.annotations.Expose;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Role;
-import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.Spectator;
+import com.maximumg9.shadow.util.MiscUtil;
+import net.minecraft.advancement.AdvancementEntry;
+import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 /**
  This is meant to represent a player who existed at some time, even if the player does not exist now
@@ -36,9 +39,8 @@ public class IndirectPlayer {
     public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
         this.server = base.server;
-        Shadow shadow = getShadow(this.server);
         this.role = new Spectator(this);
-        this.participating = shadow.state.phase != GamePhase.PLAYING;
+        this.participating = getShadow().state.phase != GamePhase.PLAYING;
         this.name = base.getName();
     }
 
@@ -67,51 +69,8 @@ public class IndirectPlayer {
     public boolean frozen;
     private Text name = null;
 
-    public Text getName() {
-        this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
-        if(name == null) this.name = Text.literal(playerUUID.toString());
-        return this.name;
-    }
-
-    public ServerPlayerEntity getPlayerOrThrow() throws OfflinePlayerException {
-        if(Random.create().nextInt(100) == 0) throw new OfflinePlayerException();
-
-        return this.getPlayer()
-            .orElseThrow(OfflinePlayerException::new);
-    }
-
-    Optional<ServerPlayerEntity> getPlayer() {
-        return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
-    }
-
-    public void giveItem(ItemStack stack, Predicate<IndirectPlayer> cancelPredicate) {
-        scheduleOnLoad(
-                (player) -> player.getInventory().insertStack(stack),
-                cancelPredicate
-        );
-    }
-
-    public void giveItemNow(ItemStack stack) {
-        this.getPlayer()
-                .orElseThrow(OfflinePlayerException::new)
-                .getInventory()
-                .insertStack(stack);
-    }
-
-    public void setTitleTimes(int fadeInTicks, int stayTicks, int fadeOutTicks, Predicate<IndirectPlayer> cancelPredicate) {
-        TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
-        scheduleOnLoad(
-                (player) -> player.networkHandler.sendPacket(packet),
-                cancelPredicate
-        );
-    }
-
-    public void setTitleTimesNow(int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
-
-        this.getPlayer()
-                .orElseThrow(OfflinePlayerException::new)
-                .networkHandler.sendPacket(packet);
+    public Shadow getShadow() {
+        return MiscUtil.getShadow(this.server);
     }
 
     static IndirectPlayer load(MinecraftServer server, NbtCompound nbt) {
@@ -138,6 +97,72 @@ public class IndirectPlayer {
         return nbt;
     }
 
+    public Text getName() {
+        this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
+        if(name == null) this.name = Text.literal(playerUUID.toString());
+        return this.name;
+    }
+
+    public ServerPlayerEntity getPlayerOrThrow() throws OfflinePlayerException {
+        return this.getPlayer()
+            .orElseThrow(OfflinePlayerException::new);
+    }
+
+    Optional<ServerPlayerEntity> getPlayer() {
+        return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
+    }
+
+    public void giveEffect(StatusEffectInstance effect, Predicate<IndirectPlayer> cancelPredicate) {
+        scheduleOnLoad(
+                (player) -> player.addStatusEffect(effect),
+                cancelPredicate
+        );
+    }
+
+    public void giveEffectNow(StatusEffectInstance effect) {
+        this.getPlayerOrThrow()
+                .addStatusEffect(effect);
+    }
+
+    public void removeEffect(RegistryEntry<StatusEffect> effectType, Predicate<IndirectPlayer> cancelPredicate) {
+        scheduleOnLoad(
+                (player) -> player.removeStatusEffect(effectType),
+                cancelPredicate
+        );
+    }
+
+    public void removeEffectNow(RegistryEntry<StatusEffect> effectType) {
+        this.getPlayerOrThrow().removeStatusEffect(effectType);
+    }
+
+    public void giveItem(ItemStack stack, Predicate<IndirectPlayer> cancelPredicate) {
+        scheduleOnLoad(
+                (player) -> player.getInventory().insertStack(stack),
+                cancelPredicate
+        );
+    }
+
+    public void giveItemNow(ItemStack stack) {
+        this.getPlayerOrThrow()
+                .getInventory()
+                .insertStack(stack);
+    }
+
+    public void setTitleTimes(int fadeInTicks, int stayTicks, int fadeOutTicks, Predicate<IndirectPlayer> cancelPredicate) {
+        TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
+        scheduleOnLoad(
+                (player) -> player.networkHandler.sendPacket(packet),
+                cancelPredicate
+        );
+    }
+
+    public void setTitleTimesNow(int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
+
+        this.getPlayerOrThrow()
+                .networkHandler.sendPacket(packet);
+    }
+
     public void sendTitle(Text title, Predicate<IndirectPlayer> cancelCondition) {
         TitleS2CPacket packet = new TitleS2CPacket(title);
 
@@ -148,8 +173,8 @@ public class IndirectPlayer {
 
     public void sendTitleNow(Text title) throws OfflinePlayerException {
         TitleS2CPacket packet = new TitleS2CPacket(title);
-        ServerPlayerEntity player = this.getPlayer().orElseThrow(OfflinePlayerException::new);
-        player.networkHandler.sendPacket(packet);
+        this.getPlayerOrThrow()
+                .networkHandler.sendPacket(packet);
     }
 
     public void sendSubtitle(Text subtitle, Predicate<IndirectPlayer> cancelCondition) {
@@ -162,8 +187,7 @@ public class IndirectPlayer {
 
     public void sendSubtitleNow(Text subtitle) throws OfflinePlayerException {
         SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
-        this.getPlayer()
-            .orElseThrow(OfflinePlayerException::new)
+        this.getPlayerOrThrow()
             .networkHandler.sendPacket(packet);
     }
 
@@ -174,8 +198,7 @@ public class IndirectPlayer {
     }
 
     public void sendMessageNow(Text chatMessage) throws OfflinePlayerException {
-        this.getPlayer()
-                .orElseThrow(OfflinePlayerException::new)
+        this.getPlayerOrThrow()
                 .sendMessage(chatMessage);
     }
 
@@ -186,7 +209,7 @@ public class IndirectPlayer {
             task.accept(sPlayer.get());
 
         } else if(cancelCondition.test(this)) { // Don't bother scheduling if it should already be cancelled
-            getShadow(server)
+            getShadow()
                 .indirectPlayerManager
                 .schedule(
                     new IndirectPlayerManager.IndirectPlayerTask(
@@ -207,6 +230,21 @@ public class IndirectPlayer {
     public void clearPlayerData(Predicate<IndirectPlayer> cancelCondition) {
         scheduleOnLoad(
             (player) -> {
+                for (
+                        AdvancementEntry advancement
+                        :
+                        Objects.requireNonNull(player.getServer())
+                                .getAdvancementLoader()
+                                .getAdvancements()
+                ) {
+                    AdvancementProgress advancementProgress = player.getAdvancementTracker().getProgress(advancement);
+                    if (advancementProgress.isAnyObtained()) {
+                        for(String string : advancementProgress.getObtainedCriteria()) {
+                            player.getAdvancementTracker().revokeCriterion(advancement, string);
+                        }
+                    }
+                }
+
                 player.getInventory().clear();
                 player.getEnderChestInventory().clear();
                 player.setHealth(player.getMaxHealth());

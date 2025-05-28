@@ -8,9 +8,11 @@ import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 public abstract class CancelPredicates {
     public static Predicate<IndirectPlayer> cancelOnPhaseChange(GamePhase currentPhase) {
-        return (player) -> currentPhase != getShadow(player.server).state.phase;
+        return (p) -> currentPhase != getShadow(p.server).state.phase;
     }
 
+    public static final Predicate<IndirectPlayer> IS_NIGHT = (p) -> getShadow(p.server).isNight();
+    public static final Predicate<IndirectPlayer> IS_DAY = (p) -> !getShadow(p.server).isNight();
     public static final Predicate<IndirectPlayer> ALWAYS_CANCEL = (p) -> true;
     public static final Predicate<IndirectPlayer> NEVER_CANCEL = (p) -> false;
 }

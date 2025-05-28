@@ -9,6 +9,7 @@ import java.util.List;
 public class GameState implements Cloneable {
     public GamePhase phase = GamePhase.NOT_PLAYING;
 
+    boolean isNight = false;
     public BlockPos currentLocation = null;
     public ChunkPos strongholdChunkPosition = null;
     public List<ChunkPos> playedStrongholdPositions = new ArrayList<>();
