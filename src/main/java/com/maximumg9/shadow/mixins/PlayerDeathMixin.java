@@ -2,7 +2,6 @@ package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Spectator;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -14,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.GameRules;
@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
-import java.util.Objects;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
@@ -55,15 +54,14 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
             MutableText name = Team.decorateName(this.getScoreboardTeam(), this.getName());
 
+            IndirectPlayer iPlayer = shadow.getIndirect((ServerPlayerEntity) (Object) this);
+
             name
                 .append(Text.of(" died. They were a "))
                 .append(
-                    Objects.requireNonNull(
-                        shadow
-                            .indirectPlayerManager
-                            .getIndirect((ServerPlayerEntity) (Object) this)
-                            .role
-                    ).getName()
+                    iPlayer.role == null ?
+                        Text.literal("Null").styled((style) -> style.withColor(Formatting.RED)) :
+                        iPlayer.role.getName()
                 );
 
             shadow.broadcast(name);

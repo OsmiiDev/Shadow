@@ -4,6 +4,7 @@ import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
@@ -43,22 +44,47 @@ public abstract class Role implements ItemRepresentable {
 
     public abstract TextColor getColor();
 
+    public abstract boolean cantSeeGlowingDuringNight();
+
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putString("role",this.getRawName());
         return nbt;
     }
 
     public void onNight() {
+        // Cursed forcing to send an update on the flags
+        this.player.getPlayer().ifPresent(
+                (p) -> p.getDataTracker().set(
+                        Entity.FLAGS,
+                        p.getDataTracker().get(Entity.FLAGS),
+                        true
+                )
+        );
         this.abilities.forEach(Ability::onNight);
     }
 
     public void onDay() {
+        this.player.getPlayer().ifPresent(
+                (p) -> p.getDataTracker().set(
+                        Entity.FLAGS,
+                        p.getDataTracker().get(Entity.FLAGS),
+                        true
+                )
+        );
         this.abilities.forEach(Ability::onDay);
     }
 
     public void readNbt(NbtCompound nbt) {}
 
     public void init() {
+        this.player.getPlayer().ifPresent(
+                (p) -> p.getDataTracker().set(
+                        Entity.FLAGS,
+                        (byte) (p.getDataTracker().get(Entity.FLAGS) |
+                                (1 << Entity.GLOWING_FLAG_INDEX)),
+                        true
+                )
+        );
         this.player.giveEffect(
             new StatusEffectInstance(
                 StatusEffects.HASTE,

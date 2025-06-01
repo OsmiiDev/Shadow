@@ -1,16 +1,12 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.screens.ItemRepresentable;
-import com.maximumg9.shadow.util.MiscUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.random.Random;
 

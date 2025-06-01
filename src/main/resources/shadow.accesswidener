@@ -13,3 +13,7 @@ accessible field net/minecraft/entity/attribute/AttributeContainer custom Ljava/
 accessible method net/minecraft/entity/decoration/DisplayEntity$ItemDisplayEntity setItemStack (Lnet/minecraft/item/ItemStack;)V
 
 accessible method net/minecraft/server/world/ServerChunkManager updateChunks ()Z
+
+accessible class net/minecraft/server/world/ServerChunkLoadingManager$EntityTracker
+accessible field net/minecraft/entity/Entity FLAGS Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/entity/Entity GLOWING_FLAG_INDEX I

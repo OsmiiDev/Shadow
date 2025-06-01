@@ -108,7 +108,7 @@ public class IndirectPlayer {
             .orElseThrow(OfflinePlayerException::new);
     }
 
-    Optional<ServerPlayerEntity> getPlayer() {
+    public Optional<ServerPlayerEntity> getPlayer() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
     }
 

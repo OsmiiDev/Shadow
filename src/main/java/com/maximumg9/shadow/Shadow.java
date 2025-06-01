@@ -98,6 +98,10 @@ public class Shadow implements Tickable {
         });
     }
 
+    public void setSilentDay() {
+        this.state.isNight = false;
+    }
+
     public void ERROR(String message) {
         LOGGER.error(message);
         this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));

@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.mixins;
 
+import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
@@ -18,6 +19,10 @@ public abstract class ServerWorldMixin {
     @Redirect(method = "tickTime",at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;setTimeOfDay(J)V"))
     public void setTimeOfDay(ServerWorld instance, long timeOfDay) {
         Shadow shadow = getShadow(instance.getServer());
+        if(shadow.state.phase != GamePhase.PLAYING) {
+            shadow.setSilentDay();
+        }
+
         if (timeOfDay % 24000 < 13000 && shadow.isNight()) {
             shadow.setDay();
         }

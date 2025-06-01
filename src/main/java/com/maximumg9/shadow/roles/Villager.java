@@ -69,6 +69,11 @@ public class Villager extends Role {
         return TextColor.fromFormatting(Formatting.GREEN);
     }
 
+    @Override
+    public boolean cantSeeGlowingDuringNight() {
+        return true;
+    }
+
     public static final RoleFactory<Villager> FACTORY = new Factory();
     private static class Factory implements RoleFactory<Villager> {
         @Override

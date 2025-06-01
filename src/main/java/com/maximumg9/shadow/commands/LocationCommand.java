@@ -88,7 +88,15 @@ public class LocationCommand {
                                 return 0;
                             })
                     )
-                .executes(LocationCommand::findAndGotoLocation)
+                .executes((ctx) -> {
+                    int ret = 0;
+                    try {
+                        ret = LocationCommand.findAndGotoLocation(ctx);
+                    } catch(Exception e) {
+                        getShadow(ctx.getSource().getServer()).ERROR(e.toString());
+                    }
+                    return ret;
+                })
         );
     }
 

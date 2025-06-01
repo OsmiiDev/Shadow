@@ -43,6 +43,11 @@ public class Spectator extends Role {
     }
 
     @Override
+    public boolean cantSeeGlowingDuringNight() {
+        return false;
+    }
+
+    @Override
     public void onDay() {
         this.player.sendSubtitle(
                 Text.literal("It's now day")

@@ -50,6 +50,11 @@ public class ShadowRole extends Role {
     @Override
     public TextColor getColor() { return TextColor.fromFormatting(Formatting.RED); }
 
+    @Override
+    public boolean cantSeeGlowingDuringNight() {
+        return false;
+    }
+
     public static final RoleFactory<ShadowRole> FACTORY = new Factory();
 
     private static class Factory implements RoleFactory<ShadowRole> {

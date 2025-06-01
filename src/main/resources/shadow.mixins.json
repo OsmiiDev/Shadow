@@ -6,6 +6,8 @@
   "mixins": [
     "CommandManagerMixin",
     "DragonDeathMixin",
+    "EntityTrackerEntryMixin",
+    "EntityTrackerMixin",
     "ItemMixin",
     "ItemsMixin",
     "MinecraftServerMixin",
