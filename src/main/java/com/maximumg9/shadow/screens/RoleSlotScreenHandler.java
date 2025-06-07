@@ -5,6 +5,7 @@ import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.roles.RoleSlot;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.util.Delay;
+import com.maximumg9.shadow.util.MiscUtil;
 import com.mojang.logging.LogUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -33,11 +35,14 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
     private final RoleSlot slot;
     private final Inventory inventory;
+    private final ScreenHandlerContext context;
 
     private int page = 0;
 
-    private RoleSlotScreenHandler(int syncID, RoleSlot slot) {
+    private RoleSlotScreenHandler(int syncID, RoleSlot slot, ScreenHandlerContext context) {
         super(ScreenHandlerType.GENERIC_9X6, syncID);
+        this.context = context;
+
         this.slot = slot;
 
         this.inventory = new SimpleInventory(SIZE);
@@ -109,7 +114,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
                 upStack.set(DataComponentTypes.ITEM_NAME, UP_TEXT);
                 this.inventory.setStack((row*3) * 9 + column,upStack);
 
-                ItemStack roleStack = proxyRole.getAsItem();
+                ItemStack roleStack = MiscUtil.getItemWithContext(proxyRole,this.context);
                 roleStack.set(
                     DataComponentTypes.LORE,
                     new LoreComponent(
@@ -207,7 +212,10 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
         @Override
         public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-            return new RoleSlotScreenHandler(syncId, slot);
+            return new RoleSlotScreenHandler(
+                syncId, slot,
+                ScreenHandlerContext.create(player.getWorld(),player.getBlockPos())
+            );
         }
     }
 }

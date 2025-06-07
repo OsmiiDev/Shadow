@@ -1,11 +1,13 @@
 package com.maximumg9.shadow.screens;
 
+import com.maximumg9.shadow.util.MiscUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -44,7 +46,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         }
     }
 
-    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values) {
+    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values, ScreenHandlerContext context) {
         super(getTypeForSize(values.size()), syncId);
 
         inventorySize = Math.ceilDiv(values.size(), 9) * 9;
@@ -56,7 +58,9 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
         int i=0;
         for(V value : values) {
-            this.getSlot(i).insertStack(value.getAsItem());
+            this.getSlot(i).insertStack(
+                MiscUtil.getItemWithContext(value,context)
+            );
             decisionResultHashMap.put(i,value);
             i++;
         }
@@ -109,7 +113,10 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
         @Override
         public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-            return new DecisionScreenHandler<>(syncId, this.resultCallback, values);
+            return new DecisionScreenHandler<>(
+                syncId, this.resultCallback, values,
+                ScreenHandlerContext.create(player.getWorld(),player.getBlockPos())
+            );
         }
     }
 

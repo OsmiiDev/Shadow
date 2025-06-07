@@ -6,6 +6,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.random.Random;
@@ -91,7 +92,7 @@ public class RoleSlot implements ItemRepresentable {
     }
 
     @Override
-    public ItemStack getAsItem() {
+    public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
         ItemStack stack = new ItemStack(Items.STRUCTURE_VOID);
         stack.set(DataComponentTypes.ITEM_NAME, getName());
         ArrayList<Text> loreList = new ArrayList<>();

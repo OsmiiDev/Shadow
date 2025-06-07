@@ -17,3 +17,5 @@ accessible method net/minecraft/server/world/ServerChunkManager updateChunks ()Z
 accessible class net/minecraft/server/world/ServerChunkLoadingManager$EntityTracker
 accessible field net/minecraft/entity/Entity FLAGS Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/entity/Entity GLOWING_FLAG_INDEX I
+
+accessible method net/minecraft/entity/projectile/ProjectileEntity <init> (Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;)V

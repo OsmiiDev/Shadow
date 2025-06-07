@@ -14,7 +14,8 @@ import java.util.concurrent.CompletableFuture;
 public enum Roles {
     SPECTATOR(Spectator.FACTORY),
     VILLAGER(Villager.FACTORY),
-    SHADOW(ShadowRole.FACTORY);
+    SHADOW(ShadowRole.FACTORY),
+    SHERIFF(Sheriff.FACTORY);
 
     public final String name;
     public final RoleFactory<?> factory;
@@ -46,7 +47,7 @@ public enum Roles {
         List<Roles> possibleRoles = Arrays.stream(values()).filter((role) -> role.name.equals(roleName)).toList();
 
         if(possibleRoles.isEmpty()) {
-            throw new IllegalArgumentException("no role with name: " + roleName);
+            throw new IllegalArgumentException("No role with name: " + roleName);
         }
 
         if(possibleRoles.size() > 1) {

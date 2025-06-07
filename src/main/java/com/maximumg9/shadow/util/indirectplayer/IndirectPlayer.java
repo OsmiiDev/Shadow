@@ -57,15 +57,12 @@ public class IndirectPlayer {
         this.frozen = src.frozen;
         this.name = src.getName();
     }
-    @Expose
-    final UUID playerUUID;
+
+    public final UUID playerUUID;
     final MinecraftServer server;
     @Nullable
-    @Expose
     public Role role;
-    @Expose
     public boolean participating;
-    @Expose
     public boolean frozen;
     private Text name = null;
 

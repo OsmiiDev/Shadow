@@ -107,17 +107,51 @@ public class Shadow implements Tickable {
         this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));
     }
 
+    public void ERROR(Throwable t) {
+        ERROR("",t);
+    }
+
+    public void ERROR(String message,Throwable t) {
+        LOGGER.error(message,t);
+        this.broadcast(Text.literal(message).styled(style -> style.withColor(Formatting.RED)).append(
+            Text.literal(
+                Arrays.stream(t.getStackTrace())
+                .collect(
+                    StringBuilder::new,
+                    (str,stack) -> {
+                        str.append(stack.toString());
+                        str.append("\n");
+                    },
+                    (str1,str2) -> str1.append(str2.toString())
+                ).toString()
+            ).styled(style -> style.withColor(Formatting.RED))
+        ));
+    }
+
     public void LOG(String message) {
-        LOGGER.error(message);
-        Text messageAsText = Text.literal(message).styled((style) -> style.withColor(Formatting.DARK_GRAY));
-        this.getOnlinePlayers().stream()
+        LOGGER.info(message);
+        Text messageAsText = Text.literal("[LOG]")
+            .styled(style -> style.withColor(Formatting.GRAY))
+            .append(
+                Text.literal(message)
+                    .styled((style) -> style.withColor(Formatting.GRAY)
+                    )
+            );
+        if(config.debug) {
+            this.getOnlinePlayers()
+                .forEach(
+                    (player) -> player.sendMessageNow(messageAsText)
+                );
+        } else {
+            this.getOnlinePlayers().stream()
                 .filter(player ->
-                        player.role instanceof Spectator &&
+                    player.role instanceof Spectator &&
                         player.getPlayerOrThrow().hasPermissionLevel(4)
                 )
                 .forEach(
-                        (player) -> player.sendMessageNow(messageAsText)
+                    (player) -> player.sendMessageNow(messageAsText)
                 );
+        }
     }
 
     public Collection<IndirectPlayer> getAllPlayers() {

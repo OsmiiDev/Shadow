@@ -18,6 +18,7 @@ public class Config {
     public Food food = Food.BREAD;
     public int foodAmount = 16;
     public double additionalTimePerTickDuringNight = 1;
+    public boolean debug = false;
 
     public Config(Shadow shadow, Path saveFile) {
         this.roleManager = new RoleManager(shadow, this);
@@ -32,6 +33,8 @@ public class Config {
         this.netherRoofEyes = nbt.getInt("netherRoofEyes");
         this.food = Food.valueOf(nbt.getString("food"));
         this.foodAmount = nbt.getInt("foodAmount");
+        this.additionalTimePerTickDuringNight = nbt.getDouble("additionalTimePerTickDuringNight");
+        this.debug = nbt.getBoolean("debug");
 
         this.roleManager.readNbt(nbt.getCompound("roleManager"));
     }
@@ -44,6 +47,8 @@ public class Config {
         nbt.putInt("netherRoofEyes", this.netherRoofEyes);
         nbt.putString("food", this.food.name());
         nbt.putInt("foodAmount", this.foodAmount);
+        nbt.putDouble("additionalTimePerTickDuringNight", this.additionalTimePerTickDuringNight);
+        nbt.putBoolean("debug", this.debug);
 
         nbt.put("roleManager", this.roleManager.writeNbt(new NbtCompound()));
 

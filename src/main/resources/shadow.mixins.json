@@ -4,6 +4,7 @@
   "package": "com.maximumg9.shadow.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "PersistentProjectileMixin",
     "CommandManagerMixin",
     "DragonDeathMixin",
     "EntityTrackerEntryMixin",

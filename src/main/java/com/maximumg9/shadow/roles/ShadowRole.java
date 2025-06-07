@@ -7,6 +7,7 @@ import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
@@ -64,11 +65,11 @@ public class ShadowRole extends Role {
         }
     }
 
-    private static final ItemStack ITEM = new ItemStack(Items.NETHERITE_SWORD);
+    private static final ItemStack ITEM_STACK = new ItemStack(Items.NETHERITE_SWORD);
     static {
-        ITEM.set(DataComponentTypes.ITEM_NAME,new ShadowRole(null).getName());
+        ITEM_STACK.set(DataComponentTypes.ITEM_NAME,new ShadowRole(null).getName());
     }
 
     @Override
-    public ItemStack getAsItem() { return ITEM.copy(); }
+    public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) { return ITEM_STACK.copy(); }
 }

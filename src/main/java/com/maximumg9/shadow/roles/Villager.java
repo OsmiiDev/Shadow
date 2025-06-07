@@ -1,77 +1,32 @@
 package com.maximumg9.shadow.roles;
 
-import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Villager extends Role {
+public class Villager extends AbstractVillager {
     @Override
-    public ItemStack getAsItem() { return ITEM.copy(); }
+    public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) { return ITEM_STACK.copy(); }
 
     public Villager(@Nullable IndirectPlayer player) {
         super(player, List.of());
     }
 
     @Override
-    public Faction getFaction() {
-        return Faction.VILLAGER;
-    }
-    @Override
     public String getRawName() {
         return "Villager";
     }
 
     @Override
-    public void onNight() {
-        this.player.sendSubtitle(
-                Text.literal("It is now night, the shadows are more powerful so be careful")
-                        .styled((style) -> style.withColor(Formatting.GREEN)),
-                CancelPredicates.IS_DAY
-        );
-        this.player.giveEffect(
-                new StatusEffectInstance(
-                        StatusEffects.DARKNESS,
-                        -1,0,
-                        true,false,
-                        true
-                ),
-                CancelPredicates.IS_DAY
-        );
-        super.onNight();
-    }
-
-    @Override
-    public void onDay() {
-        this.player.sendSubtitle(
-                Text.literal("It's now day")
-                        .styled((style) -> style.withColor(Formatting.YELLOW)),
-                CancelPredicates.IS_NIGHT
-        );
-        this.player.removeEffect(
-                StatusEffects.DARKNESS,
-                CancelPredicates.IS_NIGHT
-        );
-        super.onDay();
-    }
-
-    @Override
     public TextColor getColor() {
         return TextColor.fromFormatting(Formatting.GREEN);
-    }
-
-    @Override
-    public boolean cantSeeGlowingDuringNight() {
-        return true;
     }
 
     public static final RoleFactory<Villager> FACTORY = new Factory();
@@ -82,8 +37,8 @@ public class Villager extends Role {
         }
     }
 
-    private static final ItemStack ITEM = new ItemStack(Items.EMERALD);
+    private static final ItemStack ITEM_STACK = new ItemStack(Items.EMERALD);
     static {
-        ITEM.set(DataComponentTypes.ITEM_NAME,new Villager(null).getName());
+        ITEM_STACK.set(DataComponentTypes.ITEM_NAME, new Villager(null).getName());
     }
 }

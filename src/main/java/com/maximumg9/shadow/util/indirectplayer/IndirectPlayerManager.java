@@ -125,6 +125,10 @@ public class IndirectPlayerManager implements Tickable {
         return this.indirectPlayers.values();
     }
 
+    public IndirectPlayer get(UUID uuid) {
+        return this.indirectPlayers.computeIfAbsent(uuid,(Uuid) -> new IndirectPlayer(server,Uuid));
+    }
+
     public IndirectPlayer getIndirect(ServerPlayerEntity base) {
         return this.indirectPlayers.computeIfAbsent(base.getUuid(),(uuid) -> new IndirectPlayer(base));
     }

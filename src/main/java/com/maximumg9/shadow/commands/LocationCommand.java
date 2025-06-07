@@ -10,7 +10,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -24,6 +24,7 @@ import net.minecraft.structure.StructureSetKeys;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.ChunkRandom;
 import net.minecraft.util.math.random.RandomSeed;
@@ -61,8 +62,7 @@ public class LocationCommand {
 
                                 shadow.state.currentLocation = BlockPos.ofFloored(ctx.getSource().getPosition());
                             } catch (Throwable t) {
-                                LogUtils.getLogger().error("error while forcing a location", t);
-                                shadow.ERROR(t.toString());
+                                shadow.ERROR(t);
                             }
 
                             return 1;
@@ -83,7 +83,7 @@ public class LocationCommand {
                                     return findAndGotoLocation(ctx);
                                 } catch (Throwable t) {
                                     LogUtils.getLogger().error("error while forcing a location", t);
-                                    shadow.ERROR(t.toString());
+                                    shadow.ERROR(t);
                                 }
                                 return 0;
                             })
@@ -93,7 +93,7 @@ public class LocationCommand {
                     try {
                         ret = LocationCommand.findAndGotoLocation(ctx);
                     } catch(Exception e) {
-                        getShadow(ctx.getSource().getServer()).ERROR(e.toString());
+                        getShadow(ctx.getSource().getServer()).ERROR(e);
                     }
                     return ret;
                 })
@@ -130,11 +130,18 @@ public class LocationCommand {
         overworld.getWorldBorder().setCenter(shadow.state.currentLocation.getX(),shadow.state.currentLocation.getZ());
         overworld.getWorldBorder().setSize(shadow.config.worldBorderSize);
 
-        overworld.iterateEntities().forEach((entity) -> {
-            if(entity.getType() != EntityType.PLAYER) {
-                entity.remove(Entity.RemovalReason.DISCARDED);
-            }
-        });
+        List<Entity> nonPlayers = new ArrayList<>();
+
+        server.getWorlds().forEach(
+            world ->
+                world.collectEntitiesByType(
+                    TypeFilter.instanceOf(PlayerEntity.class),
+                    (e) -> true,
+                    nonPlayers
+                )
+        );
+
+        nonPlayers.forEach(Entity::discard);
 
         src.sendFeedback(
             () ->

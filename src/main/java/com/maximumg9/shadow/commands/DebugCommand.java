@@ -46,7 +46,13 @@ public class DebugCommand {
 
                                                 IndirectPlayer indirectPlayer = shadow.getIndirect(player);
 
+                                                if(indirectPlayer.role != null) {
+                                                    indirectPlayer.role.deInit();
+                                                }
+
                                                 indirectPlayer.role = role.factory.makeRole(indirectPlayer);
+
+                                                indirectPlayer.role.init();
 
 
                                                 ctx.getSource().sendFeedback(() ->
