@@ -47,6 +47,7 @@ public class Shadow implements Tickable {
         StartCommand.register(dispatcher);
         RoleCommand.register(dispatcher);
         CancelCommand.register(dispatcher);
+        ShadowChatCommand.register(dispatcher);
     }
 
     private static final File INDIRECT_PLAYERS_FILE = new File("shadow-indirect-players.nbt");

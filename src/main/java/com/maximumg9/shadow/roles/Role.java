@@ -11,8 +11,8 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public abstract class Role implements ItemRepresentable {
 
     public abstract String getRawName();
 
-    public abstract TextColor getColor();
+    public abstract Style getStyle();
 
     public boolean cantSeeGlowingDuringNight() {
         return this.abilities.stream().noneMatch(Ability::allowSeeGlowing);
@@ -132,9 +132,7 @@ public abstract class Role implements ItemRepresentable {
 
     public Text getName() {
         return Text
-                .literal(getRawName())
-                .styled(
-                        (style) -> style.withColor(getColor())
-                );
+            .literal(getRawName())
+            .setStyle(getStyle());
     }
 }

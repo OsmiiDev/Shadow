@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Unit;
 import org.jetbrains.annotations.Nullable;
@@ -30,10 +30,9 @@ public class Sheriff extends AbstractVillager {
         return "Sheriff";
     }
 
+    private static final Style STYLE = Style.EMPTY.withColor(Formatting.GOLD);
     @Override
-    public TextColor getColor() {
-        return TextColor.fromFormatting(Formatting.GOLD);
-    }
+    public Style getStyle() { return STYLE; }
 
     private static final ItemStack ITEM_STACK;
     static {

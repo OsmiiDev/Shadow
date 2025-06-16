@@ -5,7 +5,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,10 +24,9 @@ public class Villager extends AbstractVillager {
         return "Villager";
     }
 
+    private static final Style STYLE = Style.EMPTY.withColor(Formatting.GREEN);
     @Override
-    public TextColor getColor() {
-        return TextColor.fromFormatting(Formatting.GREEN);
-    }
+    public Style getStyle() { return STYLE; }
 
     public static final RoleFactory<Villager> FACTORY = new Factory();
     private static class Factory implements RoleFactory<Villager> {

@@ -5,7 +5,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.Style;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,8 +19,9 @@ public class ShadowRole extends AbstractShadow {
     @Override
     public String getRawName() { return "Shadow"; }
 
+    private static final Style STYLE = Style.EMPTY.withColor(Formatting.RED);
     @Override
-    public TextColor getColor() { return TextColor.fromFormatting(Formatting.RED); }
+    public Style getStyle() { return STYLE; }
 
     public static final RoleFactory<ShadowRole> FACTORY = new Factory();
 

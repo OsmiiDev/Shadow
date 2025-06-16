@@ -6,8 +6,8 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,10 +28,9 @@ public class Spectator extends Role {
         return "Spectator";
     }
 
+    private static final Style STYLE = Style.EMPTY.withColor(Formatting.GRAY);
     @Override
-    public TextColor getColor() {
-        return TextColor.fromFormatting(Formatting.GRAY);
-    }
+    public Style getStyle() { return STYLE; }
 
     @Override
     public void onNight() {
