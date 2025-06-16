@@ -13,6 +13,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class NBTUtil {
     public static String INVISIBLE_KEY = "invisible";
+    public static String RESTRICT_MOVEMENT_KEY = "invisible";
 
     public static NbtCompound getCustomData(@NotNull ItemStack stack) {
         NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
@@ -26,6 +27,13 @@ public abstract class NBTUtil {
             return NbtComponent.of(operator.apply(compound));
         });
         return stack;
+    }
+
+    public static ItemStack flagRestrictMovement(@NotNull ItemStack stack) {
+        return applyCustomDataToStack(stack, nbt -> {
+            nbt.putBoolean(RESTRICT_MOVEMENT_KEY,true);
+            return nbt;
+        });
     }
 
     public static ItemStack flagAsInvisible(@NotNull ItemStack stack) {

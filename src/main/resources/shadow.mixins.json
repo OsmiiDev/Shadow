@@ -14,9 +14,11 @@
     "MinecraftServerMixin",
     "PersistentProjectileMixin",
     "PlayerDeathMixin",
+    "ScreenHandlerMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
-    "ServerWorldMixin"
+    "ServerWorldMixin",
+    "SlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -89,11 +89,12 @@ public abstract class Role implements ItemRepresentable {
         );
 
         player.giveItemNow(
+            NBTUtil.flagRestrictMovement(
             NBTUtil.flagAsInvisible(
                 NBTUtil.addID(
                     Items.NETHER_STAR.getDefaultStack(),
                     NetherStarItem.ABILITY_STAR_ID)
-            )
+            ))
         );
 
         this.player.getPlayer().ifPresent(
