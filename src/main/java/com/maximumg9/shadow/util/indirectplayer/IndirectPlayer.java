@@ -4,6 +4,7 @@ package com.maximumg9.shadow.util.indirectplayer;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Role;
+import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.Spectator;
 import com.maximumg9.shadow.util.MiscUtil;
 import net.minecraft.advancement.AdvancementEntry;
@@ -56,12 +57,14 @@ public class IndirectPlayer {
         this.frozen = src.frozen;
         this.name = src.getName();
         this.chatMessageCooldown = src.chatMessageCooldown;
+        this.originalRole = src.originalRole;
     }
 
     public final UUID playerUUID;
     final MinecraftServer server;
     @Nullable
     public Role role;
+    public Roles originalRole;
     public boolean participating;
     public boolean frozen;
     public int chatMessageCooldown;
@@ -80,6 +83,7 @@ public class IndirectPlayer {
         } else {
             player.role = null;
         }
+        player.originalRole = Roles.getRole(nbt.getString("original_role"));
 
         return player;
     }
@@ -92,6 +96,8 @@ public class IndirectPlayer {
         if(this.role != null) {
             nbt.put("role", this.role.writeNbt(new NbtCompound()));
         }
+        nbt.putString("original_role", this.originalRole.name);
+
         return nbt;
     }
 

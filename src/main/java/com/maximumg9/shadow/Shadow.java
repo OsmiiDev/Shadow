@@ -19,7 +19,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -228,13 +230,24 @@ public class Shadow implements Tickable {
             }
         });
 
-        MutableText winnersText = Text.literal("Winners are:").styled(style -> style.withColor(Formatting.GOLD));
+        MutableText winnersText = Text.literal("Winners are: ").styled(style -> style.withColor(Formatting.GOLD));
 
-        winners.forEach((winner) ->
-            winnersText.append(
-                winner.getName()
+        winnersText.append(
+            Texts.join(
+                winners.stream().map(
+                    (winner) ->
+                        winner.getName().copy().setStyle(winner.role == null ? Style.EMPTY : winner.role.getStyle())
+                ).toList(),
+                Text.literal(",").styled(style -> style.withColor(Formatting.GRAY))
             )
         );
+
+        this.broadcast(titleText.append(
+            subtitleText == null ?
+                Text.literal("") : subtitleText
+        ));
+
+        this.broadcast(winnersText);
 
         resetState();
         state.phase = GamePhase.WON;
