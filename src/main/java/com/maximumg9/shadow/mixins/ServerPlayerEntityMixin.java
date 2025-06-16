@@ -22,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
@@ -51,7 +50,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method= "onDisconnect", at=@At("HEAD"))
     public void onDisconnect(CallbackInfo ci) {
-        getShadow(this.server).checkWin(Optional.of(this.uuid));
+        getShadow(this.server).checkWin(this.uuid);
     }
 
     @Inject(method = "dropItem",at=@At("HEAD"), cancellable = true)

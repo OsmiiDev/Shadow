@@ -24,8 +24,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 @Mixin(ServerPlayerEntity.class)
@@ -67,7 +65,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
             player.role = new Spectator(player);
 
-            shadow.checkWin(Optional.empty());
+            shadow.checkWin(null);
         } else {
             showDeathMessage.set(true,this.server);
         }
