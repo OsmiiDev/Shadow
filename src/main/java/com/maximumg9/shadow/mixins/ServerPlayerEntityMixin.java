@@ -8,9 +8,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,11 +22,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
+    @org.spongepowered.asm.mixin.Shadow @Final public MinecraftServer server;
+
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);
     }
@@ -42,6 +47,11 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
                 }
             }
         }
+    }
+
+    @Inject(method= "onDisconnect", at=@At("HEAD"))
+    public void onDisconnect(CallbackInfo ci) {
+        getShadow(this.server).checkWin(Optional.of(this.uuid));
     }
 
     @Inject(method = "dropItem",at=@At("HEAD"), cancellable = true)

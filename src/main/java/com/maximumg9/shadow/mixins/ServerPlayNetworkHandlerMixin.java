@@ -1,10 +1,17 @@
 package com.maximumg9.shadow.mixins;
 
+import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.roles.Faction;
+import com.maximumg9.shadow.util.TimeUtil;
+import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.player.PlayerAbilities;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,7 +51,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         Shadow shadow = getShadow(this.player.server);
 
         if(!shadow.getIndirect(this.player).frozen) return;
-        if(this.player.hasPermissionLevel(2) && (this.player.isInCreativeMode() || this.player.isSpectator())) return;
+        if(this.player.hasPermissionLevel(3) && (this.player.isInCreativeMode() || this.player.isSpectator())) return;
 
         double x = clampHorizontal(packet.getX(this.player.getX()));
         double y = clampVertical(packet.getY(this.player.getY()));
@@ -73,5 +80,35 @@ public abstract class ServerPlayNetworkHandlerMixin {
         }
 
         return abilities;
+    }
+
+    @Inject(method = "onChatMessage",at=@At("HEAD"), cancellable = true)
+    public void restrictChatMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
+        Shadow shadow = getShadow(this.player.server);
+
+        if(shadow.state.phase != GamePhase.PLAYING) return;
+
+        IndirectPlayer p = shadow.getIndirect(this.player);
+        if((p.role == null || p.role.getFaction() == Faction.SPECTATOR) && !this.player.hasPermissionLevel(3)) {
+            p.sendMessageNow(
+                Text.literal("You are a spectator so you cannot chat").styled(style -> style.withColor(Formatting.YELLOW))
+            );
+            ci.cancel();
+            return;
+        }
+        if(p.chatMessageCooldown > 0) {
+            p.sendMessageNow(
+                Text.literal("You are still on chat cooldown for ")
+                    .styled(style -> style.withColor(Formatting.GRAY))
+                    .append(
+                        Text.literal(TimeUtil.ticksToText(p.chatMessageCooldown,false))
+                            .styled(style -> style.withColor(Formatting.YELLOW))
+                    )
+                    .append(" seconds.")
+            );
+            ci.cancel();
+            return;
+        }
+        p.chatMessageCooldown = shadow.config.chatMessageCooldown;
     }
 }

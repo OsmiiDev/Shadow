@@ -20,12 +20,11 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
+import java.util.Optional;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
@@ -68,7 +67,7 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
             player.role = new Spectator(player);
 
-            checkWin(shadow);
+            shadow.checkWin(Optional.empty());
         } else {
             showDeathMessage.set(true,this.server);
         }
@@ -82,23 +81,6 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
             if(iPlayer.role.getFaction() == Faction.SPECTATOR) {
                 this.changeGameMode(GameMode.SPECTATOR);
             }
-        }
-    }
-
-    @Unique
-    public void checkWin(Shadow shadow) {
-        long villagers = shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.VILLAGER).count();
-        long shadows = shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).count();
-
-        if(villagers == 0 && shadows == 0) {
-            shadow.endGame(List.of(),null,null);
-        }
-
-        if(villagers == 0) {
-            shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).toList(), Faction.SHADOW, null);
-        }
-        if(shadows == 0) {
-            shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.VILLAGER).toList(), Faction.VILLAGER, null);
         }
     }
 }

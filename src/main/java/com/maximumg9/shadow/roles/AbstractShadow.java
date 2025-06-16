@@ -28,30 +28,42 @@ public abstract class AbstractShadow extends Role {
     @Override
     public void init() {
         super.init();
-
-        this.player.sendMessage(
-            Text.literal("The other Shadows are:")
-                .styled((style) -> style.withColor(Formatting.RED))
-                .append(
-                    Texts.join(
-                        this.player.getShadow()
-                            .getOnlinePlayers()
-                            .stream()
-                            .filter(
-                                (player) ->
-                                    player.role != null &&
-                                    player.role.getFaction() == Faction.SHADOW &&
-                                    player.playerUUID != this.player.playerUUID
-                            ).map(IndirectPlayer::getName).map(
-                                (name) -> name.copy().styled(
-                                    (style) -> style.withColor(Formatting.RED)
-                                )
-                            ).toList(),
-                        Text.literal(",").styled((style -> style.withColor(Formatting.GRAY)))
-                    )
-                ),
-            CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
-        );
+        if(this.player.getShadow()
+            .getAllPlayers()
+            .stream()
+            .noneMatch(
+                (player) ->
+                    player.role != null &&
+                        player.role.getFaction() == Faction.SHADOW &&
+                        player.playerUUID != this.player.playerUUID
+            )) {
+            this.player.sendMessage(
+                Text.literal("The are no other Shadows (good luck!)"),
+                CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
+            );
+        } else {
+            this.player.sendMessage(
+                Text.literal("The other Shadows are: ")
+                    .styled((style) -> style.withColor(Formatting.RED))
+                    .append(
+                        Texts.join(
+                            this.player.getShadow()
+                                .getAllPlayers()
+                                .stream()
+                                .filter(
+                                    (player) ->
+                                        player.role != null &&
+                                            player.role.getFaction() == Faction.SHADOW &&
+                                            player.playerUUID != this.player.playerUUID
+                                ).map(
+                                    (player) -> player.getName().copy().setStyle(player.role.getStyle())
+                                ).toList(),
+                            Text.literal(",").styled((style -> style.withColor(Formatting.GRAY)))
+                        )
+                    ),
+                CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
+            );
+        }
     }
 
     @Override

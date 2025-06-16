@@ -27,6 +27,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.io.*;
 import java.util.*;
@@ -147,7 +148,7 @@ public class Shadow implements Tickable {
             this.getOnlinePlayers().stream()
                 .filter(player ->
                     player.role instanceof Spectator &&
-                        player.getPlayerOrThrow().hasPermissionLevel(4)
+                        player.getPlayerOrThrow().hasPermissionLevel(3)
                 )
                 .forEach(
                     (player) -> player.sendMessageNow(messageAsText)
@@ -267,6 +268,33 @@ public class Shadow implements Tickable {
                 tickable.onEnd();
                 this.tickables.remove(tickable);
             }
+        }
+    }
+
+    @Unique
+    public void checkWin(Optional<UUID> playerToIgnore) {
+        long villagers = this.getOnlinePlayers().stream().filter(
+            (player) ->
+                player.role != null &&
+                player.role.getFaction() == Faction.VILLAGER &&
+                !playerToIgnore.map((uuid) -> uuid.equals(player.playerUUID)).orElse(false)
+        ).count();
+        long shadows = this.getOnlinePlayers().stream().filter(
+            (player) ->
+                player.role != null &&
+                player.role.getFaction() == Faction.SHADOW &&
+                !playerToIgnore.map((uuid) -> uuid.equals(player.playerUUID)).orElse(false)
+        ).count();
+
+        if(villagers == 0 && shadows == 0) {
+            this.endGame(List.of(),null,null);
+        }
+
+        if(villagers == 0) {
+            this.endGame(this.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).toList(), Faction.SHADOW, null);
+        }
+        if(shadows == 0) {
+            this.endGame(this.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.VILLAGER).toList(), Faction.VILLAGER, null);
         }
     }
 

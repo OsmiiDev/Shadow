@@ -87,6 +87,9 @@ public class IndirectPlayerManager implements Tickable {
                 task.onEnd();
             }
         }
+        for(IndirectPlayer player : indirectPlayers.values()) {
+            player.tick();
+        }
     }
 
     static class IndirectPlayerTask implements Tickable {

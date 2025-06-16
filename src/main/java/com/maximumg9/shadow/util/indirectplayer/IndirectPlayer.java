@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.util.indirectplayer;
 
 
-import com.google.gson.annotations.Expose;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Role;
@@ -56,6 +55,7 @@ public class IndirectPlayer {
         this.participating = src.participating;
         this.frozen = src.frozen;
         this.name = src.getName();
+        this.chatMessageCooldown = src.chatMessageCooldown;
     }
 
     public final UUID playerUUID;
@@ -64,6 +64,7 @@ public class IndirectPlayer {
     public Role role;
     public boolean participating;
     public boolean frozen;
+    public int chatMessageCooldown;
     private Text name = null;
 
     public Shadow getShadow() {
@@ -92,6 +93,10 @@ public class IndirectPlayer {
             nbt.put("role", this.role.writeNbt(new NbtCompound()));
         }
         return nbt;
+    }
+
+    public void tick() {
+        chatMessageCooldown = chatMessageCooldown > 0 ? chatMessageCooldown - 1 : 0;
     }
 
     public Text getName() {
