@@ -64,6 +64,7 @@ public class IndirectPlayer {
     final MinecraftServer server;
     @Nullable
     public Role role;
+    @Nullable
     public Roles originalRole;
     public boolean participating;
     public boolean frozen;

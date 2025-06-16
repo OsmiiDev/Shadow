@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Faction;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
@@ -25,8 +24,8 @@ public class DragonDeathMixin extends MobEntity {
         Shadow shadow = getShadow(Objects.requireNonNull(this.getServer()));
 
         shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> {
-            assert player.role != null;
-            return player.role.getFaction() == Faction.VILLAGER;
+            assert player.originalRole != null;
+            return player.originalRole.faction == Faction.VILLAGER;
         }).toList(), Faction.VILLAGER, null);
     }
 }

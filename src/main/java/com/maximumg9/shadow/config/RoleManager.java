@@ -81,15 +81,19 @@ public class RoleManager {
         for (int i = 0; i < participatingPlayers.size(); i++) {
             IndirectPlayer player = participatingPlayers.get(i);
 
-            player.role = this.roleSlots[i]
-                .pickRandomRole(shadow.random)
-                .factory.makeRole(player);
+            Roles role = this.roleSlots[i].pickRandomRole(shadow.random);
+
+            player.originalRole = role;
+            player.role = role.factory.makeRole(player);
         }
 
         // Set non participating players to spectators
         shadow.getOnlinePlayers().stream()
             .filter((player -> !player.participating))
-            .forEach(player -> player.role = Roles.SPECTATOR.factory.makeRole(player));
+            .forEach(player -> {
+                player.originalRole = Roles.SPECTATOR;
+                player.role = Roles.SPECTATOR.factory.makeRole(player);
+            });
 
         return true;
     }

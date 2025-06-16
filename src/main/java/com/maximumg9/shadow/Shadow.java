@@ -67,6 +67,7 @@ public class Shadow implements Tickable {
     public Shadow(MinecraftServer server) {
         this.server = server;
         this.indirectPlayerManager = new IndirectPlayerManager(INDIRECT_PLAYERS_FILE, server);
+        this.addTickable(this.indirectPlayerManager);
 
         try {
             this.loadSync();
@@ -304,10 +305,24 @@ public class Shadow implements Tickable {
         }
 
         if(villagers == 0) {
-            this.endGame(this.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).toList(), Faction.SHADOW, null);
+            this.endGame(
+                this.getAllPlayers().stream().filter(
+                    (player) -> player.originalRole != null &&
+                        player.originalRole.faction == Faction.SHADOW
+                ).toList(),
+                Faction.SHADOW,
+                null
+            );
         }
         if(shadows == 0) {
-            this.endGame(this.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.VILLAGER).toList(), Faction.VILLAGER, null);
+            this.endGame(
+                this.getAllPlayers().stream().filter(
+                    (player) -> player.originalRole != null &&
+                        player.originalRole.faction == Faction.VILLAGER
+                ).toList(),
+                Faction.VILLAGER,
+                null
+            );
         }
     }
 

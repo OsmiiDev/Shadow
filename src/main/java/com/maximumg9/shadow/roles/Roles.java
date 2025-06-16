@@ -19,17 +19,19 @@ public enum Roles {
 
     public final String name;
     public final RoleFactory<?> factory;
+    public final Faction faction;
 
     Roles(RoleFactory<?> factory) {
-        this(factory.makeRole(null).getRawName(),factory);
+        this(factory.makeRole(null).getRawName(),factory, factory.makeRole(null).getFaction());
     }
 
-    Roles(String name, RoleFactory<?> factory) {
+    Roles(String name, RoleFactory<?> factory, Faction faction) {
         this.name = name;
         this.factory = factory;
+        this.faction = faction;
     }
 
-    public static CompletableFuture<Suggestions> suggest(CommandContext<?> ctx, SuggestionsBuilder builder) {
+    public static CompletableFuture<Suggestions> suggest(CommandContext<?> ignoredCtx, SuggestionsBuilder builder) {
         Arrays.stream(values())
             .filter(
                 (role) ->
