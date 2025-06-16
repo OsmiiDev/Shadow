@@ -18,7 +18,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -119,17 +118,6 @@ class StartTicker implements Tickable {
 
         if(!shadow.config.roleManager.pickRoles()) return;
 
-        MutableText otherShadowText = Text.literal("The other shadows are: ").styled((style -> style.withColor(Formatting.RED)));
-
-        shadow.getOnlinePlayers().stream().filter((player) -> player.role != null && player.role.getFaction() == Faction.SHADOW).forEachOrdered(
-            (player) ->
-                otherShadowText
-                    .append(player.getName())
-                        .styled((style -> style.withColor(Formatting.GOLD)))
-                    .append(Text.literal(","))
-                        .styled((style) -> style.withColor(Formatting.RED))
-        );
-
         for(IndirectPlayer player : shadow.getOnlinePlayers()) {
             if(player.role == null) {
                 shadow.ERROR("Null role chosen");
@@ -145,26 +133,15 @@ class StartTicker implements Tickable {
 
             player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
 
-            giveDefaultItems(player);
             player.role.init();
 
             player.frozen = false;
 
             player.setTitleTimesNow(10,40,10);
-            player.sendTitleNow(player.role.getFaction().name);
-
-            if(player.role.getFaction() == Faction.SHADOW) {
-                player.sendMessage(otherShadowText, CancelPredicates.cancelOnPhaseChange(shadow.state.phase));
-            }
+            player.sendTitleNow(player.role.getName());
         }
 
         shadow.saveAsync();
-    }
-
-    private void giveDefaultItems(IndirectPlayer player) {
-        player.giveItemNow(shadow.config.food.foodGiver.apply(shadow.config.foodAmount));
-
-        player.giveItemNow(Items.NETHER_STAR.getDefaultStack());
     }
 
     private static final int NETHER_LAVA_HEIGHT = 32;

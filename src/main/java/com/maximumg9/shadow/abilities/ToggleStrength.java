@@ -1,9 +1,9 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -13,8 +13,6 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-
-import java.util.List;
 
 public class ToggleStrength extends Ability {
     private static final ItemStack ITEM_STACK;
@@ -29,13 +27,11 @@ public class ToggleStrength extends Ability {
         );
         ITEM_STACK.set(
             DataComponentTypes.LORE,
-            new LoreComponent(
-                List.of(
-                    Text.literal("Toggle Strength I")
-                            .styled(style -> style.withColor(Formatting.GRAY)),
-                    Text.literal("During the night you also get Haste V and Speed II"),
-                    Text.literal("[ABILITY]").styled((style) -> style.withColor(Formatting.DARK_PURPLE))
-                )
+            MiscUtil.makeLore(
+                Text.literal("Toggle Strength I")
+                    .styled(style -> style.withColor(Formatting.GRAY)),
+                Text.literal("During the night you also get Haste V and Speed II"),
+                Text.literal("[ABILITY]").styled((style) -> style.withColor(Formatting.DARK_PURPLE))
             )
         );
     }

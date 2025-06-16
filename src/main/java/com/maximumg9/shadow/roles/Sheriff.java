@@ -26,16 +26,6 @@ public class Sheriff extends AbstractVillager {
     public static final RoleFactory<Sheriff> FACTORY = new Sheriff.Factory();
 
     @Override
-    public void init() {
-        super.init();
-    }
-
-    @Override
-    public void deInit() {
-        super.deInit();
-    }
-
-    @Override
     public String getRawName() {
         return "Sheriff";
     }

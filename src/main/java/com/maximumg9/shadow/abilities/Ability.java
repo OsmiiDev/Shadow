@@ -20,7 +20,8 @@ public abstract class Ability implements ItemRepresentable {
     public void init() {}
     public void deInit() {}
     public void onNight() {}
-    public  void onDay() {}
+    public void onDay() {}
+    public boolean allowSeeGlowing() { return false; }
 
     @FunctionalInterface
     public interface Factory {

@@ -31,7 +31,15 @@ public abstract class ServerPlayNetworkHandlerMixin {
         return 0;
     }
 
-    @Inject(method="onPlayerMove",at=@At("HEAD"), cancellable = true)
+    @Inject(
+            method="onPlayerMove",
+            at= @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/server/world/ServerWorld;)V",
+                    shift = At.Shift.AFTER
+            ),
+            cancellable = true
+    )
     public void restrictMovementOnLocationSelect(PlayerMoveC2SPacket packet, CallbackInfo ci) {
         Shadow shadow = getShadow(this.player.server);
 

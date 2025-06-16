@@ -2,6 +2,7 @@ package com.maximumg9.shadow.config;
 
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.RoleSlot;
+import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.screens.DecisionScreenHandler;
 import com.maximumg9.shadow.screens.RoleSlotScreenHandler;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -63,27 +64,33 @@ public class RoleManager {
     public boolean pickRoles() {
         clearRoles();
 
-        List<IndirectPlayer> onlinePlayers = new ArrayList<>(
+        List<IndirectPlayer> participatingPlayers = new ArrayList<>(
                 shadow.getOnlinePlayers().stream()
                         .filter((player -> player.participating))
                         .unordered()
                         .toList()
         );
 
-        Collections.shuffle(onlinePlayers);
+        Collections.shuffle(participatingPlayers);
 
-        if(onlinePlayers.size() > this.roleSlots.length) {
+        if(participatingPlayers.size() > this.roleSlots.length) {
             shadow.ERROR("More players than role slots, consider increasing the number of role slots in the config");
             return false;
         }
 
-        for (int i = 0; i < onlinePlayers.size(); i++) {
-            IndirectPlayer player = onlinePlayers.get(i);
+        for (int i = 0; i < participatingPlayers.size(); i++) {
+            IndirectPlayer player = participatingPlayers.get(i);
 
             player.role = this.roleSlots[i]
                 .pickRandomRole(shadow.random)
                 .factory.makeRole(player);
         }
+
+        // Set non participating players to spectators
+        shadow.getOnlinePlayers().stream()
+            .filter((player -> !player.participating))
+            .forEach(player -> player.role = Roles.SPECTATOR.factory.makeRole(player));
+
         return true;
     }
 

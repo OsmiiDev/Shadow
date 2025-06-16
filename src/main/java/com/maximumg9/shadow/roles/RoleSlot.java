@@ -102,12 +102,11 @@ public class RoleSlot implements ItemRepresentable {
                     Roles.values()[i]
                             .factory.makeRole(null)
                             .getName().copy()
-                            .styled((style) -> style.withItalic(false))
                             .append(": " + this.weights[i])
             );
         }
 
-        stack.set(DataComponentTypes.LORE, new LoreComponent(loreList));
+        stack.set(DataComponentTypes.LORE, new LoreComponent(loreList,loreList));
         return stack;
     }
 }

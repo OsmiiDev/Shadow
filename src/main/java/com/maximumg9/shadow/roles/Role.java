@@ -1,12 +1,15 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.abilities.Ability;
+import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.screens.ItemRepresentable;
+import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -44,7 +47,9 @@ public abstract class Role implements ItemRepresentable {
 
     public abstract TextColor getColor();
 
-    public abstract boolean cantSeeGlowingDuringNight();
+    public boolean cantSeeGlowingDuringNight() {
+        return this.abilities.stream().noneMatch(Ability::allowSeeGlowing);
+    }
 
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putString("role",this.getRawName());
@@ -77,13 +82,27 @@ public abstract class Role implements ItemRepresentable {
     public void readNbt(NbtCompound nbt) {}
 
     public void init() {
-        this.player.getPlayer().ifPresent(
-                (p) -> p.getDataTracker().set(
-                        Entity.FLAGS,
-                        (byte) (p.getDataTracker().get(Entity.FLAGS) |
-                                (1 << Entity.GLOWING_FLAG_INDEX)),
-                        true
+        player.giveItemNow(
+                this.player.getShadow().config.food.foodGiver.apply(
+                        this.player.getShadow().config.foodAmount
                 )
+        );
+
+        player.giveItemNow(
+            NBTUtil.flagAsInvisible(
+                NBTUtil.addID(
+                    Items.NETHER_STAR.getDefaultStack(),
+                    NetherStarItem.ABILITY_STAR_ID)
+            )
+        );
+
+        this.player.getPlayer().ifPresent(
+            (p) -> p.getDataTracker().set(
+                Entity.FLAGS,
+                (byte) (p.getDataTracker().get(Entity.FLAGS) |
+                        (1 << Entity.GLOWING_FLAG_INDEX)),
+                true
+            )
         );
         this.player.giveEffect(
             new StatusEffectInstance(

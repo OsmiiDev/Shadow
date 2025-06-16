@@ -10,7 +10,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -135,8 +135,8 @@ public class LocationCommand {
         server.getWorlds().forEach(
             world ->
                 world.collectEntitiesByType(
-                    TypeFilter.instanceOf(PlayerEntity.class),
-                    (e) -> true,
+                    TypeFilter.instanceOf(Entity.class),
+                    (entity) -> entity.getType() != EntityType.PLAYER,
                     nonPlayers
                 )
         );

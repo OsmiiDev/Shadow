@@ -47,7 +47,7 @@ public class EnderEyeItem extends net.minecraft.item.EnderEyeItem {
 
         @Override
         public void write(ItemStack stack) {
-            NBTUtil.applyToStackCustomData(stack, (compound) -> {
+            NBTUtil.applyCustomDataToStack(stack, (compound) -> {
                 compound.putBoolean("participating",participating);
                 compound.putBoolean("is_participation_eye",isParticipationEye);
 

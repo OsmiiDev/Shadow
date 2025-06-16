@@ -8,7 +8,6 @@ import com.maximumg9.shadow.util.Delay;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.mojang.logging.LogUtils;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -25,8 +24,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
@@ -117,14 +114,12 @@ public class RoleSlotScreenHandler extends ScreenHandler {
                 ItemStack roleStack = MiscUtil.getItemWithContext(proxyRole,this.context);
                 roleStack.set(
                     DataComponentTypes.LORE,
-                    new LoreComponent(
-                        List.of(
-                            Text.literal("Weight: ")
-                                .styled((style) -> style.withColor(Formatting.WHITE).withItalic(false))
-                                .append(
-                                    Text.literal(String.valueOf(weight))
-                                )
-                        )
+                    MiscUtil.makeLore(
+                        Text.literal("Weight: ")
+                            .styled((style) -> style.withColor(Formatting.WHITE).withItalic(false))
+                            .append(
+                                Text.literal(String.valueOf(weight))
+                            )
                     )
                 );
                 this.inventory.setStack((row*3 + 1)* 9 + column,roleStack);

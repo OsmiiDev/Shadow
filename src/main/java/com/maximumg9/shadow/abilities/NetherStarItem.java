@@ -1,9 +1,10 @@
 package com.maximumg9.shadow.abilities;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.ducks.ShadowProvider;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.screens.DecisionScreenHandler;
+import com.maximumg9.shadow.util.MiscUtil;
+import com.maximumg9.shadow.util.NBTUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,6 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
@@ -21,25 +23,30 @@ public class NetherStarItem extends Item {
         super(settings);
     }
 
+    public static Identifier ABILITY_STAR_ID = MiscUtil.shadowID("ability_star");
+
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(world instanceof ServerWorld) {
-            Shadow shadow = getShadow(world.getServer());
+        ItemStack stack = user.getStackInHand(hand);
+        if(!(world instanceof ServerWorld)) return TypedActionResult.pass(stack);
+        if(!NBTUtil.hasID(stack,ABILITY_STAR_ID)) return TypedActionResult.pass(stack);
 
-            Role role = shadow.getIndirect((ServerPlayerEntity) user).role;
+        Shadow shadow = getShadow(world.getServer());
 
-            if(role == null) return TypedActionResult.fail(user.getStackInHand(hand));
+        Role role = shadow.getIndirect((ServerPlayerEntity) user).role;
 
-            user.openHandledScreen(new DecisionScreenHandler.Factory<>(
-                    Text.literal("Ability Menu"),
-                    (ability, clicker) -> {
-                        if(ability != null) {
-                            ability.apply();
-                        }
-                    },
-                    role.getAbilities()
-            ));
-        }
-        return TypedActionResult.success(user.getStackInHand(hand),true);
+        if(role == null) return TypedActionResult.fail(stack);
+
+        user.openHandledScreen(new DecisionScreenHandler.Factory<>(
+                Text.literal("Ability Menu"),
+                (ability, clicker) -> {
+                    if(ability != null) {
+                        ability.apply();
+                    }
+                },
+                role.getAbilities()
+        ));
+
+        return TypedActionResult.success(stack,false);
     }
 }

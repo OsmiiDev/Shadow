@@ -53,9 +53,4 @@ public abstract class AbstractVillager extends Role {
         );
         super.onDay();
     }
-
-    @Override
-    public boolean cantSeeGlowingDuringNight() {
-        return true;
-    }
 }
