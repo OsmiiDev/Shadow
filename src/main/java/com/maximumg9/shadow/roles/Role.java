@@ -6,13 +6,16 @@ import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +72,7 @@ public abstract class Role implements ItemRepresentable {
     }
 
     public void onDay() {
+        // Cursed forcing to send an update on the flags
         this.player.getPlayer().ifPresent(
                 (p) -> p.getDataTracker().set(
                         Entity.FLAGS,
@@ -88,11 +92,18 @@ public abstract class Role implements ItemRepresentable {
                 )
         );
 
+        ItemStack abilitySelector = Items.NETHER_STAR.getDefaultStack();
+
+        abilitySelector.set(
+            DataComponentTypes.ITEM_NAME,
+            Text.literal("Ability Star").styled(style -> style.withColor(Formatting.YELLOW))
+        );
+
         player.giveItemNow(
             NBTUtil.flagRestrictMovement(
             NBTUtil.flagAsInvisible(
                 NBTUtil.addID(
-                    Items.NETHER_STAR.getDefaultStack(),
+                    abilitySelector,
                     NetherStarItem.ABILITY_STAR_ID)
             ))
         );
