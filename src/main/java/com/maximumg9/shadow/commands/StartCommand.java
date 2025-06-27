@@ -218,6 +218,7 @@ class StartTicker implements Tickable {
         Vec3d blockCenter = pos.toCenterPos();
         ItemEntity item = new ItemEntity(world, blockCenter.x, blockCenter.y, blockCenter.z, new ItemStack(Items.ENDER_EYE),0,0.2,0);
         item.setInvulnerable(true);
+        item.setNeverDespawn();
 
         DisplayEntity.ItemDisplayEntity display = EntityType.ITEM_DISPLAY.create(world);
         assert display != null;
