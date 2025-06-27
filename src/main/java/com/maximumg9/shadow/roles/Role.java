@@ -97,14 +97,16 @@ public abstract class Role implements ItemRepresentable {
             ))
         );
 
-        this.player.getPlayer().ifPresent(
+        this.player.scheduleOnLoad(
             (p) -> p.getDataTracker().set(
                 Entity.FLAGS,
                 (byte) (p.getDataTracker().get(Entity.FLAGS) |
-                        (1 << Entity.GLOWING_FLAG_INDEX)),
+                    (1 << Entity.GLOWING_FLAG_INDEX)),
                 true
-            )
+            ),
+            CancelPredicates.NEVER_CANCEL
         );
+
         this.player.giveEffect(
             new StatusEffectInstance(
                 StatusEffects.HASTE,

@@ -291,13 +291,13 @@ public class Shadow implements Tickable {
             (player) ->
                 player.role != null &&
                 player.role.getFaction() == Faction.VILLAGER &&
-                (playerToIgnore == null || playerToIgnore.equals(player.playerUUID))
+                (playerToIgnore == null || !playerToIgnore.equals(player.playerUUID))
         ).count();
         long shadows = this.getOnlinePlayers().stream().filter(
             (player) ->
                 player.role != null &&
                 player.role.getFaction() == Faction.SHADOW &&
-                (playerToIgnore == null || playerToIgnore.equals(player.playerUUID))
+                (playerToIgnore == null || !playerToIgnore.equals(player.playerUUID))
         ).count();
 
         if(villagers == 0 && shadows == 0) {

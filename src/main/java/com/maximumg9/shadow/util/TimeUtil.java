@@ -5,7 +5,7 @@ import net.minecraft.util.math.MathHelper;
 import static com.maximumg9.shadow.util.MiscUtil.padLeft;
 
 public abstract class TimeUtil {
-    public static String ticksToText(int ticks, boolean leadingZeros) {
+    public static String ticksToText(long ticks, boolean leadingZeros) {
         return secondToText(MathHelper.ceil(ticks/20.0), leadingZeros);
     }
 

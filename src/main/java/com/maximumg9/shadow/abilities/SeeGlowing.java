@@ -8,6 +8,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 public class SeeGlowing extends Ability {
     private static final ItemStack ITEM_STACK;
@@ -34,8 +35,13 @@ public class SeeGlowing extends Ability {
     }
 
     @Override
-    public String getID() {
-        return "see_glowing";
+    public boolean allowSeeGlowing() {
+        return true;
+    }
+
+    @Override
+    public Identifier getID() {
+        return MiscUtil.shadowID("see_glowing");
     }
 
     @Override

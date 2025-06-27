@@ -13,6 +13,7 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 public class ToggleStrength extends Ability {
     private static final ItemStack ITEM_STACK;
@@ -41,8 +42,8 @@ public class ToggleStrength extends Ability {
     }
 
     @Override
-    public String getID() {
-        return "toggle_strength";
+    public Identifier getID() {
+        return MiscUtil.shadowID("toggle_strength");
     }
 
     @Override

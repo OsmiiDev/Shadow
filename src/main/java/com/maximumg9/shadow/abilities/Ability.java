@@ -1,17 +1,21 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Ability implements ItemRepresentable {
-    IndirectPlayer player;
+    final IndirectPlayer player;
 
     public Ability(IndirectPlayer player) {
         this.player = player;
     }
 
-    public abstract String getID();
+    Shadow getShadow() { return player.getShadow(); }
+
+    public abstract Identifier getID();
 
     public IndirectPlayer getPlayer() {
         return this.player;

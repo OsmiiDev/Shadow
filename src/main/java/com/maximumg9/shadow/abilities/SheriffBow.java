@@ -49,7 +49,7 @@ public class SheriffBow extends Ability {
             NBTUtil.applyCustomDataToStack(
                 NBTUtil.addID(
                     new ItemStack(Items.BOW),
-                    ITEM_ID
+                    ID
                 ),
                 compound -> {
                     compound.putUuid("owner", player.playerUUID);
@@ -82,11 +82,10 @@ public class SheriffBow extends Ability {
             CancelPredicates.cancelOnPhaseChange(player.getShadow().state.phase));
         super.deInit();
     }
-    private static final String ID = "sheriff_bow";
-    public static final Identifier ITEM_ID = MiscUtil.shadowID(ID);
+    public static final Identifier ID = MiscUtil.shadowID("sheriff_bow");
 
     @Override
-    public String getID() {
+    public Identifier getID() {
         return ID;
     }
 

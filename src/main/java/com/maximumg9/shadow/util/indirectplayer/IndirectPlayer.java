@@ -25,9 +25,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -35,7 +33,6 @@ import java.util.function.Predicate;
  This is meant to represent a player who existed at some time, even if the player does not exist now
  */
 public class IndirectPlayer {
-
     public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
         this.server = base.server;
@@ -97,7 +94,9 @@ public class IndirectPlayer {
         if(this.role != null) {
             nbt.put("role", this.role.writeNbt(new NbtCompound()));
         }
-        nbt.putString("original_role", this.originalRole.name);
+        if(this.originalRole != null) {
+            nbt.putString("original_role", this.originalRole.name);
+        }
 
         return nbt;
     }

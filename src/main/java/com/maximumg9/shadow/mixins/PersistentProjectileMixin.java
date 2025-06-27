@@ -39,7 +39,7 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
         if(attacker == null) return EnchantmentHelper.getDamage(world, stack, target, damageSource, baseDamage);
         if(!(attacker instanceof ServerPlayerEntity player)) return EnchantmentHelper.getDamage(world, stack, target, damageSource, baseDamage);
 
-        if(NBTUtil.hasID(stack, SheriffBow.ITEM_ID)) {
+        if(NBTUtil.hasID(stack, SheriffBow.ID)) {
             UUID ownerUUID = NBTUtil.getCustomData(stack).getUuid("owner");
             Shadow shadow = getShadow(player.getServer());
             IndirectPlayer owner = shadow.indirectPlayerManager.get(ownerUUID);
@@ -76,7 +76,7 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
                 for (int i=0;i<player.getInventory().size();i++) {
                     ItemStack item = player.getInventory().getStack(i);
 
-                    if(NBTUtil.hasID(item, SheriffBow.ITEM_ID)) {
+                    if(NBTUtil.hasID(item, SheriffBow.ID)) {
                         removedItem = true;
                         item.decrement(1);
                         break;
@@ -87,7 +87,7 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
                     for (int i=0;i<craftingInput.size();i++) {
                         ItemStack item = player.getInventory().getStack(i);
 
-                        if(NBTUtil.hasID(item, SheriffBow.ITEM_ID)) {
+                        if(NBTUtil.hasID(item, SheriffBow.ID)) {
                             removedItem = true;
                             item.decrement(1);
                             break;
@@ -96,7 +96,7 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
                 }
                 if(!removedItem) {
                     ItemStack cursorStack = player.currentScreenHandler.getCursorStack();
-                    if(NBTUtil.hasID(cursorStack, SheriffBow.ITEM_ID)) {
+                    if(NBTUtil.hasID(cursorStack, SheriffBow.ID)) {
                         removedItem = true;
                         cursorStack.decrement(1);
                     }
@@ -124,7 +124,7 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
         if(!NBTUtil.getCustomData(weaponStack).containsUuid("owner")) return source;
         if(
             !player.getInventory().containsAny(
-                (stack) -> NBTUtil.hasID(stack, SheriffBow.ITEM_ID)
+                (stack) -> NBTUtil.hasID(stack, SheriffBow.ID)
             )
         ) return source;
 

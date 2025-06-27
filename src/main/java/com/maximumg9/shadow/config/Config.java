@@ -20,9 +20,13 @@ public class Config {
     public double additionalTimePerTickDuringNight = 1;
     public boolean debug = false;
     public int chatMessageCooldown = 30 * 20;
+    public double cullRadius = 18.0;
+    public final RoleManager roleManager;
+    public final MaxCooldownManager maxCooldownManager;
 
     public Config(Shadow shadow, Path saveFile) {
         this.roleManager = new RoleManager(shadow, this);
+        this.maxCooldownManager = new MaxCooldownManager();
         this.saveFile = saveFile;
     }
 
@@ -37,7 +41,9 @@ public class Config {
         this.additionalTimePerTickDuringNight = nbt.getDouble("additionalTimePerTickDuringNight");
         this.debug = nbt.getBoolean("debug");
         this.chatMessageCooldown = nbt.getInt("chatMessageCooldown");
+        this.cullRadius = nbt.getDouble("cullRadius");
 
+        this.maxCooldownManager.readNbt(nbt.getCompound("maxCooldownManager"));
         this.roleManager.readNbt(nbt.getCompound("roleManager"));
     }
 
@@ -52,9 +58,10 @@ public class Config {
         nbt.putDouble("additionalTimePerTickDuringNight", this.additionalTimePerTickDuringNight);
         nbt.putBoolean("debug", this.debug);
         nbt.putInt("chatMessageCooldown", this.chatMessageCooldown);
+        nbt.putDouble("cullRadius", this.cullRadius);
 
+        nbt.put("maxCooldownManager", this.maxCooldownManager.writeNbt(new NbtCompound()));
         nbt.put("roleManager", this.roleManager.writeNbt(new NbtCompound()));
-
         return nbt;
     }
 
@@ -78,5 +85,4 @@ public class Config {
     }
 
     private final Path saveFile;
-    public final RoleManager roleManager;
 }

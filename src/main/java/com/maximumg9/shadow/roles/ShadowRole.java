@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.roles;
 
+import com.maximumg9.shadow.abilities.Cull;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class ShadowRole extends AbstractShadow {
     public ShadowRole(@Nullable IndirectPlayer player) {
-        super(player,List.of());
+        super(player,List.of(Cull::new));
     }
 
     @Override
