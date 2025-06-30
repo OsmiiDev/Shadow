@@ -12,10 +12,16 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public enum GamePhase {
-    NOT_PLAYING,
-    LOCATION_SELECTED,
-    PLAYING,
-    WON;
+    NOT_PLAYING(true),
+    LOCATION_SELECTED(false),
+    PLAYING(false),
+    WON(true);
+
+    public final boolean canSelectLocation;
+
+    GamePhase(boolean canSelectLocation) {
+        this.canSelectLocation = canSelectLocation;
+    }
 
     public static CompletableFuture<Suggestions> suggest(CommandContext<?> ctx, SuggestionsBuilder builder) {
         Arrays.stream(values())

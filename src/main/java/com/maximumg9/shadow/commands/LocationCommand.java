@@ -108,7 +108,7 @@ public class LocationCommand {
 
         BlockBox frames = findLocation(ctx);
 
-        if(shadow.state.phase != GamePhase.NOT_PLAYING) return -1;
+        if(shadow.state.phase.canSelectLocation) return -1;
 
         if(frames == null) {
             shadow.ERROR("Portal frames not found");
