@@ -12,6 +12,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -53,7 +54,10 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
             IndirectPlayer iPlayer = shadow.getIndirect((ServerPlayerEntity) (Object) this);
 
+            Style roleStyle = iPlayer.role == null ? Style.EMPTY : iPlayer.role.getStyle();
+
             name
+                .setStyle(roleStyle)
                 .append(Text.of(" died. They were a "))
                 .append(
                     iPlayer.role == null ?

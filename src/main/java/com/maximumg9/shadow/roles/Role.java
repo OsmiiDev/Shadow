@@ -108,6 +108,13 @@ public abstract class Role implements ItemRepresentable {
             ))
         );
 
+        player.sendMessage(
+            Text.literal("You are a ")
+                .setStyle(this.getStyle())
+                .append(this.getName()),
+            CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
+        );
+
         this.player.scheduleOnLoad(
             (p) -> p.getDataTracker().set(
                 Entity.FLAGS,

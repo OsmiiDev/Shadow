@@ -2,6 +2,7 @@ package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.*;
 import com.maximumg9.shadow.roles.Faction;
+import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -74,6 +75,8 @@ public class StartCommand {
             EnderEyeItem.EnderEyeData data = new EnderEyeItem.EnderEyeData(player.participating,true);
 
             data.write(eyeStack);
+
+            NBTUtil.flagRestrictMovement(eyeStack);
 
             entity.giveItemStack(eyeStack);
         }
