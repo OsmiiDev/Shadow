@@ -81,7 +81,11 @@ public class IndirectPlayer {
         } else {
             player.role = null;
         }
-        player.originalRole = Roles.getRole(nbt.getString("original_role"));
+        if(nbt.contains("original_role", NbtElement.COMPOUND_TYPE)) {
+            player.originalRole = Roles.getRole(nbt.getString("original_role"));
+        } else {
+            player.originalRole = null;
+        }
 
         return player;
     }
