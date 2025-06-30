@@ -287,6 +287,8 @@ public class Shadow implements Tickable {
 
     @Unique
     public void checkWin(@Nullable UUID playerToIgnore) {
+        if(this.state.phase != GamePhase.PLAYING) return;
+
         long villagers = this.getOnlinePlayers().stream().filter(
             (player) ->
                 player.role != null &&
