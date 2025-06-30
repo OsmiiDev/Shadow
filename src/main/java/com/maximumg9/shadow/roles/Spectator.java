@@ -34,7 +34,7 @@ public class Spectator extends Role {
 
     @Override
     public void onNight() {
-        this.player.sendSubtitle(
+        this.player.sendOverlay(
                 Text.literal("It is now night")
                         .styled((style) -> style.withColor(Formatting.GRAY)),
                 CancelPredicates.IS_DAY
@@ -44,7 +44,7 @@ public class Spectator extends Role {
 
     @Override
     public void onDay() {
-        this.player.sendSubtitle(
+        this.player.sendOverlay(
                 Text.literal("It's now day")
                         .styled((style) -> style.withColor(Formatting.YELLOW)),
                 CancelPredicates.IS_NIGHT

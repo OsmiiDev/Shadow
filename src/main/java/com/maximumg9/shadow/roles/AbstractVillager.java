@@ -23,7 +23,7 @@ public abstract class AbstractVillager extends Role {
 
     @Override
     public void onNight() {
-        this.player.sendSubtitle(
+        this.player.sendOverlay(
                 Text.literal("It is now night, the shadows are more powerful so be careful")
                         .styled((style) -> style.withColor(Formatting.GREEN)),
                 CancelPredicates.IS_DAY
@@ -42,7 +42,7 @@ public abstract class AbstractVillager extends Role {
 
     @Override
     public void onDay() {
-        this.player.sendSubtitle(
+        this.player.sendOverlay(
                 Text.literal("It's now day")
                         .styled((style) -> style.withColor(Formatting.YELLOW)),
                 CancelPredicates.IS_NIGHT
