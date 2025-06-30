@@ -6,6 +6,7 @@
   "mixins": [
     "CommandManagerMixin",
     "DragonDeathMixin",
+    "EntityEquipmentUpdateS2CPacketMixin",
     "EntityTrackerEntryMixin",
     "EntityTrackerMixin",
     "ItemMixin",

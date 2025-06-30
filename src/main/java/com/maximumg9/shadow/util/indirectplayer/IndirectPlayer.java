@@ -187,9 +187,13 @@ public class IndirectPlayer {
 
     public void sendSubtitle(Text subtitle, Predicate<IndirectPlayer> cancelCondition) {
         SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
+        TitleS2CPacket titlePacket = new TitleS2CPacket(Text.empty());
 
         scheduleOnLoad(
-            (player) -> player.networkHandler.sendPacket(packet)
+            (player) -> {
+                player.networkHandler.sendPacket(packet);
+                player.networkHandler.sendPacket(titlePacket);
+            }
         , cancelCondition);
     }
 
@@ -208,6 +212,17 @@ public class IndirectPlayer {
     public void sendMessageNow(Text chatMessage) throws OfflinePlayerException {
         this.getPlayerOrThrow()
                 .sendMessage(chatMessage);
+    }
+
+    public void sendOverlay(Text chatMessage, Predicate<IndirectPlayer> cancelCondition) {
+        scheduleOnLoad(
+            (player) -> player.sendMessage(chatMessage,true)
+            , cancelCondition);
+    }
+
+    public void sendOverlayNow(Text chatMessage) throws OfflinePlayerException {
+        this.getPlayerOrThrow()
+            .sendMessage(chatMessage,true);
     }
 
     public void scheduleOnLoad(Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {

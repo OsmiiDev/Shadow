@@ -71,8 +71,8 @@ public abstract class AbstractShadow extends Role {
 
     @Override
     public void onNight() {
-        this.player.sendSubtitle(
-                Text.literal("It is now night, your power grows, it's your opportunity to kill")
+        this.player.sendOverlay(
+                Text.literal("It is now night, your opportunity to kill")
                         .styled((style) -> style.withColor(Formatting.GOLD)),
                 CancelPredicates.IS_DAY
         );
@@ -81,7 +81,7 @@ public abstract class AbstractShadow extends Role {
 
     @Override
     public void onDay() {
-        this.player.sendSubtitle(
+        this.player.sendOverlay(
                 Text.literal("It's now day")
                         .styled((style) -> style.withColor(Formatting.YELLOW)),
                 CancelPredicates.IS_NIGHT

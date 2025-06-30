@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
-public class Cull extends CooldownAbility {
+public class Cull extends Ability {
     private static final ItemStack ITEM_STACK;
 
     static {
@@ -35,10 +35,7 @@ public class Cull extends CooldownAbility {
         super(player);
     }
 
-    @Override
-    public Text getName() {
-        return Text.literal("Cull").styled(style -> style.withColor(Formatting.RED));
-    }
+    private boolean usedThisNight = false;
 
     @Override
     public Identifier getID() {
@@ -46,11 +43,10 @@ public class Cull extends CooldownAbility {
     }
 
     @Override
-    int defaultCooldown() { return 20 * 60 * 8; }
-
-    @Override
-    int initialCooldown() { return 20 * 60 * 3; }
-
+    public void onDay() {
+        usedThisNight = false;
+        super.onDay();
+    }
 
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
@@ -63,9 +59,11 @@ public class Cull extends CooldownAbility {
                     .append(
                         Text.literal(String.valueOf(this.getShadow().config.cullRadius))
                     ).append(Text.literal(" blocks of you")),
-                Text.literal("For each non-shadow within range, damage increases by ")
+                Text.literal("For each non-shadow within range"),
+                Text.literal("damage increases by ")
                     .append(Text.literal("2").styled(style -> style.withColor(Formatting.RED)))
-                    .append(Text.literal("hearts (max of 9.5 hearts)")),
+                    .append(Text.literal(" hearts")),
+                Text.literal("(max of 9.5 hearts)"),
                 Text.literal("[ABILITY]").styled((style) -> style.withColor(Formatting.DARK_PURPLE))
             )
         );
@@ -73,8 +71,19 @@ public class Cull extends CooldownAbility {
     }
 
     @Override
-    boolean applyWithCooldown() {
+    public void apply() {
         ServerPlayerEntity p = this.player.getPlayerOrThrow();
+
+        if(usedThisNight) {
+            this.player.sendMessageNow(
+                Text.literal("Cull")
+                    .styled(style -> style.withColor(Formatting.RED))
+                    .append(
+                        Text.literal(" has already been used this night")
+                    )
+            );
+            return;
+        }
 
         List<ServerPlayerEntity> realTargets = p.getServerWorld().getPlayers(
             (player) -> {
@@ -85,7 +94,10 @@ public class Cull extends CooldownAbility {
         );
 
         if(realTargets.isEmpty()) {
-            return true;
+            this.player.sendMessageNow(
+                Text.literal("No targets to hit")
+            );
+            return;
         }
 
         List<ServerPlayerEntity> fakeTargets = p.getServerWorld().getPlayers(
@@ -148,6 +160,6 @@ public class Cull extends CooldownAbility {
                 )
         );
 
-        return true;
+        usedThisNight = true;
     }
 }
