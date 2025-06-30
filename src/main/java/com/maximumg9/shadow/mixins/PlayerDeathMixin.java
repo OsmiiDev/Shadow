@@ -41,10 +41,8 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "onDeath",at=@At("HEAD"))
-    public void onDeath(DamageSource damageSource, CallbackInfo ci) {
+    public void modifyDeathMessage(DamageSource damageSource, CallbackInfo ci) {
         Shadow shadow = getShadow(this.server);
-
-        IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
 
         GameRules.BooleanRule showDeathMessage = this.getWorld().getGameRules().get(GameRules.SHOW_DEATH_MESSAGES);
         if(shadow.state.phase == GamePhase.PLAYING) {
@@ -66,13 +64,22 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
                 );
 
             shadow.broadcast(name);
-
-            player.role = new Spectator(player);
-
-            shadow.checkWin(null);
         } else {
             showDeathMessage.set(true,this.server);
         }
+    }
+
+    @Inject(method="onDeath",at=@At("TAIL"))
+    public void onDeath(DamageSource damageSource, CallbackInfo ci) {
+        Shadow shadow = getShadow(this.server);
+
+        IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
+
+        player.role = new Spectator(player);
+
+        shadow.checkWin(null);
+
+        player.getPlayerOrThrow().setHealth(0f);
     }
 
     @Inject(method="onSpawn",at=@At("TAIL"))
