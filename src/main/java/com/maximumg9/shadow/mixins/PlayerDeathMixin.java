@@ -75,6 +75,8 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
         IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
 
+        if(player.role != null) player.role.onDeath();
+
         player.role = new Spectator(player);
 
         shadow.checkWin(null);

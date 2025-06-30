@@ -50,6 +50,8 @@ public abstract class Role implements ItemRepresentable {
 
     public abstract Style getStyle();
 
+    public void onDeath() {}
+
     public boolean cantSeeGlowingDuringNight() {
         return this.abilities.stream().noneMatch(Ability::allowSeeGlowing);
     }
