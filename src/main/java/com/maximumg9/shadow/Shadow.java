@@ -199,6 +199,11 @@ public class Shadow implements Tickable {
 
     public void endGame(List<IndirectPlayer> winners, @Nullable Faction winningFaction, @Nullable Faction secondaryWinningFaction) {
         state.phase = GamePhase.WON;
+
+        this.state.playedStrongholdPositions.add(
+            this.state.strongholdChunkPosition
+        );
+
         MutableText titleText;
 
         if(winningFaction == null) {
@@ -223,7 +228,7 @@ public class Shadow implements Tickable {
         }
 
         this.getAllPlayers().forEach((player) -> {
-            player.scheduleOnLoad((sPlayer) -> sPlayer.changeGameMode(GameMode.SPECTATOR), CancelPredicates.cancelOnPhaseChange(state.phase));
+            player.scheduleUntil((sPlayer) -> sPlayer.changeGameMode(GameMode.SPECTATOR), CancelPredicates.cancelOnPhaseChange(state.phase));
             player.setTitleTimes(10,40,10, CancelPredicates.cancelOnPhaseChange(state.phase));
             player.sendTitle(titleText, CancelPredicates.cancelOnPhaseChange(state.phase));
             if(subtitleText != null) {

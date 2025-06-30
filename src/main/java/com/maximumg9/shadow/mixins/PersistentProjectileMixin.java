@@ -48,11 +48,11 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
             if(target instanceof ServerPlayerEntity pTarget) {
                 Role targetRole = shadow.getIndirect(pTarget).role;
                 if (targetRole != null && owner.role != null && targetRole.getFaction() == owner.role.getFaction()) {
-                    owner.scheduleOnLoad(
+                    owner.scheduleUntil(
                         LivingEntity::kill,
                         CancelPredicates.cancelOnPhaseChange(shadow.state.phase)
                     );
-                    iPlayer.scheduleOnLoad(
+                    iPlayer.scheduleUntil(
                         LivingEntity::kill,
                         CancelPredicates.cancelOnPhaseChange(shadow.state.phase)
                     );

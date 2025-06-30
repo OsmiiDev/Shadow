@@ -115,13 +115,16 @@ public abstract class Role implements ItemRepresentable {
             CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
         );
 
-        this.player.scheduleOnLoad(
-            (p) -> p.getDataTracker().set(
-                Entity.FLAGS,
-                (byte) (p.getDataTracker().get(Entity.FLAGS) |
-                    (1 << Entity.GLOWING_FLAG_INDEX)),
-                true
-            ),
+        this.player.scheduleUntil(
+            (p) -> {
+                p.setGlowing(true);
+                p.getDataTracker().set(
+                    Entity.FLAGS,
+                    (byte) (p.getDataTracker().get(Entity.FLAGS) |
+                        (1 << Entity.GLOWING_FLAG_INDEX)),
+                    true
+                );
+            },
             CancelPredicates.NEVER_CANCEL
         );
 

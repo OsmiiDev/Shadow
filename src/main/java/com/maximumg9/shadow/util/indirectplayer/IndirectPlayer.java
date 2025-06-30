@@ -121,7 +121,7 @@ public class IndirectPlayer {
     }
 
     public void giveEffect(StatusEffectInstance effect, Predicate<IndirectPlayer> cancelPredicate) {
-        scheduleOnLoad(
+        scheduleUntil(
                 (player) -> player.addStatusEffect(effect),
                 cancelPredicate
         );
@@ -133,7 +133,7 @@ public class IndirectPlayer {
     }
 
     public void removeEffect(RegistryEntry<StatusEffect> effectType, Predicate<IndirectPlayer> cancelPredicate) {
-        scheduleOnLoad(
+        scheduleUntil(
                 (player) -> player.removeStatusEffect(effectType),
                 cancelPredicate
         );
@@ -144,7 +144,7 @@ public class IndirectPlayer {
     }
 
     public void giveItem(ItemStack stack, Predicate<IndirectPlayer> cancelPredicate) {
-        scheduleOnLoad(
+        scheduleUntil(
                 (player) -> player.getInventory().insertStack(stack),
                 cancelPredicate
         );
@@ -158,7 +158,7 @@ public class IndirectPlayer {
 
     public void setTitleTimes(int fadeInTicks, int stayTicks, int fadeOutTicks, Predicate<IndirectPlayer> cancelPredicate) {
         TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
-        scheduleOnLoad(
+        scheduleUntil(
                 (player) -> player.networkHandler.sendPacket(packet),
                 cancelPredicate
         );
@@ -174,7 +174,7 @@ public class IndirectPlayer {
     public void sendTitle(Text title, Predicate<IndirectPlayer> cancelCondition) {
         TitleS2CPacket packet = new TitleS2CPacket(title);
 
-        scheduleOnLoad(
+        scheduleUntil(
                 (player) -> player.networkHandler.sendPacket(packet)
                 , cancelCondition);
     }
@@ -189,7 +189,7 @@ public class IndirectPlayer {
         SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
         TitleS2CPacket titlePacket = new TitleS2CPacket(Text.empty());
 
-        scheduleOnLoad(
+        scheduleUntil(
             (player) -> {
                 player.networkHandler.sendPacket(packet);
                 player.networkHandler.sendPacket(titlePacket);
@@ -204,7 +204,7 @@ public class IndirectPlayer {
     }
 
     public void sendMessage(Text chatMessage, Predicate<IndirectPlayer> cancelCondition) {
-        scheduleOnLoad(
+        scheduleUntil(
             (player) -> player.sendMessage(chatMessage)
             , cancelCondition);
     }
@@ -215,7 +215,7 @@ public class IndirectPlayer {
     }
 
     public void sendOverlay(Text chatMessage, Predicate<IndirectPlayer> cancelCondition) {
-        scheduleOnLoad(
+        scheduleUntil(
             (player) -> player.sendMessage(chatMessage,true)
             , cancelCondition);
     }
@@ -225,7 +225,7 @@ public class IndirectPlayer {
             .sendMessage(chatMessage,true);
     }
 
-    public void scheduleOnLoad(Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {
+    public void scheduleUntil(Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {
         Optional<ServerPlayerEntity> sPlayer = this.getPlayer();
 
         if(sPlayer.isPresent()) {
@@ -251,7 +251,7 @@ public class IndirectPlayer {
     }
 
     public void clearPlayerData(Predicate<IndirectPlayer> cancelCondition) {
-        scheduleOnLoad(
+        scheduleUntil(
             (player) -> {
                 for (
                         AdvancementEntry advancement

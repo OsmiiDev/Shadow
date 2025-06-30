@@ -72,7 +72,7 @@ public class SheriffBow extends Ability {
 
     @Override
     public void deInit() {
-        player.scheduleOnLoad(
+        player.scheduleUntil(
             (player) ->
                 player.getInventory()
                     .remove((item) -> player.getUuid().equals(NBTUtil.getCustomData(item).getUuid("owner"))
