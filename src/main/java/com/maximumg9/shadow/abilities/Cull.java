@@ -64,7 +64,7 @@ public class Cull extends Ability {
                     .append(Text.literal("2").styled(style -> style.withColor(Formatting.RED)))
                     .append(Text.literal(" hearts")),
                 Text.literal("(max of 9.5 hearts)"),
-                Text.literal("[ABILITY]").styled((style) -> style.withColor(Formatting.DARK_PURPLE))
+                AbilityText()
             )
         );
         return stack;

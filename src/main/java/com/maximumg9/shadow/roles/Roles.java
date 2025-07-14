@@ -15,7 +15,9 @@ public enum Roles {
     SPECTATOR(Spectator.FACTORY),
     VILLAGER(Villager.FACTORY),
     SHADOW(ShadowRole.FACTORY),
-    SHERIFF(Sheriff.FACTORY);
+    SHERIFF(Sheriff.FACTORY),
+    LOOKER(Looker.FACTORY);
+
 
     public final String name;
     public final RoleFactory<?> factory;

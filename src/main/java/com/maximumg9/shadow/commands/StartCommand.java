@@ -144,6 +144,8 @@ class StartTicker implements Tickable {
             player.sendTitleNow(player.role.getName());
         }
 
+        shadow.init();
+
         shadow.saveAsync();
     }
 

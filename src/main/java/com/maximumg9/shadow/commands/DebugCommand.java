@@ -129,9 +129,10 @@ public class DebugCommand {
                                                     player.role.getName() :
                                                     Text.literal("null").styled((style) -> style.withColor(Formatting.GRAY))
                                             )
+                                            .append(Text.literal("\n"))
                             );
 
-                            ctx.getSource().sendFeedback(() -> response, true);
+                            ctx.getSource().sendFeedback(() -> response, false);
 
                             return 1;
                         })

@@ -56,6 +56,10 @@ public abstract class Role implements ItemRepresentable {
         return this.abilities.stream().noneMatch(Ability::allowSeeGlowing);
     }
 
+    public boolean cantSeeEnderEyesGlow() {
+        return this.abilities.stream().noneMatch(Ability::enderEyesGlow);
+    }
+
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putString("role",this.getRawName());
         return nbt;

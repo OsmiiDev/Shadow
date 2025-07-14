@@ -32,7 +32,7 @@ public class ToggleStrength extends Ability {
                 Text.literal("Toggle Strength I")
                     .styled(style -> style.withColor(Formatting.GRAY)),
                 Text.literal("During the night you also get Haste V and Speed II"),
-                Text.literal("[ABILITY]").styled((style) -> style.withColor(Formatting.DARK_PURPLE))
+                AbilityText()
             )
         );
     }

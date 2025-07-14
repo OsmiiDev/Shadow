@@ -10,42 +10,42 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
-public class SeeGlowing extends Ability {
+public class SeeEnderEyesGlow extends Ability {
     private static final ItemStack ITEM_STACK;
 
     static {
         ITEM_STACK = new ItemStack(Items.ENDER_EYE);
         ITEM_STACK.set(
             DataComponentTypes.ITEM_NAME,
-            Text.literal("See Glowing During Night")
-                .styled(style -> style.withColor(Formatting.GOLD))
+            Text.literal("See ender eyes glow")
+                .styled(style -> style.withColor(Formatting.GREEN))
         );
         ITEM_STACK.set(
             DataComponentTypes.LORE,
             MiscUtil.makeLore(
-                Text.literal("See glowing during the night when others can't")
+                Text.literal("See ender eyes glow")
                     .styled(style -> style.withColor(Formatting.GRAY)),
-                PassiveText()
+                    PassiveText()
             )
         );
     }
 
-    public SeeGlowing(IndirectPlayer player) {
+    public SeeEnderEyesGlow(IndirectPlayer player) {
         super(player);
     }
 
     @Override
-    public boolean allowSeeGlowing() {
+    public Identifier getID() {
+        return MiscUtil.shadowID("see_ender_eyes_glow");
+    }
+
+    @Override
+    public boolean enderEyesGlow() {
         return true;
     }
 
     @Override
-    public Identifier getID() {
-        return MiscUtil.shadowID("see_glowing");
-    }
-
-    @Override
-    public void apply() {}
+    public void apply() { }
 
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {

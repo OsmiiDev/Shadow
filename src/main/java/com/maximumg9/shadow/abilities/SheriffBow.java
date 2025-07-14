@@ -26,8 +26,7 @@ public class SheriffBow extends Ability {
                     .styled(style -> style.withColor(Formatting.GRAY).withItalic(false)),
                 Text.literal("If shot a villager, the owner and shooter die too.")
                     .styled(style -> style.withColor(Formatting.GRAY).withItalic(false)),
-                Text.literal("[ITEM]")
-                    .styled(style -> style.withColor(Formatting.GOLD).withItalic(false))
+                ItemText()
             )
         );
         ITEM_STACK.set(

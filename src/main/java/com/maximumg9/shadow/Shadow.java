@@ -13,6 +13,7 @@ import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -330,6 +331,22 @@ public class Shadow implements Tickable {
                 Faction.VILLAGER,
                 null
             );
+        }
+    }
+
+    public void init() {
+        ServerWorld world = this.server.getOverworld();
+        for(Eye eye : this.state.eyes) {
+            Entity possibleDisplay = world.getEntity(eye.display());
+            if(possibleDisplay == null) continue;
+            possibleDisplay.setGlowing(true);
+            possibleDisplay
+                .getDataTracker()
+                .set(Entity.FLAGS,
+                    (byte) (possibleDisplay.getDataTracker().get(Entity.FLAGS) |
+                        (1 << Entity.GLOWING_FLAG_INDEX)),
+                    true
+                );
         }
     }
 
