@@ -30,6 +30,7 @@ public class MessageCommandMixin {
         Shadow shadow = getShadow(source.getServer());
 
         if(shadow.state.phase != GamePhase.PLAYING) return;
+        if(shadow.config.disableChat) ci.cancel();
 
         IndirectPlayer player = shadow.getIndirect(p);
         if((player.role == null || player.role.getFaction() == Faction.SPECTATOR) && !p.hasPermissionLevel(3)) {

@@ -88,6 +88,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
         if(shadow.state.phase != GamePhase.PLAYING) return;
 
+        if(shadow.config.disableChat) ci.cancel();
+
         IndirectPlayer p = shadow.getIndirect(this.player);
         if((p.role == null || p.role.getFaction() == Faction.SPECTATOR) && !this.player.hasPermissionLevel(3)) {
             p.sendMessageNow(

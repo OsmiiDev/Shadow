@@ -21,6 +21,7 @@ public class Config {
     public boolean debug = false;
     public int chatMessageCooldown = 30 * 20;
     public double cullRadius = 18.0;
+    public boolean disableChat = false;
     public final RoleManager roleManager;
     public final MaxCooldownManager maxCooldownManager;
 
@@ -42,6 +43,7 @@ public class Config {
         this.debug = nbt.getBoolean("debug");
         this.chatMessageCooldown = nbt.getInt("chatMessageCooldown");
         this.cullRadius = nbt.getDouble("cullRadius");
+        this.disableChat = nbt.getBoolean("disableChat");
 
         this.maxCooldownManager.readNbt(nbt.getCompound("maxCooldownManager"));
         this.roleManager.readNbt(nbt.getCompound("roleManager"));
@@ -59,6 +61,7 @@ public class Config {
         nbt.putBoolean("debug", this.debug);
         nbt.putInt("chatMessageCooldown", this.chatMessageCooldown);
         nbt.putDouble("cullRadius", this.cullRadius);
+        nbt.putBoolean("disableChat", this.disableChat);
 
         nbt.put("maxCooldownManager", this.maxCooldownManager.writeNbt(new NbtCompound()));
         nbt.put("roleManager", this.roleManager.writeNbt(new NbtCompound()));
