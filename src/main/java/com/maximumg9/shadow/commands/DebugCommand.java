@@ -63,7 +63,7 @@ public class DebugCommand {
                                                             Objects.requireNonNull(indirectPlayer.role)
                                                                 .getName()
                                                         ),
-                                                    true);
+                                                    false);
 
                                                 return 1;
                                             }
@@ -84,7 +84,7 @@ public class DebugCommand {
                                     shadow.state.phase = phase;
                                     shadow.saveAsync();
 
-                                    ctx.getSource().sendFeedback(() -> Text.of("Set Game Phase to " + phase.name()), true);
+                                    ctx.getSource().sendFeedback(() -> Text.of("Set Game Phase to " + phase.name()), false);
 
                                     return 1;
                                 })
@@ -101,7 +101,7 @@ public class DebugCommand {
 
                             int sample = ctx.getSource().getWorld().getChunk(ChunkSectionPos.getSectionCoord(x),ChunkSectionPos.getSectionCoord(z)).sampleHeightmap(Heightmap.Type.MOTION_BLOCKING,x,z);
 
-                            ctx.getSource().sendFeedback(() -> Text.of("Heightmap gives: " + sample), true);
+                            ctx.getSource().sendFeedback(() -> Text.of("Heightmap gives: " + sample), false);
 
                             return 1;
                         })
@@ -146,7 +146,7 @@ public class DebugCommand {
                                 text.append(eye.toString()).append(", ");
                             }
 
-                            ctx.getSource().sendFeedback(() -> Text.literal(text.toString()), true);
+                            ctx.getSource().sendFeedback(() -> Text.literal(text.toString()), false);
 
                             return 1;
                         })
