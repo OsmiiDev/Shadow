@@ -10,10 +10,11 @@ public abstract class CooldownAbility extends Ability {
         super(player);
     }
 
-    private long lastActivated = initialCooldown();
+    private long lastActivated;
 
     @Override
     public void init() {
+        this.lastActivated = this.getShadow().getServer().getOverworld().getTime() + initialCooldown();
         super.init();
     }
 
