@@ -23,9 +23,13 @@ public class EntityEquipmentUpdateS2CPacketMixin {
     @Inject(method = "<init>(ILjava/util/List;)V",at=@At("TAIL"))
     public void init(int entityId, List<Pair<EquipmentSlot, ItemStack>> equipmentList, CallbackInfo ci) {
         ArrayList<Pair<EquipmentSlot, ItemStack>> newList = new ArrayList<>(equipmentList);
-        newList.removeIf(
+        newList.replaceAll(
             pair ->
-            NBTUtil.getCustomData(pair.getSecond()).getBoolean(NBTUtil.INVISIBLE_KEY)
+            pair.mapSecond(
+                item ->
+                    NBTUtil.getCustomData(item)
+                        .getBoolean(NBTUtil.INVISIBLE_KEY) ? ItemStack.EMPTY : item
+            )
         );
 
         this.equipmentList = newList;

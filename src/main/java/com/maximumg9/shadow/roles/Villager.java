@@ -24,6 +24,11 @@ public class Villager extends AbstractVillager {
         return "Villager";
     }
 
+    @Override
+    public Roles getRole() {
+        return Roles.VILLAGER;
+    }
+
     private static final Style STYLE = Style.EMPTY.withColor(Formatting.GREEN);
     @Override
     public Style getStyle() { return STYLE; }

@@ -52,6 +52,11 @@ public class Spectator extends Role {
         super.onDay();
     }
 
+    @Override
+    public Roles getRole() {
+        return Roles.SPECTATOR;
+    }
+
     public static final RoleFactory<Spectator> FACTORY = new Factory();
     private static class Factory implements RoleFactory<Spectator> {
         @Override

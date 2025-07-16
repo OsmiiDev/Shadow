@@ -14,9 +14,10 @@ import java.util.concurrent.CompletableFuture;
 public enum Roles {
     SPECTATOR(Spectator.FACTORY),
     VILLAGER(Villager.FACTORY),
-    SHADOW(ShadowRole.FACTORY),
     SHERIFF(Sheriff.FACTORY),
-    LOOKER(Looker.FACTORY);
+    LOOKER(Looker.FACTORY),
+    SHADOW(ShadowRole.FACTORY),
+    ORACLE(Oracle.FACTORY);
 
 
     public final String name;

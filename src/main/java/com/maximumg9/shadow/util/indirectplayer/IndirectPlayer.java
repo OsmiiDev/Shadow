@@ -6,33 +6,45 @@ import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.Spectator;
+import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.MiscUtil;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.attribute.AttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  This is meant to represent a player who existed at some time, even if the player does not exist now
  */
-public class IndirectPlayer {
+public class IndirectPlayer implements ItemRepresentable {
     public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
         this.server = base.server;
@@ -122,6 +134,18 @@ public class IndirectPlayer {
 
     public Optional<ServerPlayerEntity> getPlayer() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
+    }
+
+    public void damage(DamageSource source, float amount, Predicate<IndirectPlayer> cancelPredicate) {
+        scheduleUntil(
+            (player) -> player.damage(source,amount),
+            cancelPredicate
+        );
+    }
+
+    public void damageNow(DamageSource source, float amount) {
+        this.getPlayerOrThrow()
+            .damage(source, amount);
     }
 
     public void giveEffect(StatusEffectInstance effect, Predicate<IndirectPlayer> cancelPredicate) {
@@ -248,6 +272,32 @@ public class IndirectPlayer {
         }
     }
 
+    @Override
+    public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
+        ComponentChanges.Builder builder = ComponentChanges.builder();
+        builder.add(
+            DataComponentTypes.ITEM_NAME,
+            this.getName()
+                .copy()
+                .styled(
+                    style -> style.withColor(Formatting.GRAY)
+                )
+        );
+        builder.add(
+            DataComponentTypes.PROFILE,
+            new ProfileComponent(
+                Optional.empty(),
+                Optional.of(this.playerUUID),
+                new PropertyMap()
+            )
+        );
+
+        return new ItemStack(
+            Registries.ITEM.getEntry(Items.PLAYER_HEAD),
+            1,
+            builder.build());
+    }
+
     public class OfflinePlayerException extends IllegalStateException {
         private OfflinePlayerException() {
             super(IndirectPlayer.this.getName().getLiteralString() + " could not execute the task as they are not online");
@@ -264,10 +314,14 @@ public class IndirectPlayer {
                                 .getAdvancementLoader()
                                 .getAdvancements()
                 ) {
-                    AdvancementProgress advancementProgress = player.getAdvancementTracker().getProgress(advancement);
+                    AdvancementProgress advancementProgress = player
+                        .getAdvancementTracker()
+                        .getProgress(advancement);
                     if (advancementProgress.isAnyObtained()) {
                         for(String string : advancementProgress.getObtainedCriteria()) {
-                            player.getAdvancementTracker().revokeCriterion(advancement, string);
+                            player
+                                .getAdvancementTracker()
+                                .revokeCriterion(advancement, string);
                         }
                     }
                 }

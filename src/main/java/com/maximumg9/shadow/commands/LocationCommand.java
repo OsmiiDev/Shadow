@@ -117,7 +117,14 @@ public class LocationCommand {
 
         clearPortalEyes(overworld, frames);
 
-        frames = frames.expand(shadow.config.worldBorderSize / 2, 0, shadow.config.worldBorderSize / 2);
+        int xRange = shadow.config.worldBorderSize / 2;
+        int zRange = shadow.config.worldBorderSize / 2;
+
+        frames = frames.expand(
+            xRange - frames.getBlockCountX(),
+            0,
+            zRange - frames.getBlockCountZ()
+        );
 
         int x = overworld.getRandom().nextBetween(frames.getMinX(),frames.getMaxX());
         int z = overworld.getRandom().nextBetween(frames.getMinZ(),frames.getMaxZ());

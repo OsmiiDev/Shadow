@@ -31,6 +31,11 @@ public class Looker extends AbstractVillager {
     @Override
     public Style getStyle() { return STYLE; }
 
+    @Override
+    public Roles getRole() {
+        return Roles.LOOKER;
+    }
+
     public static final RoleFactory<Looker> FACTORY = new Factory();
     private static class Factory implements RoleFactory<Looker> {
         @Override

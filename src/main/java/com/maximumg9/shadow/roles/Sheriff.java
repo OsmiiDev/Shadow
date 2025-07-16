@@ -45,6 +45,11 @@ public class Sheriff extends AbstractVillager {
     }
 
     @Override
+    public Roles getRole() {
+        return Roles.SHERIFF;
+    }
+
+    @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
         ItemStack item = ITEM_STACK.copy();
         item.addEnchantment(

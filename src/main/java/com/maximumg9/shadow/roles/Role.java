@@ -155,6 +155,8 @@ public abstract class Role implements ItemRepresentable {
         this.abilities.forEach(Ability::init);
     }
 
+    public abstract Roles getRole();
+
     public void deInit() {
         this.abilities.forEach(Ability::deInit);
     }

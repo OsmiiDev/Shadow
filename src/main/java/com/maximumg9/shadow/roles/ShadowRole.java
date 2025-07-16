@@ -24,6 +24,11 @@ public class ShadowRole extends AbstractShadow {
     @Override
     public Style getStyle() { return STYLE; }
 
+    @Override
+    public Roles getRole() {
+        return Roles.SHADOW;
+    }
+
     public static final RoleFactory<ShadowRole> FACTORY = new Factory();
 
     private static class Factory implements RoleFactory<ShadowRole> {
