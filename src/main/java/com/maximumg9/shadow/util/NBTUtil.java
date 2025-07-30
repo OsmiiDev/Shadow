@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Objects;
 import java.util.function.UnaryOperator;
@@ -14,6 +15,9 @@ import java.util.function.UnaryOperator;
 public abstract class NBTUtil {
     public static String INVISIBLE_KEY = "invisible";
     public static String RESTRICT_MOVEMENT_KEY = "invisible";
+
+    @Unique
+    public static Identifier ABILITY_STAR_ID = MiscUtil.shadowID("ability_star");
 
     public static NbtCompound getCustomData(@NotNull ItemStack stack) {
         NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);

@@ -12,6 +12,7 @@
     "EntityTrackerMixin",
     "ItemMixin",
     "ItemsMixin",
+    "ItemStackMixin",
     "LivingEntityMixin",
     "MessageCommandMixin",
     "MinecraftServerMixin",

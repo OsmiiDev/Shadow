@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.abilities.Ability;
-import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
@@ -102,7 +101,9 @@ public abstract class Role implements ItemRepresentable {
 
         abilitySelector.set(
             DataComponentTypes.ITEM_NAME,
-            Text.literal("Ability Star").styled(style -> style.withColor(Formatting.YELLOW))
+            Text.literal("Ability Star").styled(
+                style -> style.withColor(Formatting.YELLOW)
+            )
         );
 
         player.giveItemNow(
@@ -110,7 +111,8 @@ public abstract class Role implements ItemRepresentable {
             NBTUtil.flagAsInvisible(
                 NBTUtil.addID(
                     abilitySelector,
-                    NetherStarItem.ABILITY_STAR_ID)
+                    NBTUtil.ABILITY_STAR_ID
+                )
             ))
         );
 

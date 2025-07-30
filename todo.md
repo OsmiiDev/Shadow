@@ -1,4 +1,4 @@
 
-- in hand relog fix
-- advancement
+- [x] in hand relog fix
+- [x] advancement
 - anti-stall

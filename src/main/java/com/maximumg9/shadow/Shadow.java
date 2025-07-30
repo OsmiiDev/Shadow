@@ -2,7 +2,6 @@ package com.maximumg9.shadow;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.maximumg9.shadow.abilities.NetherStarItem;
 import com.maximumg9.shadow.commands.*;
 import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.roles.Faction;
@@ -41,7 +40,6 @@ public class Shadow implements Tickable {
     public static final Map<Identifier, Function<Item.Settings,Item>> modifiedItems = new HashMap<>();
 
     static {
-        modifiedItems.put(Identifier.ofVanilla("nether_star"), NetherStarItem::new);
         modifiedItems.put(Identifier.ofVanilla("ender_eye"), EnderEyeItem::new);
     }
 
