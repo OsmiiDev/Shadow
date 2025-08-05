@@ -293,13 +293,19 @@ public class Shadow implements Tickable {
     public void checkWin(@Nullable UUID playerToIgnore) {
         if(this.state.phase != GamePhase.PLAYING) return;
 
-        long villagers = this.getOnlinePlayers().stream().filter(
+        long villagers = this.indirectPlayerManager
+            .getRecentlyOnlinePlayers(this.config.disconnectTime)
+            .stream()
+            .filter(
             (player) ->
                 player.role != null &&
                 player.role.getFaction() == Faction.VILLAGER &&
                 (playerToIgnore == null || !playerToIgnore.equals(player.playerUUID))
         ).count();
-        long shadows = this.getOnlinePlayers().stream().filter(
+        long shadows = this.indirectPlayerManager
+            .getRecentlyOnlinePlayers(this.config.disconnectTime)
+            .stream()
+            .filter(
             (player) ->
                 player.role != null &&
                 player.role.getFaction() == Faction.SHADOW &&
@@ -312,20 +318,26 @@ public class Shadow implements Tickable {
 
         if(villagers == 0) {
             this.endGame(
-                this.getAllPlayers().stream().filter(
-                    (player) -> player.originalRole != null &&
+                this.indirectPlayerManager
+                    .getRecentlyOnlinePlayers(this.config.disconnectTime)
+                    .stream()
+                    .filter(
+                        (player) -> player.originalRole != null &&
                         player.originalRole.faction == Faction.SHADOW
-                ).toList(),
+                    ).toList(),
                 Faction.SHADOW,
                 null
             );
         }
         if(shadows == 0) {
             this.endGame(
-                this.getAllPlayers().stream().filter(
+                this.indirectPlayerManager
+                    .getRecentlyOnlinePlayers(this.config.disconnectTime)
+                    .stream()
+                    .filter(
                     (player) -> player.originalRole != null &&
                         player.originalRole.faction == Faction.VILLAGER
-                ).toList(),
+                    ).toList(),
                 Faction.VILLAGER,
                 null
             );

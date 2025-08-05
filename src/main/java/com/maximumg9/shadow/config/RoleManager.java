@@ -95,6 +95,13 @@ public class RoleManager {
                 player.role = Roles.SPECTATOR.factory.makeRole(player);
             });
 
+        shadow.getAllPlayers().stream()
+            .filter(player -> player.getPlayer().isEmpty())
+            .forEach(player -> {
+                player.originalRole = Roles.SPECTATOR;
+                player.role = Roles.SPECTATOR.factory.makeRole(player);
+            });
+
         return true;
     }
 

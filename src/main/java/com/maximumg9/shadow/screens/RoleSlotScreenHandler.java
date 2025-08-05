@@ -109,6 +109,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
                 ItemStack upStack = Items.GREEN_CONCRETE.getDefaultStack();
                 upStack.set(DataComponentTypes.ITEM_NAME, UP_TEXT);
+
                 this.inventory.setStack((row*3) * 9 + column,upStack);
 
                 ItemStack roleStack = MiscUtil.getItemWithContext(proxyRole,this.context);
@@ -122,6 +123,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
                             )
                     )
                 );
+                roleStack.setCount(Math.max(1,Math.min(weight, 64)));
                 this.inventory.setStack((row*3 + 1)* 9 + column,roleStack);
 
                 ItemStack downStack = Items.RED_CONCRETE.getDefaultStack();
@@ -153,7 +155,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
                 if(operation == 0) {
                     this.slot.setWeight(role,this.slot.getWeight(role) + 1);
-                } else if(operation == 2 && this.slot.weightSum() > 1) {
+                } else if(operation == 2 && this.slot.weightSum() > 1  && this.slot.getWeight(role) > 0) {
                     this.slot.setWeight(role,this.slot.getWeight(role) - 1);
                 }
                 // nothing for clicking the role icon for now!

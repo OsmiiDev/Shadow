@@ -8,6 +8,7 @@ import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.Spectator;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.MiscUtil;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
@@ -78,6 +79,7 @@ public class IndirectPlayer implements ItemRepresentable {
     public boolean participating;
     public boolean frozen;
     public int chatMessageCooldown;
+    private int offlineTicks = Integer.MAX_VALUE;
     private Text name = null;
 
     public Shadow getShadow() {
@@ -99,6 +101,8 @@ public class IndirectPlayer implements ItemRepresentable {
             player.originalRole = null;
         }
 
+        player.offlineTicks = nbt.getInt("offline_ticks");
+
         return player;
     }
 
@@ -114,16 +118,38 @@ public class IndirectPlayer implements ItemRepresentable {
             nbt.putString("original_role", this.originalRole.name);
         }
 
+        nbt.putInt("offline_ticks", this.offlineTicks);
+
         return nbt;
     }
 
     public void tick() {
         chatMessageCooldown = chatMessageCooldown > 0 ? chatMessageCooldown - 1 : 0;
+        if(this.getPlayer().isPresent()) {
+            this.offlineTicks = 0;
+        } else if(offlineTicks < Integer.MAX_VALUE) {
+            this.offlineTicks++;
+        }
+    }
+
+    public int getOfflineTicks() {
+        return this.offlineTicks;
     }
 
     public Text getName() {
         this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
-        if(name == null) this.name = Text.literal(playerUUID.toString());
+        if(name == null) {
+            Optional<GameProfile> profile = this.server.getUserCache().getByUuid(this.playerUUID);
+            this.name = profile.map(
+                gameProfile -> Text.literal(
+                    gameProfile.getName()
+                )
+            ).orElse(
+                Text.literal(
+                    playerUUID.toString()
+                )
+            );
+        }
         return this.name;
     }
 

@@ -22,6 +22,7 @@ public class Config {
     public int chatMessageCooldown = 30 * 20;
     public double cullRadius = 18.0;
     public boolean disableChat = false;
+    public int disconnectTime = 20 * 60 * 10;
     public final RoleManager roleManager;
     public final MaxCooldownManager maxCooldownManager;
 

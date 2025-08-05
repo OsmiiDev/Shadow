@@ -24,7 +24,7 @@ public class RoleCommand {
 
                     ctx.getSource().sendFeedback(
                         () -> Text.literal("Opened Role Menu"),
-                        true
+                        false
                     );
 
                     return 2;

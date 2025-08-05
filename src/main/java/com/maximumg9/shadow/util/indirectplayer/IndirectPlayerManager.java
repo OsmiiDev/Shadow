@@ -128,6 +128,10 @@ public class IndirectPlayerManager implements Tickable {
         return this.indirectPlayers.values();
     }
 
+    public Collection<IndirectPlayer> getRecentlyOnlinePlayers(int maxTicksOffline) {
+        return this.indirectPlayers.values().stream().filter(iP -> iP.getOfflineTicks() <= maxTicksOffline).toList();
+    }
+
     public IndirectPlayer get(UUID uuid) {
         return this.indirectPlayers.computeIfAbsent(uuid,(Uuid) -> new IndirectPlayer(server,Uuid));
     }

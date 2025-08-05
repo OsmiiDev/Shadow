@@ -109,4 +109,9 @@ public class RoleSlot implements ItemRepresentable {
         stack.set(DataComponentTypes.LORE, new LoreComponent(loreList,loreList));
         return stack;
     }
+
+    @Override
+    public String toString() {
+        return "RoleSlot={index=" + index + ",weights=" + Arrays.toString(weights) + "}";
+    }
 }

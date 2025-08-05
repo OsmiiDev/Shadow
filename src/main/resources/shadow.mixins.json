@@ -17,6 +17,7 @@
     "MessageCommandMixin",
     "MinecraftServerMixin",
     "PersistentProjectileMixin",
+    "PlayerAdvancementTrackerMixin",
     "PlayerDeathMixin",
     "ScreenHandlerMixin",
     "ServerPlayerEntityMixin",

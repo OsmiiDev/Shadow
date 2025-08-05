@@ -23,9 +23,17 @@ public class DragonDeathMixin extends MobEntity {
     public void onDeath(DamageSource damageSource) {
         Shadow shadow = getShadow(Objects.requireNonNull(this.getServer()));
 
-        shadow.endGame(shadow.getOnlinePlayers().stream().filter((player) -> {
-            assert player.originalRole != null;
-            return player.originalRole.faction == Faction.VILLAGER;
-        }).toList(), Faction.VILLAGER, null);
+        shadow.endGame(
+            shadow
+                .indirectPlayerManager
+                .getRecentlyOnlinePlayers(shadow.config.disconnectTime)
+                .stream()
+                .filter((player) -> {
+                    assert player.originalRole != null;
+                    return player.originalRole.faction == Faction.VILLAGER;
+                }).toList(),
+            Faction.VILLAGER,
+            null
+        );
     }
 }

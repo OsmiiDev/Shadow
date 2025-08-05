@@ -8,14 +8,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
-import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static com.mojang.brigadier.arguments.StringArgumentType.string;
+import static net.minecraft.command.argument.MessageArgumentType.message;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -24,7 +24,7 @@ public class ShadowChatCommand {
         LiteralCommandNode<ServerCommandSource> cmd = dispatcher.register(
             literal("shadowchat")
                 .then(
-                    argument("message", string())
+                    argument("message", message())
                         .executes(ShadowChatCommand::sendShadowChat)
                 )
         );
@@ -48,7 +48,7 @@ public class ShadowChatCommand {
             return 0;
         }
 
-        String message = getString(ctx,"message");
+        Text msg = MessageArgumentType.getMessage(ctx, "message");
 
             shadow.getAllPlayers().stream().filter(
                 (p) ->
@@ -60,7 +60,7 @@ public class ShadowChatCommand {
                         .append(Text.literal(" <"))
                         .append(player.getName().copy().setStyle(player.role.getStyle()))
                         .append(Text.literal("> "))
-                        .append(Text.literal(message)),
+                        .append(msg),
                     CancelPredicates.cancelOnPhaseChange(shadow.state.phase)
                 )
             );
