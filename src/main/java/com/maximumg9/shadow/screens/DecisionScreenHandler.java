@@ -28,6 +28,8 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
     private final int inventorySize;
 
+    private final boolean autoClose;
+
     private static ScreenHandlerType<?> getTypeForSize(int size) {
         if(size <= 9) {
             return ScreenHandlerType.GENERIC_9X1;
@@ -46,7 +48,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         }
     }
 
-    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values, ScreenHandlerContext context) {
+    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values, ScreenHandlerContext context, boolean autoClose) {
         super(getTypeForSize(values.size()), syncId);
 
         inventorySize = Math.ceilDiv(values.size(), 9) * 9;
@@ -64,6 +66,8 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
             decisionResultHashMap.put(i,value);
             i++;
         }
+
+        this.autoClose = autoClose;
     }
 
     public void initSlots() {
@@ -79,10 +83,13 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
     @Override
     public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        if(slotIndex > this.decisionResultHashMap.size()) return;
         if(player instanceof ServerPlayerEntity sPlayer) {
             this.syncState();
             V value = decisionResultHashMap.get(slotIndex);
-            sPlayer.closeHandledScreen();
+            if(this.autoClose) {
+                sPlayer.closeHandledScreen();
+            }
             if(this.resultCallback != null) {
                 this.resultCallback.accept(value, sPlayer);
             }
@@ -99,11 +106,20 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         public final Callback<V> resultCallback;
         private final Text name;
         private final List<V> values;
+        private final boolean autoClose;
+
+        public Factory(Text name, Callback<V> resultCallback, List<V> values, boolean autoClose) {
+            this.name = name;
+            this.resultCallback = resultCallback;
+            this.values = values;
+            this.autoClose = autoClose;
+        }
 
         public Factory(Text name, Callback<V> resultCallback, List<V> values) {
             this.name = name;
             this.resultCallback = resultCallback;
             this.values = values;
+            this.autoClose = true;
         }
 
         @Override
@@ -115,9 +131,11 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
             return new DecisionScreenHandler<>(
                 syncId, this.resultCallback, values,
-                ScreenHandlerContext.create(player.getWorld(),player.getBlockPos())
+                ScreenHandlerContext.create(player.getWorld(),player.getBlockPos()),
+                autoClose
             );
         }
+
     }
 
     @FunctionalInterface

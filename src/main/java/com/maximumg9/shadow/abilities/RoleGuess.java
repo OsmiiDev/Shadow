@@ -87,7 +87,7 @@ public class RoleGuess extends CooldownAbility {
     }
 
     @Override
-    boolean applyWithCooldown() {
+    public AbilityResult apply() {
         this.player.getPlayerOrThrow().openHandledScreen(
             new DecisionScreenHandler.Factory<>(
                 Text.literal("Person to guess"),
@@ -173,7 +173,7 @@ public class RoleGuess extends CooldownAbility {
                     .toList()
             )
         );
-        return false;
+        return AbilityResult.NO_CLOSE;
     }
 
     @Override

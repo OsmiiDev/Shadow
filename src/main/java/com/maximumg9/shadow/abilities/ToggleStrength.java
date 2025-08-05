@@ -47,7 +47,7 @@ public class ToggleStrength extends Ability {
     }
 
     @Override
-    public void apply() {
+    public AbilityResult apply() {
         hasStrength = !hasStrength;
         if(hasStrength) {
             this.player.giveEffectNow(
@@ -110,6 +110,7 @@ public class ToggleStrength extends Ability {
             }
             this.player.sendMessageNow(Text.literal("Turned Strength Off!"));
         }
+        return AbilityResult.CLOSE;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.abilities.AbilityResult;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.screens.DecisionScreenHandler;
 import com.maximumg9.shadow.util.NBTUtil;
@@ -51,7 +52,10 @@ public abstract class ItemStackMixin implements ComponentHolder {
                 Text.literal("Ability Menu"),
                 (ability, clicker) -> {
                     if(ability != null) {
-                        ability.apply();
+                        AbilityResult result = ability.apply();
+                        if(result.close) {
+                            clicker.closeHandledScreen();
+                        }
                     }
                 },
                 role.getAbilities()

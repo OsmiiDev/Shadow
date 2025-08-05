@@ -23,7 +23,10 @@ public abstract class Ability implements ItemRepresentable {
     public IndirectPlayer getPlayer() {
         return this.player;
     }
-    public abstract void apply();
+    public AbilityResult triggerApply() {
+        return apply();
+    }
+    public abstract AbilityResult apply();
     public void init() {}
     public void deInit() {}
     public void onNight() {}

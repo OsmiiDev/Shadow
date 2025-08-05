@@ -71,7 +71,7 @@ public class Cull extends Ability {
     }
 
     @Override
-    public void apply() {
+    public AbilityResult apply() {
         ServerPlayerEntity p = this.player.getPlayerOrThrow();
 
         if(usedThisNight) {
@@ -82,7 +82,7 @@ public class Cull extends Ability {
                         Text.literal(" has already been used this night")
                     )
             );
-            return;
+            return AbilityResult.CLOSE;
         }
 
         List<ServerPlayerEntity> realTargets = p.getServerWorld().getPlayers(
@@ -97,7 +97,7 @@ public class Cull extends Ability {
             this.player.sendMessageNow(
                 Text.literal("No targets to hit")
             );
-            return;
+            return AbilityResult.CLOSE;
         }
 
         List<ServerPlayerEntity> fakeTargets = p.getServerWorld().getPlayers(
@@ -161,5 +161,6 @@ public class Cull extends Ability {
         );
 
         usedThisNight = true;
+        return AbilityResult.CLOSE;
     }
 }

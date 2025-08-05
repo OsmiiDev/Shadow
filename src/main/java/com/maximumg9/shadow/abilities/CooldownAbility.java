@@ -27,21 +27,22 @@ public abstract class CooldownAbility extends Ability {
     public abstract Text getName();
 
     @Override
-    public void apply() {
+    public AbilityResult triggerApply() {
         long currentTicks = this.getShadow().getServer().getOverworld().getTime();
         long endTime = lastActivated + this.getShadow().config.maxCooldownManager.getMaxCooldown(this.getID(),defaultCooldown());
 
         long timeLeft = endTime-currentTicks;
 
         if(timeLeft <= 0) {
-            boolean result = applyWithCooldown();
+            AbilityResult result = apply();
 
-            if(result) {
+            if(result.reset) {
                 resetCooldown();
             }
         } else {
             onCooldownFail(timeLeft);
         }
+        return null;
     }
 
     void resetCooldown() {
@@ -73,7 +74,4 @@ public abstract class CooldownAbility extends Ability {
     abstract int defaultCooldown();
 
     abstract int initialCooldown();
-
-    // if true is returned, reset cooldown, otherwise don't reset cooldown
-    abstract boolean applyWithCooldown();
 }

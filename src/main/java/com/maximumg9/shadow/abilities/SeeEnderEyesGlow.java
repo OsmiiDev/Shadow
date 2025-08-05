@@ -45,7 +45,9 @@ public class SeeEnderEyesGlow extends Ability {
     }
 
     @Override
-    public void apply() { }
+    public AbilityResult apply() {
+        return AbilityResult.NO_CLOSE;
+    }
 
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
