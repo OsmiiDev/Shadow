@@ -108,9 +108,9 @@ public class LocationCommand {
         MinecraftServer server = src.getServer();
         Shadow shadow = getShadow(server);
 
-        BlockBox frames = findLocation(ctx);
-
         if(!shadow.state.phase.canSelectLocation) return -1;
+
+        BlockBox frames = findLocation(ctx);
 
         if(frames == null) {
             shadow.ERROR("Portal frames not found");
