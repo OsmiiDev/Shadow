@@ -112,6 +112,7 @@ public class RoleSlot implements ItemRepresentable {
         }
 
         // @TODO: If the weights match a predefined bucket, show the ItemStack for that bucket instead of the structure void.
+        // Haha bucket lover!!!!!
 
         stack.set(DataComponentTypes.ITEM_NAME, getName());
         ArrayList<Text> loreList = new ArrayList<>();
