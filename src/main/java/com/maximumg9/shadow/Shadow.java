@@ -117,7 +117,11 @@ public class Shadow implements Tickable {
 
     public void ERROR(String message) {
         LOGGER.error(message);
-        this.broadcast(Text.literal(message).styled((style) -> style.withColor(Formatting.RED)));
+        this.broadcast(
+            Text.literal("[ERROR] ")
+                .styled((style) -> style.withColor(Formatting.RED))
+                .append(message)
+        );
     }
 
     public void ERROR(Throwable t) {
@@ -143,7 +147,7 @@ public class Shadow implements Tickable {
 
     public void LOG(String message) {
         LOGGER.info(message);
-        Text messageAsText = Text.literal("[LOG]")
+        Text messageAsText = Text.literal("[LOG] ")
             .styled(style -> style.withColor(Formatting.GRAY))
             .append(
                 Text.literal(message)

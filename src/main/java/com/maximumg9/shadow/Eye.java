@@ -23,14 +23,15 @@ public record Eye(RegistryKey<World> worldKey, UUID item, UUID display, BlockPos
             if(itemEntity != null) {
                 itemEntity.remove(Entity.RemovalReason.DISCARDED);
             } else {
-                shadow.LOG("Tried to remove eye item that doesn't exist @" + position.toShortString());
+                // I'll do better logging later I promise
+                // shadow.LOG("Tried to remove eye item that doesn't exist @" + position.toShortString());
             }
 
             Entity displayEntity = world.getEntity(display);
             if(displayEntity != null) {
                 displayEntity.remove(Entity.RemovalReason.DISCARDED);
             } else {
-                shadow.LOG("Tried to remove eye display that doesn't exist @" + position.toShortString());
+                // shadow.LOG("Tried to remove eye display that doesn't exist @" + position.toShortString());
             }
 
             world.getChunkManager().setChunkForced(new ChunkPos(position), false);
