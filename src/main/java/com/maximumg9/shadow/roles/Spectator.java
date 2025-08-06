@@ -14,6 +14,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class Spectator extends Role {
+    public static final RoleFactory<Spectator> FACTORY = new Factory();
+    private static final Style STYLE = Style.EMPTY.withColor(Formatting.GRAY);
+    private static final ItemStack ITEM_STACK = new ItemStack(Items.LIGHT);
+
+    static {
+        ITEM_STACK.set(DataComponentTypes.ITEM_NAME, new Spectator(null).getName());
+    }
+
     public Spectator(@Nullable IndirectPlayer player) {
         super(player, List.of());
     }
@@ -24,13 +32,17 @@ public class Spectator extends Role {
     }
 
     @Override
+    public SubFaction getSubFaction() { return SubFaction.SPECTATOR; }
+
+    @Override
     public String getRawName() {
         return "Spectator";
     }
 
-    private static final Style STYLE = Style.EMPTY.withColor(Formatting.GRAY);
     @Override
-    public Style getStyle() { return STYLE; }
+    public Style getStyle() {
+        return STYLE;
+    }
 
     @Override
     public void onNight() {
@@ -57,19 +69,15 @@ public class Spectator extends Role {
         return Roles.SPECTATOR;
     }
 
-    public static final RoleFactory<Spectator> FACTORY = new Factory();
+    @Override
+    public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
+        return ITEM_STACK.copy();
+    }
+
     private static class Factory implements RoleFactory<Spectator> {
         @Override
         public Spectator makeRole(@Nullable IndirectPlayer player) {
             return new Spectator(player);
         }
     }
-
-    private static final ItemStack ITEM_STACK = new ItemStack(Items.LIGHT);
-    static {
-        ITEM_STACK.set(DataComponentTypes.ITEM_NAME,new Spectator(null).getName());
-    }
-
-    @Override
-    public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) { return ITEM_STACK.copy(); }
 }

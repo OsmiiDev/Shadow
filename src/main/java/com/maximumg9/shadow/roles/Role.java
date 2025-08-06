@@ -41,6 +41,8 @@ public abstract class Role implements ItemRepresentable {
 
     public abstract Faction getFaction();
 
+    public abstract SubFaction getSubFaction();
+
     public List<Ability> getAbilities() {
         return this.abilities;
     }
@@ -57,6 +59,10 @@ public abstract class Role implements ItemRepresentable {
 
     public boolean cantSeeEnderEyesGlow() {
         return this.abilities.stream().noneMatch(Ability::enderEyesGlow);
+    }
+
+    public boolean hasAbility(Ability.Factory factory) {
+        return this.abilities.stream().anyMatch(factory::equals);
     }
 
     public NbtCompound writeNbt(NbtCompound nbt) {

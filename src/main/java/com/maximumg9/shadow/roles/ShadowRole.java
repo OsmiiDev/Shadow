@@ -18,6 +18,9 @@ public class ShadowRole extends AbstractShadow {
     }
 
     @Override
+    public SubFaction getSubFaction() { return SubFaction.SHADOW; }
+
+    @Override
     public String getRawName() { return "Shadow"; }
 
     private static final Style STYLE = Style.EMPTY.withColor(Formatting.RED);
