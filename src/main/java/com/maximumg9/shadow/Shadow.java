@@ -39,8 +39,17 @@ public class Shadow implements Tickable {
 
     public static final Map<Identifier, Function<Item.Settings,Item>> modifiedItems = new HashMap<>();
 
+    public static final HashMap<Identifier, ItemUseCallback> ITEM_USE_CALLBACK_MAP = new HashMap<>();
+
     static {
-        modifiedItems.put(Identifier.ofVanilla("ender_eye"), EnderEyeItem::new);
+        ITEM_USE_CALLBACK_MAP.put(
+            AbilityStar.ID,
+            new AbilityStar()
+        );
+        ITEM_USE_CALLBACK_MAP.put(
+            ParticipationEye.ID,
+            new ParticipationEye()
+        );
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess) {

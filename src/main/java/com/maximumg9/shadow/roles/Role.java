@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.roles;
 
+import com.maximumg9.shadow.AbilityStar;
 import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.MiscUtil;
@@ -112,7 +113,7 @@ public abstract class Role implements ItemRepresentable {
             NBTUtil.flagAsInvisible(
                 NBTUtil.addID(
                     abilitySelector,
-                    NBTUtil.ABILITY_STAR_ID
+                    AbilityStar.ID
                 )
             )),
             MiscUtil.DELETE_WARN

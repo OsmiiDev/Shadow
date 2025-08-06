@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 
-public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHandler {
+public class DecisionScreenHandler<V extends ItemRepresentable> extends ShadowScreenHandler {
 
     public final HashMap<Integer,V> decisionResultHashMap = new HashMap<>();
 
@@ -48,8 +48,8 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         }
     }
 
-    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values, ScreenHandlerContext context, boolean autoClose) {
-        super(getTypeForSize(values.size()), syncId);
+    protected DecisionScreenHandler(int syncId, @Nullable  Callback<V> resultCallback, List<V> values, PlayerInventory playerInventory, ScreenHandlerContext context, boolean autoClose) {
+        super(getTypeForSize(values.size()), syncId, playerInventory);
 
         inventorySize = Math.ceilDiv(values.size(), 9) * 9;
         this.resultCallback = resultCallback;
@@ -60,9 +60,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
         int i=0;
         for(V value : values) {
-            this.getSlot(i).insertStack(
-                MiscUtil.getItemWithContext(value,context)
-            );
+            this.inventory.setStack(i, MiscUtil.getItemWithContext(value,context));
             decisionResultHashMap.put(i,value);
             i++;
         }
@@ -70,10 +68,18 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         this.autoClose = autoClose;
     }
 
-    public void initSlots() {
+    void initSlots() {
         for(int k = 0; k < inventorySize; ++k) {
-            this.addSlot(new Slot(inventory, k, 0, 0));
+            this.addSlot(
+                new Slot(
+                    inventory,
+                    k,
+                    0,
+                    0
+                )
+            );
         }
+        super.initSlots();
     }
 
     @Override
@@ -131,6 +137,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
         public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
             return new DecisionScreenHandler<>(
                 syncId, this.resultCallback, values,
+                playerInventory,
                 ScreenHandlerContext.create(player.getWorld(),player.getBlockPos()),
                 autoClose
             );

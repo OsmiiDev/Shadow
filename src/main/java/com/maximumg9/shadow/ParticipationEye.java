@@ -1,6 +1,7 @@
 package com.maximumg9.shadow;
 
 import com.maximumg9.shadow.util.ItemData;
+import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,26 +12,25 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Unique;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
-public class EnderEyeItem extends net.minecraft.item.EnderEyeItem {
-    public EnderEyeItem(Settings settings) {
-        super(settings);
-    }
+public class ParticipationEye implements ItemUseCallback {
+    @Unique
+    public static Identifier ID = MiscUtil.shadowID("participation_eye");
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(!(world instanceof ServerWorld)) return super.use(world, user, hand);
+        if(!(world instanceof ServerWorld)) return null;
 
         ItemStack item = user.getStackInHand(hand);
         EnderEyeData data = EnderEyeData.read(item);
 
-        if(!data.isParticipationEye) return super.use(world, user, hand);
-
-        EnderEyeData newData = new EnderEyeData(!data.participating,true);
+        EnderEyeData newData = new EnderEyeData(!data.participating);
         newData.write(item);
 
         getShadow(world.getServer())
@@ -40,7 +40,7 @@ public class EnderEyeItem extends net.minecraft.item.EnderEyeItem {
         return TypedActionResult.success(item);
     }
 
-    public record EnderEyeData(boolean participating, boolean isParticipationEye) implements ItemData {
+    public record EnderEyeData(boolean participating) implements ItemData {
 
         private static final Text PARTICIPATING_TEXT = Text.literal("Participating").styled((style) -> style.withColor(Formatting.GREEN));
         private static final Text NOT_PARTICIPATING_TEXT = Text.literal("Not Participating").styled((style) -> style.withColor(Formatting.RED));
@@ -49,29 +49,27 @@ public class EnderEyeItem extends net.minecraft.item.EnderEyeItem {
         public void write(ItemStack stack) {
             NBTUtil.applyCustomDataToStack(stack, (compound) -> {
                 compound.putBoolean("participating",participating);
-                compound.putBoolean("is_participation_eye",isParticipationEye);
 
                 return compound;
             });
 
-            if(this.isParticipationEye) {
-                stack.apply(DataComponentTypes.ITEM_NAME, Text.literal("This text should never appear"),(text) -> {
-                    if(participating) {
-                        return PARTICIPATING_TEXT;
-                    } else {
-                        return NOT_PARTICIPATING_TEXT;
-                    }
-                });
-            }
+            NBTUtil.addID(stack, ID);
+
+            stack.apply(DataComponentTypes.ITEM_NAME, Text.literal("This text should never appear"),(text) -> {
+                if(participating) {
+                    return PARTICIPATING_TEXT;
+                } else {
+                    return NOT_PARTICIPATING_TEXT;
+                }
+            });
         }
 
         public static EnderEyeData read(ItemStack stack) {
             NbtCompound customData = NBTUtil.getCustomData(stack);
 
             boolean participating = customData.getBoolean("participating");
-            boolean isParticipationEye = customData.getBoolean("is_participation_eye");
 
-            return new EnderEyeData(participating,isParticipationEye);
+            return new EnderEyeData(participating);
         }
     }
 }

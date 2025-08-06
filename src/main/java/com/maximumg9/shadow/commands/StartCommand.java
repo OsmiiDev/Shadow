@@ -72,7 +72,7 @@ public class StartCommand {
 
             ItemStack eyeStack = new ItemStack(Items.ENDER_EYE);
 
-            EnderEyeItem.EnderEyeData data = new EnderEyeItem.EnderEyeData(player.participating,true);
+            ParticipationEye.EnderEyeData data = new ParticipationEye.EnderEyeData(player.participating);
 
             data.write(eyeStack);
 

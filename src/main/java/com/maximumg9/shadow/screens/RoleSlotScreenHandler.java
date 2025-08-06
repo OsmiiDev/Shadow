@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
-public class RoleSlotScreenHandler extends ScreenHandler {
+public class RoleSlotScreenHandler extends ShadowScreenHandler {
     private static final int SIZE = 9 * 6;
     private static final Text NEXT_PAGE_TEXT = Text.literal("Next Page").styled((style) -> style.withColor(Formatting.GOLD));
     private static final Text LAST_PAGE_TEXT = Text.literal("Last Page").styled((style) -> style.withColor(Formatting.GOLD));
@@ -50,8 +50,8 @@ public class RoleSlotScreenHandler extends ScreenHandler {
     private final ScreenHandlerContext context;
     private int page = 0;
 
-    private RoleSlotScreenHandler(int syncID, RoleSlot slot, ScreenHandlerContext context) {
-        super(ScreenHandlerType.GENERIC_9X6, syncID);
+    private RoleSlotScreenHandler(int syncID, RoleSlot slot, PlayerInventory playerInventory, ScreenHandlerContext context) {
+        super(ScreenHandlerType.GENERIC_9X6, syncID, playerInventory);
         this.context = context;
 
         this.slot = slot;
@@ -63,10 +63,18 @@ public class RoleSlotScreenHandler extends ScreenHandler {
         buildUI();
     }
 
-    private void initSlots() {
+    void initSlots() {
         for(int k = 0; k < SIZE; ++k) {
-            this.addSlot(new Slot(inventory, k, 0, 0));
+            this.addSlot(
+                new Slot(
+                    inventory,
+                    k,
+                    0,
+                    0
+                )
+            );
         }
+        super.initSlots();
     }
 
     private void buildUI() {
@@ -228,6 +236,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
         public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
             return new RoleSlotScreenHandler(
                 syncId, slot,
+                playerInventory,
                 ScreenHandlerContext.create(player.getWorld(), player.getBlockPos())
             );
         }
