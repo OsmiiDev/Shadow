@@ -114,6 +114,7 @@ public class RoleManager {
     }
 
     private void openRoleMenu(RoleSlot slot, ServerPlayerEntity clicker) {
+        System.out.println("tried to open role menu");
         if(slot == null) return;
 
         clicker.openHandledScreen(new RoleSlotScreenHandler.Factory(

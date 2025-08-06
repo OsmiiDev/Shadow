@@ -29,11 +29,26 @@ import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 public class RoleSlotScreenHandler extends ScreenHandler {
     private static final int SIZE = 9 * 6;
-
+    private static final Text NEXT_PAGE_TEXT = Text.literal("Next Page").styled((style) -> style.withColor(Formatting.GOLD));
+    private static final Text LAST_PAGE_TEXT = Text.literal("Last Page").styled((style) -> style.withColor(Formatting.GOLD));
+    private static final Text EXIT_SCREEN_TEXT = Text.literal("Return to role menu").styled((style) -> style.withColor(Formatting.RED));
+    private static final Text UP_TEXT = Text.literal("Increase Weight").styled((style) -> style.withColor(Formatting.GREEN));
+    private static final Text DOWN_TEXT = Text.literal("Decrease Weight").styled((style) -> style.withColor(Formatting.RED));
     private final RoleSlot slot;
+    // What does the UI look like? Well here it is:
+    // ,--------------------------------------------,
+    // | Up | Up | Up | Up | Up | Up | Up | Up |Next|
+    // |Role|Role|Role|Role|Role|Role|Role|Role|    |
+    // |Down|Down|Down|Down|Down|Down|Down|Down|    |
+    // | Up | Up | Up | Up | Up | Up | Up | Up |    |
+    // |Role|Role|Role|Role|Role|Role|Role|Role|    |
+    // |Down|Down|Down|Down|Down|Down|Down|Down|Exit|
+    // '--------------------------------------------'
+
+    // The role weight items are made by buildPage
+    // The Next and Exit items are made by buildUI
     private final SimpleInventory inventory;
     private final ScreenHandlerContext context;
-
     private int page = 0;
 
     private RoleSlotScreenHandler(int syncID, RoleSlot slot, ScreenHandlerContext context) {
@@ -54,33 +69,17 @@ public class RoleSlotScreenHandler extends ScreenHandler {
             this.addSlot(new Slot(inventory, k, 0, 0));
         }
     }
-    // What does the UI look like? Well here it is:
-    // ,--------------------------------------------,
-    // | Up | Up | Up | Up | Up | Up | Up | Up |Next|
-    // |Role|Role|Role|Role|Role|Role|Role|Role|    |
-    // |Down|Down|Down|Down|Down|Down|Down|Down|    |
-    // | Up | Up | Up | Up | Up | Up | Up | Up |    |
-    // |Role|Role|Role|Role|Role|Role|Role|Role|    |
-    // |Down|Down|Down|Down|Down|Down|Down|Down|Exit|
-    // '--------------------------------------------'
-
-    // The role weight items are made by buildPage
-    // The Next and Exit items are made by buildUI
-
-    private static final Text NEXT_PAGE_TEXT = Text.literal("Next Page").styled((style) -> style.withColor(Formatting.GOLD));
-    private static final Text LAST_PAGE_TEXT = Text.literal("Last Page").styled((style) -> style.withColor(Formatting.GOLD));
-    private static final Text EXIT_SCREEN_TEXT = Text.literal("Return to role menu").styled((style) -> style.withColor(Formatting.RED));
 
     private void buildUI() {
         if(this.page < (Roles.values().length / 9) / 2) {
             ItemStack nextPageStack = Items.SPECTRAL_ARROW.getDefaultStack();
             nextPageStack.set(DataComponentTypes.ITEM_NAME, NEXT_PAGE_TEXT);
-            this.inventory.setStack(8,nextPageStack);
+            this.inventory.setStack(8, nextPageStack);
         }
         if(this.page > 0) {
             ItemStack nextPageStack = Items.SPECTRAL_ARROW.getDefaultStack();
             nextPageStack.set(DataComponentTypes.ITEM_NAME, LAST_PAGE_TEXT);
-            this.inventory.setStack(9 + 8,nextPageStack);
+            this.inventory.setStack(9 + 8, nextPageStack);
         }
 
         ItemStack exitStack = Items.BARRIER.getDefaultStack();
@@ -89,9 +88,6 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
         buildPage();
     }
-
-    private static final Text UP_TEXT = Text.literal("Increase Weight").styled((style) -> style.withColor(Formatting.GREEN));
-    private static final Text DOWN_TEXT = Text.literal("Decrease Weight").styled((style) -> style.withColor(Formatting.RED));
 
     private void buildPage() {
         int startRoleIndicies = page * 2 * 9;
@@ -109,10 +105,9 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
                 ItemStack upStack = Items.GREEN_CONCRETE.getDefaultStack();
                 upStack.set(DataComponentTypes.ITEM_NAME, UP_TEXT);
+                this.inventory.setStack((row * 3) * 9 + column, upStack);
 
-                this.inventory.setStack((row*3) * 9 + column,upStack);
-
-                ItemStack roleStack = MiscUtil.getItemWithContext(proxyRole,this.context);
+                ItemStack roleStack = MiscUtil.getItemWithContext(proxyRole, this.context);
                 roleStack.set(
                     DataComponentTypes.LORE,
                     MiscUtil.makeLore(
@@ -123,6 +118,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
                             )
                     )
                 );
+                this.inventory.setStack((row * 3 + 1) * 9 + column, roleStack);
                 if(weight > 0) {
                     roleStack.set(
                         DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
@@ -139,7 +135,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
                 ItemStack downStack = Items.RED_CONCRETE.getDefaultStack();
                 downStack.set(DataComponentTypes.ITEM_NAME, DOWN_TEXT);
-                this.inventory.setStack((row*3 + 2) * 9 + column,downStack);
+                this.inventory.setStack((row * 3 + 2) * 9 + column, downStack);
             }
         }
     }
@@ -222,7 +218,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
         public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
             return new RoleSlotScreenHandler(
                 syncId, slot,
-                ScreenHandlerContext.create(player.getWorld(),player.getBlockPos())
+                ScreenHandlerContext.create(player.getWorld(), player.getBlockPos())
             );
         }
     }
