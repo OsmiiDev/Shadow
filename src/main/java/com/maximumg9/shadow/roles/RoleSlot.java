@@ -118,6 +118,7 @@ public class RoleSlot implements ItemRepresentable {
         ArrayList<Text> loreList = new ArrayList<>();
 
         for (int i = 0; i < this.weights.length; i++) {
+            if(this.weights[i] == 0) continue;
             loreList.add(
                     Roles.values()[i]
                             .factory.makeRole(null)
