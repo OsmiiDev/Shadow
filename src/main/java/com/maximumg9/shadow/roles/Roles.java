@@ -16,6 +16,7 @@ public enum Roles {
     VILLAGER(Villager.FACTORY),
     SHERIFF(Sheriff.FACTORY),
     LOOKER(Looker.FACTORY),
+    LIFEWEAVER(Lifeweaver.FACTORY),
     SHADOW(ShadowRole.FACTORY),
     ORACLE(Oracle.FACTORY);
 
