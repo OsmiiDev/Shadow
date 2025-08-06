@@ -5,10 +5,8 @@ import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -59,6 +57,10 @@ public class SheriffBow extends Ability {
             DataComponentTypes.ITEM_NAME,
             Text.literal("Sheriff Bow").styled(style -> style.withColor(Formatting.GOLD))
         );
+        item.set(
+            DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
+            true
+        );
         NBTUtil.flagRestrictMovement(item);
         return item;
     }
@@ -96,7 +98,10 @@ public class SheriffBow extends Ability {
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
         ItemStack item = ITEM_STACK.copy();
-        item.addEnchantment(registries.getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING),1);
+        item.set(
+            DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
+            true
+        );
         return item;
     }
 }

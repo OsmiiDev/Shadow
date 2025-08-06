@@ -58,7 +58,8 @@ public abstract class ItemStackMixin implements ComponentHolder {
                         }
                     }
                 },
-                role.getAbilities()
+                role.getAbilities(),
+                false
             ));
 
 

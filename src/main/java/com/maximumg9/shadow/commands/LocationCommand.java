@@ -31,6 +31,8 @@ import net.minecraft.util.math.random.RandomSeed;
 import net.minecraft.util.math.random.Xoroshiro128PlusPlusRandom;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
+import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.chunk.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.gen.chunk.placement.StructurePlacement;
 import net.minecraft.world.gen.structure.Structure;
@@ -136,6 +138,17 @@ public class LocationCommand {
 
         overworld.getWorldBorder().setCenter(shadow.state.currentLocation.getX(),shadow.state.currentLocation.getZ());
         overworld.getWorldBorder().setSize(shadow.config.worldBorderSize);
+        World nether = server.getWorld(World.NETHER);
+        if(nether != null) {
+            nether.getWorldBorder().setCenter(0,0);
+            nether.getWorldBorder().setSize(WorldBorder.STATIC_AREA_SIZE);
+        }
+        World end = server.getWorld(World.END);
+        if(end != null) {
+            end.getWorldBorder().setCenter(0,0);
+            end.getWorldBorder().setSize(WorldBorder.STATIC_AREA_SIZE);
+        }
+
 
         List<Entity> nonPlayers = new ArrayList<>();
 

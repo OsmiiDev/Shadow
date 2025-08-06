@@ -83,7 +83,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ScreenHa
 
     @Override
     public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
-        if(slotIndex > this.decisionResultHashMap.size()) return;
+        if(slotIndex >= this.decisionResultHashMap.size()) return;
         if(player instanceof ServerPlayerEntity sPlayer) {
             this.syncState();
             V value = decisionResultHashMap.get(slotIndex);

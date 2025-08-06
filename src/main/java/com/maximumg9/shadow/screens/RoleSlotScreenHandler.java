@@ -10,7 +10,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -23,6 +22,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
@@ -31,7 +31,7 @@ public class RoleSlotScreenHandler extends ScreenHandler {
     private static final int SIZE = 9 * 6;
 
     private final RoleSlot slot;
-    private final Inventory inventory;
+    private final SimpleInventory inventory;
     private final ScreenHandlerContext context;
 
     private int page = 0;
@@ -123,8 +123,19 @@ public class RoleSlotScreenHandler extends ScreenHandler {
                             )
                     )
                 );
-                roleStack.setCount(Math.max(1,Math.min(weight, 64)));
-                this.inventory.setStack((row*3 + 1)* 9 + column,roleStack);
+                if(weight > 0) {
+                    roleStack.set(
+                        DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
+                        true
+                    );
+                }
+                int count = MathHelper.clamp(weight, 1, 99);
+                roleStack.setCount(count);
+                roleStack.set(
+                    DataComponentTypes.MAX_STACK_SIZE,
+                    count
+                );
+                this.inventory.setStack((row*3 + 1)* 9 + column, roleStack);
 
                 ItemStack downStack = Items.RED_CONCRETE.getDefaultStack();
                 downStack.set(DataComponentTypes.ITEM_NAME, DOWN_TEXT);
