@@ -49,7 +49,7 @@ public class Shadow implements Tickable {
         DebugCommand.register(dispatcher);
         LocationCommand.register(dispatcher);
         StartCommand.register(dispatcher);
-        RoleCommand.register(dispatcher);
+        RolesCommand.register(dispatcher);
         CancelCommand.register(dispatcher);
         ShadowChatCommand.register(dispatcher);
     }
