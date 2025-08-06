@@ -67,7 +67,11 @@ public class SheriffBow extends Ability {
 
     @Override
     public void init() {
-        player.giveItem(createSheriffBow(player), CancelPredicates.cancelOnPhaseChange(player.getShadow().state.phase));
+        player.giveItem(
+            createSheriffBow(player),
+            MiscUtil.DELETE_WARN,
+            CancelPredicates.cancelOnPhaseChange(player.getShadow().state.phase)
+        );
         super.init();
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -17,6 +18,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public abstract class MiscUtil {
     public static String padLeft(String original, char padding, int desiredLength) {
@@ -63,4 +65,13 @@ public abstract class MiscUtil {
         );
         return item;
     }
+
+    public static final BiConsumer<ServerPlayerEntity,ItemStack> DROP = (p, item) -> p.dropItem(item,true,true);
+    public static final BiConsumer<ServerPlayerEntity,ItemStack> DELETE = (p, item) -> {};
+    public static final BiConsumer<ServerPlayerEntity,ItemStack> DELETE_WARN = (p, item) ->
+        p.sendMessage(
+            Text.literal("Could not find space for ")
+                .styled(style -> style.withColor(Formatting.YELLOW))
+                .append(item.toHoverableText())
+        );
 }

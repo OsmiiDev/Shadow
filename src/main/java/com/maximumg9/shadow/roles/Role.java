@@ -2,6 +2,7 @@ package com.maximumg9.shadow.roles;
 
 import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.screens.ItemRepresentable;
+import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -91,9 +92,10 @@ public abstract class Role implements ItemRepresentable {
 
     public void init() {
         player.giveItemNow(
-                this.player.getShadow().config.food.foodGiver.apply(
-                        this.player.getShadow().config.foodAmount
-                )
+            this.player.getShadow().config.food.foodGiver.apply(
+                    this.player.getShadow().config.foodAmount
+            ),
+            MiscUtil.DELETE_WARN
         );
 
         ItemStack abilitySelector = Items.NETHER_STAR.getDefaultStack();
@@ -112,7 +114,8 @@ public abstract class Role implements ItemRepresentable {
                     abilitySelector,
                     NBTUtil.ABILITY_STAR_ID
                 )
-            ))
+            )),
+            MiscUtil.DELETE_WARN
         );
 
         player.sendMessage(

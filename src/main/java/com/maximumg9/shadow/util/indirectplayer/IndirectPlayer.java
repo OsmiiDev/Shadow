@@ -34,11 +34,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.UserCache;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -68,6 +70,7 @@ public class IndirectPlayer implements ItemRepresentable {
         this.name = src.getName();
         this.chatMessageCooldown = src.chatMessageCooldown;
         this.originalRole = src.originalRole;
+        this.offlineTicks = src.offlineTicks;
     }
 
     public final UUID playerUUID;
@@ -139,16 +142,24 @@ public class IndirectPlayer implements ItemRepresentable {
     public Text getName() {
         this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
         if(name == null) {
-            Optional<GameProfile> profile = this.server.getUserCache().getByUuid(this.playerUUID);
-            this.name = profile.map(
-                gameProfile -> Text.literal(
-                    gameProfile.getName()
-                )
-            ).orElse(
-                Text.literal(
+            UserCache cache = this.server.getUserCache();
+            if(cache != null) {
+                Optional<GameProfile> profile = cache.getByUuid(this.playerUUID);
+                this.name = profile.map(
+                    gameProfile -> Text.literal(
+                        gameProfile.getName()
+                    )
+                ).orElse(
+                    Text.literal(
+                        playerUUID.toString()
+                    )
+                );
+            } else {
+                this.name = Text.literal(
                     playerUUID.toString()
-                )
-            );
+                );
+            }
+
         }
         return this.name;
     }
@@ -197,15 +208,30 @@ public class IndirectPlayer implements ItemRepresentable {
         this.getPlayerOrThrow().removeStatusEffect(effectType);
     }
 
-    public void giveItem(ItemStack stack, Predicate<IndirectPlayer> cancelPredicate) {
+    public void giveItem(ItemStack stack, BiConsumer<ServerPlayerEntity,ItemStack> ifFail, Predicate<IndirectPlayer> cancelPredicate) {
         scheduleUntil(
-                (player) -> player.getInventory().insertStack(stack),
+                (player) -> {
+                    boolean result = player.getInventory().insertStack(stack);
+                    if(!result) {
+                        ifFail.accept(player, stack);
+                    }
+                },
                 cancelPredicate
         );
     }
 
-    public void giveItemNow(ItemStack stack) {
-        this.getPlayerOrThrow()
+    public boolean giveItemNow(ItemStack stack, BiConsumer<ServerPlayerEntity,ItemStack> ifFail) {
+        ServerPlayerEntity player = this.getPlayerOrThrow();
+
+        boolean result = player
+            .getInventory()
+            .insertStack(stack);
+
+        if(!result) {
+            ifFail.accept(player, stack);
+        }
+
+        return this.getPlayerOrThrow()
                 .getInventory()
                 .insertStack(stack);
     }
