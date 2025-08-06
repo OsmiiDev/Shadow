@@ -50,6 +50,10 @@ public class Shadow implements Tickable {
             ParticipationEye.ID,
             new ParticipationEye()
         );
+        ITEM_USE_CALLBACK_MAP.put(
+            LifeweaverHeart.ID,
+            new LifeweaverHeart()
+        );
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess) {

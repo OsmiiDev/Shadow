@@ -1,5 +1,6 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.LifeweaverHeart;
 import com.maximumg9.shadow.roles.Lifeweaver;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
@@ -66,13 +67,13 @@ public class GetHeart extends Ability {
                 new ItemStack(
                     Items.ENCHANTED_GOLDEN_APPLE
                 ),
-                MiscUtil.shadowID("lifeweaver_heart")
+                LifeweaverHeart.ID
             );
 
             NBTUtil.applyCustomDataToStack(
                 heart,
                 (nbt) -> {
-                    nbt.putDouble("health_increase", 2.0);
+                    nbt.putDouble(LifeweaverHeart.HEALTH_INCREASE_KEY, 2.0);
                     return nbt;
                 }
             );
