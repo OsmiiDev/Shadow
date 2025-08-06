@@ -21,6 +21,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +33,6 @@ public class RoleSlotScreenHandler extends ScreenHandler {
     private static final Text NEXT_PAGE_TEXT = Text.literal("Next Page").styled((style) -> style.withColor(Formatting.GOLD));
     private static final Text LAST_PAGE_TEXT = Text.literal("Last Page").styled((style) -> style.withColor(Formatting.GOLD));
     private static final Text EXIT_SCREEN_TEXT = Text.literal("Return to role menu").styled((style) -> style.withColor(Formatting.RED));
-    private static final Text UP_TEXT = Text.literal("Increase Weight").styled((style) -> style.withColor(Formatting.GREEN));
-    private static final Text DOWN_TEXT = Text.literal("Decrease Weight").styled((style) -> style.withColor(Formatting.RED));
     private final RoleSlot slot;
     // What does the UI look like? Well here it is:
     // ,--------------------------------------------,
@@ -90,9 +89,9 @@ public class RoleSlotScreenHandler extends ScreenHandler {
     }
 
     private void buildPage() {
-        int startRoleIndicies = page * 2 * 9;
+        int startRoleIndicies = page * 6 * 8;
 
-        for(int row = 0; row < 2; row++) {
+        for(int row = 0; row < 6; row++) {
             for(int column = 0; column < 8; column++) {
                 int roleIndex = startRoleIndicies + row * 8 + column;
 
@@ -103,39 +102,42 @@ public class RoleSlotScreenHandler extends ScreenHandler {
 
                 int weight = slot.getWeight(role);
 
-                ItemStack upStack = Items.GREEN_CONCRETE.getDefaultStack();
-                upStack.set(DataComponentTypes.ITEM_NAME, UP_TEXT);
-                this.inventory.setStack((row * 3) * 9 + column, upStack);
-
                 ItemStack roleStack = MiscUtil.getItemWithContext(proxyRole, this.context);
                 roleStack.set(
                     DataComponentTypes.LORE,
                     MiscUtil.makeLore(
                         Text.literal("Weight: ")
-                            .styled((style) -> style.withColor(Formatting.WHITE).withItalic(false))
                             .append(
                                 Text.literal(String.valueOf(weight))
+                            ),
+                        Text.literal("[Left Click]")
+                            .append(
+                                Text.literal(" to increase weight")
+                                    .styled(style -> style.withColor(Formatting.GRAY))
+                            ),
+                        Text.literal("[Right Click]")
+                            .append(
+                                Text.literal(" to decrease weight")
+                                    .styled(style -> style.withColor(Formatting.GRAY))
                             )
                     )
                 );
-                this.inventory.setStack((row * 3 + 1) * 9 + column, roleStack);
+
                 if(weight > 0) {
                     roleStack.set(
                         DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
                         true
                     );
                 }
+
                 int count = MathHelper.clamp(weight, 1, 99);
                 roleStack.setCount(count);
                 roleStack.set(
                     DataComponentTypes.MAX_STACK_SIZE,
                     count
                 );
-                this.inventory.setStack((row*3 + 1)* 9 + column, roleStack);
 
-                ItemStack downStack = Items.RED_CONCRETE.getDefaultStack();
-                downStack.set(DataComponentTypes.ITEM_NAME, DOWN_TEXT);
-                this.inventory.setStack((row * 3 + 2) * 9 + column, downStack);
+                this.inventory.setStack(row * 9 + column, roleStack);
             }
         }
     }
@@ -145,11 +147,19 @@ public class RoleSlotScreenHandler extends ScreenHandler {
         if(player instanceof ServerPlayerEntity sPlayer) {
             // Yeah, I'm a bit of a math guy
             if(slotIndex % 9 < 8) {
+                if(
+                    actionType == SlotActionType.SWAP ||
+                    actionType == SlotActionType.CLONE ||
+                    actionType == SlotActionType.THROW ||
+                    actionType == SlotActionType.PICKUP_ALL ||
+                    actionType == SlotActionType.QUICK_CRAFT
+                ) return;
+
+                ClickType clickType = button == 0 ? ClickType.LEFT : ClickType.RIGHT;
+
                 // Oh, also sorry to whoever works with this next, but I just wanted to do it this way :P
 
-                int operation = (slotIndex / 9) % 3;
-
-                int roleRow = (slotIndex / 9) / 3;
+                int roleRow = (slotIndex / 9);
 
                 int roleColumn = (slotIndex - (slotIndex / 9)) % 8;
 
@@ -160,9 +170,9 @@ public class RoleSlotScreenHandler extends ScreenHandler {
                 Roles role = Roles.values()[roleIndex];
                 LogUtils.getLogger().info(role.name);
 
-                if(operation == 0) {
+                if(clickType == ClickType.LEFT) {
                     this.slot.setWeight(role,this.slot.getWeight(role) + 1);
-                } else if(operation == 2 && this.slot.weightSum() > 1  && this.slot.getWeight(role) > 0) {
+                } else if(this.slot.weightSum() > 1 && this.slot.getWeight(role) > 0) {
                     this.slot.setWeight(role,this.slot.getWeight(role) - 1);
                 }
                 // nothing for clicking the role icon for now!
