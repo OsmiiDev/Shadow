@@ -1,7 +1,6 @@
 package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.Entity;
