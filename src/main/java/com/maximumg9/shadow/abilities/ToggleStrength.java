@@ -41,10 +41,9 @@ public class ToggleStrength extends Ability {
         super(player);
     }
 
+    public static final Identifier ID = MiscUtil.shadowID("toggle_strength");
     @Override
-    public Identifier getID() {
-        return MiscUtil.shadowID("toggle_strength");
-    }
+    public Identifier getID() { return ID; }
 
     @Override
     public AbilityResult apply() {

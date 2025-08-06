@@ -84,11 +84,8 @@ public class SheriffBow extends Ability {
         super.deInit();
     }
     public static final Identifier ID = MiscUtil.shadowID("sheriff_bow");
-
     @Override
-    public Identifier getID() {
-        return ID;
-    }
+    public Identifier getID() { return ID; }
 
     @Override
     public AbilityResult apply() {

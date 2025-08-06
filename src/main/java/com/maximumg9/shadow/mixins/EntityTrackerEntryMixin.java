@@ -2,7 +2,8 @@ package com.maximumg9.shadow.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.util.MiscUtil;
+import com.maximumg9.shadow.abilities.SeeEnderEyesGlow;
+import com.maximumg9.shadow.abilities.SeeGlowing;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -28,10 +29,11 @@ public class EntityTrackerEntryMixin {
 
         IndirectPlayer Iplayer = shadow.getIndirect(player);
         if(shadow.isNight() && this.entity.getType() == EntityType.PLAYER) {
-            if(Iplayer.role == null || !Iplayer.role.hasAbility(MiscUtil.shadowID("see_glowing"))) {
+            if(Iplayer.role == null || !Iplayer.role.hasAbility(SeeGlowing.ID)) {
                 changedEntries.replaceAll(
                     (entry) -> {
                         if(entry.id() == Entity.FLAGS.id()) {
+                            @SuppressWarnings("unchecked")
                             DataTracker.SerializedEntry<Byte> bEntry = (DataTracker.SerializedEntry<Byte>) entry;
 
                             return new DataTracker.SerializedEntry<>(
@@ -46,11 +48,12 @@ public class EntityTrackerEntryMixin {
             }
         }
 
-        if (Iplayer.role == null || !Iplayer.role.hasAbility(MiscUtil.shadowID("see_ender_eyes_glow"))) {
+        if (Iplayer.role == null || !Iplayer.role.hasAbility(SeeEnderEyesGlow.ID)) {
             if(shadow.state.eyes.stream().anyMatch(eye -> eye.display().equals(this.entity.getUuid()))) {
                 changedEntries.replaceAll(
                     (entry) -> {
                         if(entry.id() == Entity.FLAGS.id()) {
+                            @SuppressWarnings("unchecked")
                             DataTracker.SerializedEntry<Byte> bEntry = (DataTracker.SerializedEntry<Byte>) entry;
 
                             return new DataTracker.SerializedEntry<>(

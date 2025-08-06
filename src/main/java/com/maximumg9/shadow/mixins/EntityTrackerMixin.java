@@ -1,7 +1,8 @@
 package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.Shadow;
-import com.maximumg9.shadow.util.MiscUtil;
+import com.maximumg9.shadow.abilities.SeeEnderEyesGlow;
+import com.maximumg9.shadow.abilities.SeeGlowing;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -20,7 +21,7 @@ import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 @Mixin(ServerChunkLoadingManager.EntityTracker.class)
 public class EntityTrackerMixin {
-    @org.spongepowered.asm.mixin.Shadow @Final private Entity entity;
+    @org.spongepowered.asm.mixin.Shadow @Final Entity entity;
 
     @Redirect(
         method = "sendToOtherNearbyPlayers",
@@ -43,7 +44,7 @@ public class EntityTrackerMixin {
         }
 
         if(shadow.isNight() && this.entity.getType() == EntityType.PLAYER) {
-            if(player.role == null || !player.role.hasAbility(MiscUtil.shadowID("see_glowing"))) {
+            if(player.role == null || !player.role.hasAbility(SeeGlowing.ID)) {
                 EntityTrackerUpdateS2CPacket noGlowingPacket = new EntityTrackerUpdateS2CPacket(
                     originalPacket.id(),
                     originalPacket.trackedValues()
@@ -51,6 +52,7 @@ public class EntityTrackerMixin {
                         .map(
                             (entry) -> {
                                 if(entry.id() == Entity.FLAGS.id()) {
+                                    @SuppressWarnings("unchecked")
                                     DataTracker.SerializedEntry<Byte> bEntry = (DataTracker.SerializedEntry<Byte>) entry;
 
                                     return new DataTracker.SerializedEntry<>(
@@ -68,7 +70,7 @@ public class EntityTrackerMixin {
             }
         }
 
-        if (player.role == null || !player.role.hasAbility(MiscUtil.shadowID("see_ender_eyes_glow"))) {
+        if (player.role == null || !player.role.hasAbility(SeeEnderEyesGlow.ID)) {
             if(shadow.state.eyes.stream().anyMatch(eye -> eye.display().equals(this.entity.getUuid()))) {
                 EntityTrackerUpdateS2CPacket eyeGlowingPacket = new EntityTrackerUpdateS2CPacket(
                     originalPacket.id(),
@@ -77,6 +79,7 @@ public class EntityTrackerMixin {
                         .map(
                             (entry) -> {
                                 if(entry.id() == Entity.FLAGS.id()) {
+                                    @SuppressWarnings("unchecked")
                                     DataTracker.SerializedEntry<Byte> bEntry = (DataTracker.SerializedEntry<Byte>) entry;
 
                                     return new DataTracker.SerializedEntry<>(

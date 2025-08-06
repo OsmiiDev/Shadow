@@ -34,10 +34,9 @@ public class SeeEnderEyesGlow extends Ability {
         super(player);
     }
 
+    public static final Identifier ID = MiscUtil.shadowID("see_ender_eyes_glow");
     @Override
-    public Identifier getID() {
-        return MiscUtil.shadowID("see_ender_eyes_glow");
-    }
+    public Identifier getID() { return ID; }
 
     @Override
     public AbilityResult apply() {

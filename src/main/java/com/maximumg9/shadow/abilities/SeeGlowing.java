@@ -34,10 +34,9 @@ public class SeeGlowing extends Ability {
         super(player);
     }
 
+    public static final Identifier ID = MiscUtil.shadowID("see_glowing");
     @Override
-    public Identifier getID() {
-        return MiscUtil.shadowID("see_glowing");
-    }
+    public Identifier getID() { return ID; }
 
     @Override
     public AbilityResult apply() {

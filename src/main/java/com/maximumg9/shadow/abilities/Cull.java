@@ -37,10 +37,9 @@ public class Cull extends Ability {
 
     private boolean usedThisNight = false;
 
+    public static final Identifier ID = MiscUtil.shadowID("cull");
     @Override
-    public Identifier getID() {
-        return MiscUtil.shadowID("cull");
-    }
+    public Identifier getID() { return ID; }
 
     @Override
     public void onDay() {

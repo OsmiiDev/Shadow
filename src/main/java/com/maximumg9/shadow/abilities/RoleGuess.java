@@ -176,10 +176,9 @@ public class RoleGuess extends CooldownAbility {
         return AbilityResult.NO_CLOSE;
     }
 
+    public static final Identifier ID = MiscUtil.shadowID("role_guess");
     @Override
-    public Identifier getID() {
-        return MiscUtil.shadowID("role_guess");
-    }
+    public Identifier getID() { return ID; }
 
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
