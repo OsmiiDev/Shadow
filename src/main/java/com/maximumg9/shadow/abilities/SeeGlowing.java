@@ -35,11 +35,6 @@ public class SeeGlowing extends Ability {
     }
 
     @Override
-    public boolean allowSeeGlowing() {
-        return true;
-    }
-
-    @Override
     public Identifier getID() {
         return MiscUtil.shadowID("see_glowing");
     }

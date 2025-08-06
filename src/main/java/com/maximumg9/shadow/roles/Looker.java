@@ -23,6 +23,9 @@ public class Looker extends AbstractVillager {
     }
 
     @Override
+    public SubFaction getSubFaction() { return SubFaction.VILLAGER_SUPPORT; }
+
+    @Override
     public String getRawName() {
         return "Looker";
     }

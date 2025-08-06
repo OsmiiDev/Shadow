@@ -23,6 +23,9 @@ public class Sheriff extends AbstractVillager {
     public static final RoleFactory<Sheriff> FACTORY = new Sheriff.Factory();
 
     @Override
+    public SubFaction getSubFaction() { return SubFaction.VILLAGER_KILLING; }
+
+    @Override
     public String getRawName() {
         return "Sheriff";
     }

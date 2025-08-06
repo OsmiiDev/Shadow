@@ -1,6 +1,7 @@
 package com.maximumg9.shadow.mixins;
 
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -42,7 +43,7 @@ public class EntityTrackerMixin {
         }
 
         if(shadow.isNight() && this.entity.getType() == EntityType.PLAYER) {
-            if(player.role == null || player.role.cantSeeGlowingDuringNight()) {
+            if(player.role == null || !player.role.hasAbility(MiscUtil.shadowID("see_glowing"))) {
                 EntityTrackerUpdateS2CPacket noGlowingPacket = new EntityTrackerUpdateS2CPacket(
                     originalPacket.id(),
                     originalPacket.trackedValues()
@@ -67,7 +68,7 @@ public class EntityTrackerMixin {
             }
         }
 
-        if (player.role == null || player.role.cantSeeEnderEyesGlow()) {
+        if (player.role == null || !player.role.hasAbility(MiscUtil.shadowID("see_ender_eyes_glow"))) {
             if(shadow.state.eyes.stream().anyMatch(eye -> eye.display().equals(this.entity.getUuid()))) {
                 EntityTrackerUpdateS2CPacket eyeGlowingPacket = new EntityTrackerUpdateS2CPacket(
                     originalPacket.id(),

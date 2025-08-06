@@ -20,6 +20,9 @@ public class Villager extends AbstractVillager {
     }
 
     @Override
+    public SubFaction getSubFaction() { return SubFaction.VILLAGER_OUTLIER; }
+
+    @Override
     public String getRawName() {
         return "Villager";
     }

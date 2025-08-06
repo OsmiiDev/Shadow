@@ -21,6 +21,9 @@ public class Oracle extends AbstractShadow {
     }
 
     @Override
+    public SubFaction getSubFaction() { return SubFaction.SHADOW; }
+
+    @Override
     public String getRawName() { return "Oracle"; }
 
     private static final Style STYLE = Style.EMPTY.withColor(Formatting.DARK_PURPLE);
