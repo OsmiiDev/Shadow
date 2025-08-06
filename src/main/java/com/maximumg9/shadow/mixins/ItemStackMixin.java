@@ -52,7 +52,7 @@ public abstract class ItemStackMixin implements ComponentHolder {
                 Text.literal("Ability Menu"),
                 (ability, clicker) -> {
                     if(ability != null) {
-                        AbilityResult result = ability.apply();
+                        AbilityResult result = ability.triggerApply();
                         if(result.close) {
                             clicker.closeHandledScreen();
                         }
