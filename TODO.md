@@ -1,0 +1,8 @@
+- [x] In hand relog fix
+- [x] Advancement
+- [ ] Anti-stall
+- [ ] End regen
+- [ ] Saved rolelist
+- [ ] In role slot list set barriers for ones not in play and struct voids for others
+- [ ] Role slot menu rework
+- [ ] Modifiers
