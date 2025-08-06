@@ -10,7 +10,7 @@ import java.util.Objects;
 import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class RoleCommand {
+public class RolesCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("$roles")
