@@ -2,6 +2,7 @@ package com.maximumg9.shadow.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -27,7 +28,7 @@ public class EntityTrackerEntryMixin {
 
         IndirectPlayer Iplayer = shadow.getIndirect(player);
         if(shadow.isNight() && this.entity.getType() == EntityType.PLAYER) {
-            if(Iplayer.role == null || Iplayer.role.cantSeeGlowingDuringNight()) {
+            if(Iplayer.role == null || !Iplayer.role.hasAbility(MiscUtil.shadowID("see_glowing"))) {
                 changedEntries.replaceAll(
                     (entry) -> {
                         if(entry.id() == Entity.FLAGS.id()) {
@@ -45,7 +46,7 @@ public class EntityTrackerEntryMixin {
             }
         }
 
-        if (Iplayer.role == null || Iplayer.role.cantSeeEnderEyesGlow()) {
+        if (Iplayer.role == null || !Iplayer.role.hasAbility(MiscUtil.shadowID("see_ender_eyes_glow"))) {
             if(shadow.state.eyes.stream().anyMatch(eye -> eye.display().equals(this.entity.getUuid()))) {
                 changedEntries.replaceAll(
                     (entry) -> {

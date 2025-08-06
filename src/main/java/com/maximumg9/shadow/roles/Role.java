@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,16 +54,8 @@ public abstract class Role implements ItemRepresentable {
 
     public void onDeath() {}
 
-    public boolean cantSeeGlowingDuringNight() {
-        return this.abilities.stream().noneMatch(Ability::allowSeeGlowing);
-    }
-
-    public boolean cantSeeEnderEyesGlow() {
-        return this.abilities.stream().noneMatch(Ability::enderEyesGlow);
-    }
-
-    public boolean hasAbility(Ability.Factory factory) {
-        return this.abilities.stream().anyMatch(factory::equals);
+    public boolean hasAbility(Identifier id) {
+        return this.abilities.stream().anyMatch(ability -> ability.getID().equals(id));
     }
 
     public NbtCompound writeNbt(NbtCompound nbt) {

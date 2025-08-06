@@ -40,11 +40,6 @@ public class SeeEnderEyesGlow extends Ability {
     }
 
     @Override
-    public boolean enderEyesGlow() {
-        return true;
-    }
-
-    @Override
     public AbilityResult apply() {
         return AbilityResult.NO_CLOSE;
     }

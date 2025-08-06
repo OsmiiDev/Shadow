@@ -31,9 +31,6 @@ public abstract class Ability implements ItemRepresentable {
     public void deInit() {}
     public void onNight() {}
     public void onDay() {}
-    public boolean allowSeeGlowing() { return false; }
-    public boolean enderEyesGlow() { return false; }
-
 
     private static final Text PASSIVE_TEXT = Text.literal("[PASSIVE]")
         .styled((style) -> style.withColor(Formatting.BLUE));
