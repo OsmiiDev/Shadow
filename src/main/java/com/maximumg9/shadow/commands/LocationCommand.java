@@ -108,7 +108,15 @@ public class LocationCommand {
         MinecraftServer server = src.getServer();
         Shadow shadow = getShadow(server);
 
-        if(!shadow.state.phase.canSelectLocation) return -1;
+        if(!shadow.state.phase.canSelectLocation) {
+            src.sendFeedback(
+                () ->
+                    Text.literal("Cannot select location in phase " + shadow.state.phase)
+                        .styled(style -> style.withColor(Formatting.RED)),
+                false
+            );
+            return -1;
+        }
 
         BlockBox frames = findLocation(ctx);
 
