@@ -90,6 +90,9 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
 
                         );
                     }
+                    else {
+                        player.sendMessage(name);
+                    }
                 });
             } else {
                 name
