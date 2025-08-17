@@ -1,8 +1,8 @@
 package com.maximumg9.shadow.commands;
 
-import com.maximumg9.shadow.Eye;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.items.Eye;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;

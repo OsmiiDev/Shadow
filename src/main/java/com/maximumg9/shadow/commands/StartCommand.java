@@ -1,12 +1,14 @@
 package com.maximumg9.shadow.commands;
 
-import com.maximumg9.shadow.Eye;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.Tickable;
+import com.maximumg9.shadow.items.Eye;
 import com.maximumg9.shadow.items.ParticipationEye;
+import com.maximumg9.shadow.modifiers.Modifier;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.util.NBTUtil;
+import com.maximumg9.shadow.util.TextUtil;
 import com.maximumg9.shadow.util.TimeUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
@@ -24,6 +26,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -123,6 +126,7 @@ class StartTicker implements Tickable {
         shadow.state.phase = GamePhase.PLAYING;
         
         if (!shadow.config.roleManager.pickRoles()) return;
+        if (!shadow.config.modifierManager.pickModifiers()) return;
         
         for (IndirectPlayer player : shadow.getOnlinePlayers()) {
             if (player.role == null) {
@@ -140,11 +144,20 @@ class StartTicker implements Tickable {
             player.clearPlayerData(CancelPredicates.NEVER_CANCEL);
             
             player.role.init();
+            player.modifiers.forEach(Modifier::init);
+            player.sendMessage(TextUtil.gray("Your modifiers: ").append(
+                player.modifiers.isEmpty() ? TextUtil.error("None") : Texts.join(
+                    player.modifiers.stream().map(modifier -> modifier.getName().copy())
+                        .toList(),
+                    Text.literal(", ").styled(style -> style.withColor(Formatting.GRAY))
+                )
+            ), CancelPredicates.NEVER_CANCEL);
             
             player.frozen = false;
             
             player.setTitleTimesNow(10, 40, 10);
             player.sendTitleNow(player.role.getName());
+            player.sendSubtitleNow(player.role.getSubFaction().name);
         }
         
         shadow.init();

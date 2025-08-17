@@ -3,6 +3,7 @@ package com.maximumg9.shadow.util.indirectplayer;
 
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.modifiers.Modifier;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.roles.Roles;
 import com.maximumg9.shadow.roles.Spectator;
@@ -37,9 +38,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.UserCache;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -54,6 +53,7 @@ public class IndirectPlayer implements ItemRepresentable {
     public Role role;
     @Nullable
     public Roles originalRole;
+    public ArrayList<Modifier> modifiers = new ArrayList<>();
     public boolean participating;
     public boolean frozen;
     public int chatMessageCooldown;
@@ -80,6 +80,7 @@ public class IndirectPlayer implements ItemRepresentable {
         this.playerUUID = src.playerUUID;
         this.server = src.server;
         this.role = src.role;
+        this.modifiers = src.modifiers;
         this.participating = src.participating;
         this.frozen = src.frozen;
         this.name = src.getName();
@@ -103,6 +104,13 @@ public class IndirectPlayer implements ItemRepresentable {
             player.originalRole = null;
         }
         
+        if (nbt.contains("modifiers", NbtElement.LIST_TYPE)) {
+            for (int i = 0; i < nbt.getList("modifiers", NbtElement.COMPOUND_TYPE).size(); i++) {
+                player.modifiers.add(
+                    Modifier.load(nbt.getList("modifiers", NbtElement.COMPOUND_TYPE).getCompound(i), player)
+                );
+            }
+        }
         player.offlineTicks = nbt.getInt("offline_ticks");
         player.extraStorage = nbt.getCompound("extra_storage");
         return player;

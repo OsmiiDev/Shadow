@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.maximumg9.shadow.commands.*;
 import com.maximumg9.shadow.config.Config;
-import com.maximumg9.shadow.items.AbilityStar;
-import com.maximumg9.shadow.items.LifeweaverHeart;
-import com.maximumg9.shadow.items.ParticipationEye;
+import com.maximumg9.shadow.items.*;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Spectator;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
@@ -102,6 +100,7 @@ public class Shadow implements Tickable {
         LocationCommand.register(dispatcher);
         StartCommand.register(dispatcher);
         RolesCommand.register(dispatcher);
+        ModifiersCommand.register(dispatcher);
         CancelCommand.register(dispatcher);
         ShadowChatCommand.register(dispatcher);
     }

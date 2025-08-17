@@ -154,7 +154,7 @@ public class Cull extends Ability {
                                 (text) -> text.copy().styled(style -> style.withColor(Formatting.YELLOW))
                             )
                             .toList(),
-                        Text.literal(",").styled(style -> style.withColor(Formatting.GREEN))
+                        Text.literal(", ").styled(style -> style.withColor(Formatting.GREEN))
                     )
                 ).append(
                     Text.literal(" for ").styled(style -> style.withColor(Formatting.GREEN))

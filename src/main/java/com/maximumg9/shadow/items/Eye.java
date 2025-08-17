@@ -1,5 +1,6 @@
-package com.maximumg9.shadow;
+package com.maximumg9.shadow.items;
 
+import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.util.Delay;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;

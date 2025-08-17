@@ -1,6 +1,5 @@
 package com.maximumg9.shadow.items;
 
-import com.maximumg9.shadow.ItemUseCallback;
 import com.maximumg9.shadow.abilities.GetHeart;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
@@ -25,25 +24,25 @@ public class LifeweaverHeart implements ItemUseCallback {
     
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(!(world instanceof ServerWorld)) return null;
+        if (!(world instanceof ServerWorld)) return null;
         
         ItemStack stack = user.getStackInHand(hand);
         
         NbtCompound nbt = NBTUtil.getCustomData(stack);
         
-        if(!nbt.contains(HEALTH_INCREASE_KEY, NbtElement.DOUBLE_TYPE)) {
+        if (!nbt.contains(HEALTH_INCREASE_KEY, NbtElement.DOUBLE_TYPE)) {
             return null;
         } else {
             double healthIncrease = nbt.getDouble(HEALTH_INCREASE_KEY);
             EntityAttributeInstance instance = user.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
             
-            if(instance == null) {
-                return  null;
+            if (instance == null) {
+                return null;
             }
             
             EntityAttributeModifier modifier = instance.getModifier(GetHeart.ATTR_ID);
             
-            if(modifier == null) {
+            if (modifier == null) {
                 instance.addPersistentModifier(
                     new EntityAttributeModifier(
                         GetHeart.ATTR_ID,
@@ -52,7 +51,7 @@ public class LifeweaverHeart implements ItemUseCallback {
                     )
                 );
             } else {
-                if(modifier.operation() != EntityAttributeModifier.Operation.ADD_VALUE) {
+                if (modifier.operation() != EntityAttributeModifier.Operation.ADD_VALUE) {
                     getShadow(world.getServer()).ERROR("Existing lifeweaver attribute modifier is not add value");
                     return null;
                 }

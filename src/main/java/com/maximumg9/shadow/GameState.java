@@ -1,5 +1,6 @@
 package com.maximumg9.shadow;
 
+import com.maximumg9.shadow.items.Eye;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 

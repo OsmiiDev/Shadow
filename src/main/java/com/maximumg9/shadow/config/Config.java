@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 public class Config {
     public final RoleManager roleManager;
+    public final ModifierManager modifierManager;
     public final MaxCooldownManager maxCooldownManager;
     private final Path saveFile;
     
@@ -31,6 +32,7 @@ public class Config {
     
     public Config(Shadow shadow, Path saveFile) {
         this.roleManager = new RoleManager(shadow, this);
+        this.modifierManager = new ModifierManager(shadow, this);
         this.maxCooldownManager = new MaxCooldownManager();
         this.saveFile = saveFile;
     }
@@ -51,6 +53,7 @@ public class Config {
         
         this.maxCooldownManager.readNbt(nbt.getCompound("maxCooldownManager"));
         this.roleManager.readNbt(nbt.getCompound("roleManager"));
+        this.modifierManager.readNbt(nbt.getCompound("modifierManager"));
     }
     private NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putInt("worldBorderSize", this.worldBorderSize);
@@ -69,6 +72,7 @@ public class Config {
         
         nbt.put("maxCooldownManager", this.maxCooldownManager.writeNbt(new NbtCompound()));
         nbt.put("roleManager", this.roleManager.writeNbt(new NbtCompound()));
+        nbt.put("modifierManager", this.modifierManager.writeNbt(new NbtCompound()));
         return nbt;
     }
     public Config copy(Shadow shadow) {

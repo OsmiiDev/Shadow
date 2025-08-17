@@ -1,6 +1,6 @@
 package com.maximumg9.shadow.mixins;
 
-import com.maximumg9.shadow.Eye;
+import com.maximumg9.shadow.items.Eye;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.util.Delay;
 import com.maximumg9.shadow.util.NBTUtil;

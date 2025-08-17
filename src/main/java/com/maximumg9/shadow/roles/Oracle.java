@@ -28,6 +28,8 @@ public class Oracle extends AbstractShadow {
     @Override
     public SubFaction getSubFaction() { return SubFaction.SHADOW; }
     @Override
+    public String aOrAn() { return "an"; }
+    @Override
     public String getRawName() { return "Oracle"; }
     @Override
     public Style getStyle() { return STYLE; }

@@ -1,6 +1,5 @@
 package com.maximumg9.shadow.items;
 
-import com.maximumg9.shadow.ItemUseCallback;
 import com.maximumg9.shadow.util.ItemData;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;

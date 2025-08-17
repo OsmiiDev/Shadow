@@ -10,6 +10,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -113,12 +114,12 @@ public class RoleManager {
     public void showRoleListIndex(ServerPlayerEntity player, boolean editable) {
         player.openHandledScreen(new DecisionScreenHandler.Factory<>(
             Text.literal("Pick a Role Slot to edit"),
-            editable ? this::openRoleMenu : (slot, clicker) -> { },
+            editable ? this::openRoleMenu : (slot, clicker, _b, _a) -> { },
             Arrays.asList(this.roleSlots)
         ));
     }
     
-    private void openRoleMenu(RoleSlot slot, ServerPlayerEntity clicker) {
+    private void openRoleMenu(RoleSlot slot, ServerPlayerEntity clicker, int button, SlotActionType actionType) {
         System.out.println("tried to open role menu");
         if (slot == null) return;
         

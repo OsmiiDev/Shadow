@@ -43,7 +43,7 @@ public abstract class AbstractShadow extends Role {
             );
         } else {
             this.player.sendMessage(
-                Text.literal("The other Shadows are: ")
+                Text.literal("The other shadows are: ")
                     .styled(style -> style.withColor(Formatting.RED))
                     .append(
                         Texts.join(
@@ -58,7 +58,7 @@ public abstract class AbstractShadow extends Role {
                                 ).map(
                                     (player) -> player.getName().copy().setStyle(player.role.getStyle())
                                 ).toList(),
-                            Text.literal(",").styled((style -> style.withColor(Formatting.GRAY)))
+                            Text.literal(", ").styled((style -> style.withColor(Formatting.GRAY)))
                         )
                     ),
                 CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)

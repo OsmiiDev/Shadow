@@ -1,7 +1,7 @@
 package com.maximumg9.shadow.mixins;
 
-import com.maximumg9.shadow.ItemUseCallback;
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.items.ItemUseCallback;
 import com.maximumg9.shadow.util.NBTUtil;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.entity.player.PlayerEntity;

@@ -96,7 +96,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ShadowSc
                 sPlayer.closeHandledScreen();
             }
             if (this.resultCallback != null) {
-                this.resultCallback.accept(value, sPlayer);
+                this.resultCallback.accept(value, sPlayer, button, actionType);
             }
         }
     }
@@ -108,7 +108,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ShadowSc
     
     @FunctionalInterface
     public interface Callback<V> {
-        void accept(@Nullable V value, ServerPlayerEntity player);
+        void accept(@Nullable V value, ServerPlayerEntity player, int button, SlotActionType actionType);
     }
     
     public static class Factory<V extends ItemRepresentable> implements NamedScreenHandlerFactory {

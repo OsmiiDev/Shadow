@@ -95,18 +95,18 @@ public class RoleGuess extends Ability {
         this.player.getPlayerOrThrow().openHandledScreen(
             new DecisionScreenHandler.Factory<>(
                 Text.literal("Person to guess"),
-                (target, p) -> {
+                (target, actor, _a, _b) -> {
                     if (target == null) {
-                        p.sendMessage(
+                        actor.sendMessage(
                             Text.literal("Failed to select player to guess")
                                 .styled(style -> style.withColor(Formatting.RED))
                         );
                         return;
                     }
-                    p.openHandledScreen(
+                    actor.openHandledScreen(
                         new DecisionScreenHandler.Factory<>(
                             Text.literal("Role to guess"),
-                            (guessedRole, pl) -> {
+                            (guessedRole, pl, __a, __b) -> {
                                 if (guessedRole == null) {
                                     pl.sendMessage(TextUtil.error("Failed to select role to guess"));
                                     return;

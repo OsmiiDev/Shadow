@@ -1,6 +1,5 @@
 package com.maximumg9.shadow.items;
 
-import com.maximumg9.shadow.ItemUseCallback;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.abilities.AbilityResult;
 import com.maximumg9.shadow.roles.Role;
@@ -40,7 +39,7 @@ public class AbilityStar implements ItemUseCallback {
 
         user.openHandledScreen(new DecisionScreenHandler.Factory<>(
             Text.literal("Ability Menu"),
-            (ability, clicker) -> {
+            (ability, clicker, _a, _b) -> {
                 if(ability != null) {
                     AbilityResult result = ability.triggerApply();
                     if(result.close) {
