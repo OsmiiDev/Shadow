@@ -25,7 +25,7 @@ public class ModifierManager {
     
     private final Shadow shadow;
     
-    public ModifierManager(Shadow shadow, Config config) {
+    public ModifierManager(Shadow shadow) {
         modifierSlots = new ArrayList<>();
         this.shadow = shadow;
     }

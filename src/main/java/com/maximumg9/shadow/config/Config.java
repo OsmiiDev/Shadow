@@ -32,7 +32,7 @@ public class Config {
     
     public Config(Shadow shadow, Path saveFile) {
         this.roleManager = new RoleManager(shadow, this);
-        this.modifierManager = new ModifierManager(shadow, this);
+        this.modifierManager = new ModifierManager(shadow);
         this.maxCooldownManager = new MaxCooldownManager();
         this.saveFile = saveFile;
     }
