@@ -16,17 +16,17 @@ public class RolesCommand {
             literal("$roles")
                 .executes((ctx) -> {
                     ServerCommandSource src = ctx.getSource();
-
-                    if(!src.isExecutedByPlayer()) {return -1;}
-
+                    
+                    if (!src.isExecutedByPlayer()) { return -1; }
+                    
                     Shadow shadow = getShadow(src.getServer());
-                    shadow.config.roleManager.showRoleListIndex(Objects.requireNonNull(src.getPlayer()),src.hasPermissionLevel(3));
-
+                    shadow.config.roleManager.showRoleListIndex(Objects.requireNonNull(src.getPlayer()), src.hasPermissionLevel(3));
+                    
                     ctx.getSource().sendFeedback(
                         () -> Text.literal("Opened Role Menu"),
                         false
                     );
-
+                    
                     return 2;
                 })
         );

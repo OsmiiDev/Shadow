@@ -1,5 +1,7 @@
-package com.maximumg9.shadow;
+package com.maximumg9.shadow.items;
 
+import com.maximumg9.shadow.ItemUseCallback;
+import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.abilities.AbilityResult;
 import com.maximumg9.shadow.roles.Role;
 import com.maximumg9.shadow.screens.DecisionScreenHandler;

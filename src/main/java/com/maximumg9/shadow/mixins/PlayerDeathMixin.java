@@ -34,40 +34,39 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
     @org.spongepowered.asm.mixin.Shadow
     @Final
     public MinecraftServer server;
-
+    
     public PlayerDeathMixin(World world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);
     }
-
+    
     @SuppressWarnings("UnusedReturnValue")
     @org.spongepowered.asm.mixin.Shadow
     public abstract boolean changeGameMode(GameMode gameMode);
-
+    
     @SuppressWarnings("DataFlowIssue")
     @Inject(method = "onDeath", at = @At("HEAD"))
     public void modifyDeathMessage(DamageSource damageSource, CallbackInfo ci) {
         Shadow shadow = getShadow(this.server);
-
+        
         GameRules.BooleanRule showDeathMessage = this.getWorld().getGameRules().get(GameRules.SHOW_DEATH_MESSAGES);
         if (shadow.state.phase == GamePhase.PLAYING) {
             showDeathMessage.set(false, this.server);
-
+            
             MutableText name = Team.decorateName(this.getScoreboardTeam(), this.getName());
-
+            
             IndirectPlayer iPlayer = shadow.getIndirect((ServerPlayerEntity) (Object) this);
-
-            Style roleStyle = iPlayer.role == null ? Style.EMPTY : iPlayer.role.getStyle();
-
-
+            
+            Style factionStyle = iPlayer.role == null ? Style.EMPTY : iPlayer.role.getFaction().name.getStyle();
+            
             // @TODO test this code with a working ability that applies the hide role flag
             if (iPlayer.extraStorage.contains(ObfuscateRole.HIDE_ROLE_KEY, NbtElement.INT_TYPE)) {
                 name
                     .setStyle(Style.EMPTY.withColor(Formatting.GRAY))
                     .append(Text.of(" died. They were a "))
                     .append(
-                        Text.literal("aaaaaaa").styled((style) -> style.withColor(Formatting.GRAY).withObfuscated(true))
+                        Text.literal("aaaaaaa").styled(style -> style.withColor(Formatting.GRAY).withObfuscated(true))
                     );
-
+                
                 this.server.getPlayerManager().getPlayerList().forEach((player) -> {
                     if (
                         shadow.getIndirect(player).role.getFaction().ordinal() ==
@@ -77,55 +76,54 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
                             Text.literal("").
                                 append(name)
                                 .append(
-                                    Text.literal(" (").styled((style) -> style.withColor(Formatting.GRAY).withObfuscated(false))
+                                    Text.literal(" (").styled(style -> style.withColor(Formatting.GRAY).withObfuscated(false))
                                 )
                                 .append(
                                     iPlayer.role == null ?
-                                        Text.literal("Null").styled((style) -> style.withColor(Formatting.RED)) :
+                                        Text.literal("Null").styled(style -> style.withColor(Formatting.RED)) :
                                         iPlayer.role.getName()
                                 )
                                 .append(
-                                    Text.literal(")").styled((style) -> style.withColor(Formatting.GRAY))
+                                    Text.literal(")").styled(style -> style.withColor(Formatting.GRAY))
                                 )
-
+                        
                         );
-                    }
-                    else {
+                    } else {
                         player.sendMessage(name);
                     }
                 });
             } else {
                 name
-                    .setStyle(roleStyle)
+                    .setStyle(factionStyle)
                     .append(Text.of(" died. They were a "))
                     .append(
                         iPlayer.role == null ?
-                            Text.literal("Null").styled((style) -> style.withColor(Formatting.RED)) :
+                            Text.literal("Null").styled(style -> style.withColor(Formatting.RED)) :
                             iPlayer.role.getName()
                     );
-
+                
                 shadow.broadcast(name);
             }
         } else {
             showDeathMessage.set(true, this.server);
         }
     }
-
+    
     @Inject(method = "onDeath", at = @At("TAIL"))
     public void onDeath(DamageSource damageSource, CallbackInfo ci) {
         Shadow shadow = getShadow(this.server);
-
+        
         IndirectPlayer player = shadow.getIndirect((ServerPlayerEntity) ((Object) this));
-
+        
         if (player.role != null) player.role.onDeath();
-
+        
         player.role = new Spectator(player);
-
+        
         shadow.checkWin(null);
-
+        
         player.getPlayerOrThrow().setHealth(0f);
     }
-
+    
     @Inject(method = "onSpawn", at = @At("TAIL"))
     public void onSpawn(CallbackInfo ci) {
         Shadow shadow = getShadow(this.server);

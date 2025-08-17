@@ -1,6 +1,6 @@
 package com.maximumg9.shadow.roles;
 
-import com.maximumg9.shadow.AbilityStar;
+import com.maximumg9.shadow.items.AbilityStar;
 import com.maximumg9.shadow.abilities.Ability;
 import com.maximumg9.shadow.screens.ItemRepresentable;
 import com.maximumg9.shadow.util.MiscUtil;

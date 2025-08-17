@@ -1,8 +1,10 @@
 package com.maximumg9.shadow.abilities;
 
+import com.maximumg9.shadow.items.LifeweaverHeart;
 import com.maximumg9.shadow.roles.Lifeweaver;
 import com.maximumg9.shadow.util.MiscUtil;
 import com.maximumg9.shadow.util.NBTUtil;
+import com.maximumg9.shadow.util.TextUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -16,13 +18,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 public class GetHeart extends Ability {
-    public GetHeart(IndirectPlayer player) {
-        super(player);
-    }
-
+    public static final Identifier ATTR_ID = MiscUtil.shadowID("lifeweaver_max_health");
     private static final ItemStack ITEM_STACK = new ItemStack(Items.ENCHANTED_GOLDEN_APPLE);
-
+    
     static {
         ITEM_STACK.set(
             DataComponentTypes.ITEM_NAME,
@@ -32,101 +34,111 @@ public class GetHeart extends Ability {
         ITEM_STACK.set(
             DataComponentTypes.LORE,
             MiscUtil.makeLore(
-                Text.literal("Get a heart as an item"),
+                TextUtil.gray("Get a heart as an item"),
                 Ability.AbilityText()
             )
         );
     }
-
-    public static final Identifier ATTR_ID = MiscUtil.shadowID("lifeweaver_max_health");
-
+    
+    public GetHeart(IndirectPlayer player) {
+        super(player);
+    }
+    
+    public List<Supplier<AbilityFilterResult>> getFilters() {
+        return List.of(
+            () -> {
+                ServerPlayerEntity player = this.player.getPlayerOrThrow();
+                float maxHealth = player.getMaxHealth();
+                
+                if (maxHealth <= 2f) {
+                    return AbilityFilterResult.FAIL("You don't have enough health to remove another heart!");
+                }
+                
+                return AbilityFilterResult.PASS();
+            }
+        );
+    }
+    
     @Override
     public Identifier getID() {
         return MiscUtil.shadowID("get_heart");
     }
-
+    
     @Override
     public AbilityResult apply() {
         ServerPlayerEntity player = this.player.getPlayerOrThrow();
-
-        float pastMaxHealth = player.getMaxHealth();
-        if(pastMaxHealth > 2f) {
-            EntityAttributeInstance attr = player
-                .getAttributes()
-                .getCustomInstance(
-                    EntityAttributes.GENERIC_MAX_HEALTH
-                );
-
-            if(attr == null) {
-                getShadow().ERROR("Players don't have a max health attribute (we're so cooked)");
-                return AbilityResult.CLOSE;
-            }
-
-            ItemStack heart = NBTUtil.addID(
-                new ItemStack(
-                    Items.ENCHANTED_GOLDEN_APPLE
-                ),
-                MiscUtil.shadowID("lifeweaver_heart")
+        
+        EntityAttributeInstance attr = player
+            .getAttributes()
+            .getCustomInstance(
+                EntityAttributes.GENERIC_MAX_HEALTH
             );
-
-            NBTUtil.applyCustomDataToStack(
-                heart,
-                (nbt) -> {
-                    nbt.putDouble("health_increase", 2.0);
-                    return nbt;
-                }
-            );
-
-            if(this.player.giveItemNow(
-                heart,
-                MiscUtil.DELETE
-            )) {
-                this.player.sendMessageNow(
-                    Text.literal("Failed to get heart")
-                        .styled(style -> style.withColor(Formatting.RED))
-                );
-                return AbilityResult.CLOSE;
-            } else {
-                player.currentScreenHandler.sendContentUpdates();
-
-                EntityAttributeModifier modifier = attr.getModifier(ATTR_ID);
-                if(modifier == null) {
-                    attr.addPersistentModifier(new EntityAttributeModifier(
-                        ATTR_ID,
-                        -2.0,
-                        EntityAttributeModifier.Operation.ADD_VALUE
-                    ));
-                } else {
-                    double oldValue = modifier.value();
-                    if(
-                        modifier.operation() !=
-                        EntityAttributeModifier.Operation.ADD_VALUE
-                    ) {
-                        getShadow().ERROR("Existing lifeweaver attribute modifier is not add value");
-                    }
-                    attr.updateModifier(new EntityAttributeModifier(
-                        ATTR_ID,
-                        oldValue - 2.0,
-                        EntityAttributeModifier.Operation.ADD_VALUE
-                    ));
-                }
-
-                this.player.sendMessageNow(
-                    Text.literal("Removed heart")
-                        .styled(style -> style.withColor(Formatting.GREEN))
-                );
-                return AbilityResult.NO_CLOSE;
-            }
-        } else {
-            this.player.sendMessageNow(
-                Text.literal("Not enough health to remove another heart")
-                    .styled(style -> style.withColor(Formatting.RED))
-            );
-
+        
+        if (attr == null) {
+            getShadow().ERROR("Players don't have a max health attribute (we're so cooked).");
             return AbilityResult.CLOSE;
         }
+        
+        ItemStack heart = NBTUtil.addID(
+            new ItemStack(
+                Items.ENCHANTED_GOLDEN_APPLE
+            ),
+            LifeweaverHeart.ID
+        );
+        
+        heart.set(
+            DataComponentTypes.ITEM_NAME,
+            Text.literal("Lifeweaver Heart").styled(style -> style.withColor(Formatting.GOLD))
+        );
+        
+        NBTUtil.applyCustomDataToStack(
+            heart,
+            (nbt) -> {
+                nbt.putDouble(LifeweaverHeart.HEALTH_INCREASE_KEY, 2.0);
+                return nbt;
+            }
+        );
+        
+        if (this.player.giveItemNow(
+            heart,
+            MiscUtil.DELETE
+        )) {
+            this.player.sendMessageNow(TextUtil.error("Failed to get heart. Make sure you have enough space in your inventory!"));
+            return AbilityResult.CLOSE;
+        } else {
+            player.currentScreenHandler.sendContentUpdates();
+            
+            EntityAttributeModifier modifier = attr.getModifier(ATTR_ID);
+            if (modifier == null) {
+                attr.addPersistentModifier(new EntityAttributeModifier(
+                    ATTR_ID,
+                    -2.0,
+                    EntityAttributeModifier.Operation.ADD_VALUE
+                ));
+            } else {
+                double oldValue = modifier.value();
+                if (
+                    modifier.operation() !=
+                        EntityAttributeModifier.Operation.ADD_VALUE
+                ) {
+                    getShadow().ERROR("Existing lifeweaver attribute modifier is not add value");
+                }
+                attr.updateModifier(new EntityAttributeModifier(
+                    ATTR_ID,
+                    oldValue - 2.0,
+                    EntityAttributeModifier.Operation.ADD_VALUE
+                ));
+            }
+            
+            this.player.sendMessageNow(
+                TextUtil.success("You got a heart! Your max health is now ")
+                    .append(TextUtil.hearts(player.getMaxHealth()))
+                    .append(Text.literal(".").styled(style -> style.withColor(Formatting.GREEN)))
+            );
+            return AbilityResult.NO_CLOSE;
+        }
     }
-
+    
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
         return ITEM_STACK.copy();

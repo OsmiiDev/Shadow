@@ -21,21 +21,33 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public abstract class MiscUtil {
+    public static final BiConsumer<ServerPlayerEntity, ItemStack> DROP = (p, item) -> p.dropItem(item, true, true);
+    public static final BiConsumer<ServerPlayerEntity, ItemStack> DELETE = (p, item) -> { };
+    public static final BiConsumer<ServerPlayerEntity, ItemStack> DELETE_WARN = (p, item) ->
+        p.sendMessage(
+            Text.literal("Could not find space for ")
+                .styled(style -> style.withColor(Formatting.YELLOW))
+                .append(item.toHoverableText())
+        );
+    private static final Style DEFAULT_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withItalic(false);
+    
     public static String padLeft(String original, char padding, int desiredLength) {
-        if(original.length() >= desiredLength) return original;
+        if (original.length() >= desiredLength) return original;
         StringBuilder builder = new StringBuilder(original);
         for (int i = 0; i < desiredLength - builder.length(); i++) {
             builder.insert(0, padding);
         }
         return builder.toString();
     }
-
-    public static Identifier shadowID(String id) {
-        return Identifier.of("shadow",id);
+    
+    public static Shadow getShadow(MinecraftServer server) {
+        return ((ShadowProvider) server).shadow$getShadow();
     }
-
-    private static final Style DEFAULT_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withItalic(false);
-
+    
+    public static Identifier shadowID(String id) {
+        return Identifier.of("shadow", id);
+    }
+    
     public static LoreComponent makeLore(MutableText... texts) {
         List<Text> lore = Arrays.stream(texts)
             .map(
@@ -43,35 +55,22 @@ public abstract class MiscUtil {
             ).toList();
         return new LoreComponent(lore, lore);
     }
-
-    public static Shadow getShadow(MinecraftServer server) {
-        return ((ShadowProvider) server).shadow$getShadow();
-    }
-
+    
     public static ItemStack getItemWithContext(ItemRepresentable item, ScreenHandlerContext context) {
         return context.get(
-                        (world, blockPos) -> world.getRegistryManager()
-                )
-                .map(item::getAsItem)
-                .orElse(getErrorItem());
+                (world, blockPos) -> world.getRegistryManager()
+            )
+            .map(item::getAsItem)
+            .orElse(getErrorItem());
     }
-
+    
     public static ItemStack getErrorItem() {
         ItemStack item = Items.BARRIER.getDefaultStack();
         item.set(
-                DataComponentTypes.ITEM_NAME,
-                Text.literal("ERROR")
-                        .styled(style -> style.withColor(Formatting.RED))
+            DataComponentTypes.ITEM_NAME,
+            Text.literal("ERROR")
+                .styled(style -> style.withColor(Formatting.RED))
         );
         return item;
     }
-
-    public static final BiConsumer<ServerPlayerEntity,ItemStack> DROP = (p, item) -> p.dropItem(item,true,true);
-    public static final BiConsumer<ServerPlayerEntity,ItemStack> DELETE = (p, item) -> {};
-    public static final BiConsumer<ServerPlayerEntity,ItemStack> DELETE_WARN = (p, item) ->
-        p.sendMessage(
-            Text.literal("Could not find space for ")
-                .styled(style -> style.withColor(Formatting.YELLOW))
-                .append(item.toHoverableText())
-        );
 }

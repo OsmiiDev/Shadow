@@ -22,15 +22,15 @@ public abstract class ItemStackMixin implements ComponentHolder {
     private static ItemStack c(Object mixin) {
         return (ItemStack) mixin;
     }
-
-    @Inject(method = "use",at=@At("HEAD"),cancellable = true)
+    
+    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         Identifier id = NBTUtil.getID(c(this));
         ItemUseCallback callback = Shadow.ITEM_USE_CALLBACK_MAP.get(id);
-
-        if(callback != null) {
+        
+        if (callback != null) {
             TypedActionResult<ItemStack> result = callback.use(world, user, hand);
-            if(result != null) {
+            if (result != null) {
                 cir.setReturnValue(result);
                 cir.cancel();
             }

@@ -57,10 +57,10 @@ public class IndirectPlayer implements ItemRepresentable {
     public boolean participating;
     public boolean frozen;
     public int chatMessageCooldown;
+    public NbtCompound extraStorage;
     private int offlineTicks = Integer.MAX_VALUE;
     private Text name = null;
-    public NbtCompound extraStorage;
-
+    
     public IndirectPlayer(ServerPlayerEntity base) {
         this.playerUUID = base.getUuid();
         this.server = base.server;
@@ -69,13 +69,13 @@ public class IndirectPlayer implements ItemRepresentable {
         this.name = base.getName();
         this.extraStorage = new NbtCompound();
     }
-
+    
     IndirectPlayer(MinecraftServer server, UUID uuid) {
         this.server = server;
         this.playerUUID = uuid;
         this.extraStorage = new NbtCompound();
     }
-
+    
     IndirectPlayer(IndirectPlayer src) {
         this.playerUUID = src.playerUUID;
         this.server = src.server;
@@ -88,11 +88,6 @@ public class IndirectPlayer implements ItemRepresentable {
         this.offlineTicks = src.offlineTicks;
         this.extraStorage = new NbtCompound();
     }
-
-    public Shadow getShadow() {
-        return MiscUtil.getShadow(this.server);
-    }
-
     static IndirectPlayer load(MinecraftServer server, NbtCompound nbt) {
         IndirectPlayer player = new IndirectPlayer(server, nbt.getUuid("playerUUID"));
         player.frozen = nbt.getBoolean("frozen");
@@ -107,30 +102,32 @@ public class IndirectPlayer implements ItemRepresentable {
         } else {
             player.originalRole = null;
         }
-
+        
         player.offlineTicks = nbt.getInt("offline_ticks");
         player.extraStorage = nbt.getCompound("extra_storage");
         return player;
     }
-
+    public Shadow getShadow() {
+        return MiscUtil.getShadow(this.server);
+    }
     NbtCompound save(NbtCompound nbt) {
         nbt.putUuid("playerUUID", this.playerUUID);
         nbt.putBoolean("frozen", this.frozen);
         nbt.putBoolean("participating", this.participating);
-
+        
         if (this.role != null) {
             nbt.put("role", this.role.writeNbt(new NbtCompound()));
         }
         if (this.originalRole != null) {
             nbt.putString("original_role", this.originalRole.name);
         }
-
+        
         nbt.putInt("offline_ticks", this.offlineTicks);
         nbt.put("extra_storage", this.extraStorage);
-
+        
         return nbt;
     }
-
+    
     public void tick() {
         chatMessageCooldown = chatMessageCooldown > 0 ? chatMessageCooldown - 1 : 0;
         if (this.getPlayer().isPresent()) {
@@ -139,11 +136,11 @@ public class IndirectPlayer implements ItemRepresentable {
             this.offlineTicks++;
         }
     }
-
+    
     public int getOfflineTicks() {
         return this.offlineTicks;
     }
-
+    
     public Text getName() {
         this.getPlayer().ifPresent((psPlayer) -> this.name = psPlayer.getName());
         if (name == null) {
@@ -151,247 +148,247 @@ public class IndirectPlayer implements ItemRepresentable {
             if (cache != null) {
                 Optional<GameProfile> profile = cache.getByUuid(this.playerUUID);
                 this.name = profile.map(
-                        gameProfile -> Text.literal(
-                                gameProfile.getName()
-                        )
+                    gameProfile -> Text.literal(
+                        gameProfile.getName()
+                    )
                 ).orElse(
-                        Text.literal(
-                                playerUUID.toString()
-                        )
+                    Text.literal(
+                        playerUUID.toString()
+                    )
                 );
             } else {
                 this.name = Text.literal(
-                        playerUUID.toString()
+                    playerUUID.toString()
                 );
             }
-
+            
         }
         return this.name;
     }
-
+    
     public ServerPlayerEntity getPlayerOrThrow() throws OfflinePlayerException {
         return this.getPlayer()
-                .orElseThrow(OfflinePlayerException::new);
+            .orElseThrow(OfflinePlayerException::new);
     }
-
+    
     public Optional<ServerPlayerEntity> getPlayer() {
         return Optional.ofNullable(server.getPlayerManager().getPlayer(this.playerUUID));
     }
-
+    
     public void damage(DamageSource source, float amount, Predicate<IndirectPlayer> cancelPredicate) {
         scheduleUntil(
-                (player) -> player.damage(source, amount),
-                cancelPredicate
+            (player) -> player.damage(source, amount),
+            cancelPredicate
         );
     }
-
+    
     public void damageNow(DamageSource source, float amount) {
         this.getPlayerOrThrow()
-                .damage(source, amount);
+            .damage(source, amount);
     }
-
+    
     public void giveEffect(StatusEffectInstance effect, Predicate<IndirectPlayer> cancelPredicate) {
         scheduleUntil(
-                (player) -> player.addStatusEffect(effect),
-                cancelPredicate
+            (player) -> player.addStatusEffect(effect),
+            cancelPredicate
         );
     }
-
+    
     public void giveEffectNow(StatusEffectInstance effect) {
         this.getPlayerOrThrow()
-                .addStatusEffect(effect);
+            .addStatusEffect(effect);
     }
-
+    
     public void removeEffect(RegistryEntry<StatusEffect> effectType, Predicate<IndirectPlayer> cancelPredicate) {
         scheduleUntil(
-                (player) -> player.removeStatusEffect(effectType),
-                cancelPredicate
+            (player) -> player.removeStatusEffect(effectType),
+            cancelPredicate
         );
     }
-
+    
     public void removeEffectNow(RegistryEntry<StatusEffect> effectType) {
         this.getPlayerOrThrow().removeStatusEffect(effectType);
     }
-
+    
     public void giveItem(ItemStack stack, BiConsumer<ServerPlayerEntity, ItemStack> ifFail, Predicate<IndirectPlayer> cancelPredicate) {
         scheduleUntil(
-                (player) -> {
-                    boolean result = player.getInventory().insertStack(stack);
-                    if (!result) {
-                        ifFail.accept(player, stack);
-                    }
-                },
-                cancelPredicate
+            (player) -> {
+                boolean result = player.getInventory().insertStack(stack);
+                if (!result) {
+                    ifFail.accept(player, stack);
+                }
+            },
+            cancelPredicate
         );
     }
-
+    
     public boolean giveItemNow(ItemStack stack, BiConsumer<ServerPlayerEntity, ItemStack> ifFail) {
         ServerPlayerEntity player = this.getPlayerOrThrow();
-
+        
         boolean result = player
-                .getInventory()
-                .insertStack(stack);
-
+            .getInventory()
+            .insertStack(stack);
+        
         if (!result) {
             ifFail.accept(player, stack);
         }
-
+        
         return this.getPlayerOrThrow()
-                .getInventory()
-                .insertStack(stack);
+            .getInventory()
+            .insertStack(stack);
     }
-
+    
     public void setTitleTimes(int fadeInTicks, int stayTicks, int fadeOutTicks, Predicate<IndirectPlayer> cancelPredicate) {
         TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
         scheduleUntil(
-                (player) -> player.networkHandler.sendPacket(packet),
-                cancelPredicate
+            (player) -> player.networkHandler.sendPacket(packet),
+            cancelPredicate
         );
     }
-
+    
     public void setTitleTimesNow(int fadeInTicks, int stayTicks, int fadeOutTicks) {
         TitleFadeS2CPacket packet = new TitleFadeS2CPacket(fadeInTicks, stayTicks, fadeOutTicks);
-
+        
         this.getPlayerOrThrow()
-                .networkHandler.sendPacket(packet);
+            .networkHandler.sendPacket(packet);
     }
-
+    
     public void sendTitle(Text title, Predicate<IndirectPlayer> cancelCondition) {
         TitleS2CPacket packet = new TitleS2CPacket(title);
-
+        
         scheduleUntil(
-                (player) -> player.networkHandler.sendPacket(packet)
-                , cancelCondition);
+            (player) -> player.networkHandler.sendPacket(packet)
+            , cancelCondition);
     }
-
+    
     public void sendTitleNow(Text title) throws OfflinePlayerException {
         TitleS2CPacket packet = new TitleS2CPacket(title);
         this.getPlayerOrThrow()
-                .networkHandler.sendPacket(packet);
+            .networkHandler.sendPacket(packet);
     }
-
+    
     public void sendSubtitle(Text subtitle, Predicate<IndirectPlayer> cancelCondition) {
         SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
         TitleS2CPacket titlePacket = new TitleS2CPacket(Text.empty());
-
+        
         scheduleUntil(
-                (player) -> {
-                    player.networkHandler.sendPacket(packet);
-                    player.networkHandler.sendPacket(titlePacket);
-                }
-                , cancelCondition);
+            (player) -> {
+                player.networkHandler.sendPacket(packet);
+                player.networkHandler.sendPacket(titlePacket);
+            }
+            , cancelCondition);
     }
-
+    
     public void sendSubtitleNow(Text subtitle) throws OfflinePlayerException {
         SubtitleS2CPacket packet = new SubtitleS2CPacket(subtitle);
         this.getPlayerOrThrow()
-                .networkHandler.sendPacket(packet);
+            .networkHandler.sendPacket(packet);
     }
-
+    
     public void sendMessage(Text chatMessage, Predicate<IndirectPlayer> cancelCondition) {
         scheduleUntil(
-                (player) -> player.sendMessage(chatMessage)
-                , cancelCondition);
+            (player) -> player.sendMessage(chatMessage)
+            , cancelCondition);
     }
-
+    
     public void sendMessageNow(Text chatMessage) throws OfflinePlayerException {
         this.getPlayerOrThrow()
-                .sendMessage(chatMessage);
+            .sendMessage(chatMessage);
     }
-
+    
     public void sendOverlay(Text chatMessage, Predicate<IndirectPlayer> cancelCondition) {
         scheduleUntil(
-                (player) -> player.sendMessage(chatMessage, true)
-                , cancelCondition);
+            (player) -> player.sendMessage(chatMessage, true)
+            , cancelCondition);
     }
-
+    
     public void sendOverlayNow(Text chatMessage) throws OfflinePlayerException {
         this.getPlayerOrThrow()
-                .sendMessage(chatMessage, true);
+            .sendMessage(chatMessage, true);
     }
-
+    
     public void scheduleUntil(Consumer<ServerPlayerEntity> task, Predicate<IndirectPlayer> cancelCondition) {
         Optional<ServerPlayerEntity> sPlayer = this.getPlayer();
-
+        
         if (sPlayer.isPresent()) {
             task.accept(sPlayer.get());
-
+            
         } else if (cancelCondition.test(this)) { // Don't bother scheduling if it should already be cancelled
             getShadow()
-                    .indirectPlayerManager
-                    .schedule(
-                            new IndirectPlayerManager.IndirectPlayerTask(
-                                    this,
-                                    task,
-                                    cancelCondition
-                            )
-                    );
+                .indirectPlayerManager
+                .schedule(
+                    new IndirectPlayerManager.IndirectPlayerTask(
+                        this,
+                        task,
+                        cancelCondition
+                    )
+                );
         }
     }
-
+    
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
         ComponentChanges.Builder builder = ComponentChanges.builder();
         builder.add(
-                DataComponentTypes.ITEM_NAME,
-                this.getName()
-                        .copy()
-                        .styled(
-                                style -> style.withColor(Formatting.GRAY)
-                        )
-        );
-        builder.add(
-                DataComponentTypes.PROFILE,
-                new ProfileComponent(
-                        Optional.empty(),
-                        Optional.of(this.playerUUID),
-                        new PropertyMap()
+            DataComponentTypes.ITEM_NAME,
+            this.getName()
+                .copy()
+                .styled(
+                    style -> style.withColor(Formatting.GRAY)
                 )
         );
-
+        builder.add(
+            DataComponentTypes.PROFILE,
+            new ProfileComponent(
+                Optional.empty(),
+                Optional.of(this.playerUUID),
+                new PropertyMap()
+            )
+        );
+        
         return new ItemStack(
-                Registries.ITEM.getEntry(Items.PLAYER_HEAD),
-                1,
-                builder.build());
+            Registries.ITEM.getEntry(Items.PLAYER_HEAD),
+            1,
+            builder.build());
     }
-
+    
     public void clearPlayerData(Predicate<IndirectPlayer> cancelCondition) {
         scheduleUntil(
-                (player) -> {
-                    for (
-                            AdvancementEntry advancement
-                            :
-                            Objects.requireNonNull(player.getServer())
-                                    .getAdvancementLoader()
-                                    .getAdvancements()
-                    ) {
-                        AdvancementProgress advancementProgress = player
+            (player) -> {
+                for (
+                    AdvancementEntry advancement
+                    :
+                    Objects.requireNonNull(player.getServer())
+                        .getAdvancementLoader()
+                        .getAdvancements()
+                ) {
+                    AdvancementProgress advancementProgress = player
+                        .getAdvancementTracker()
+                        .getProgress(advancement);
+                    if (advancementProgress.isAnyObtained()) {
+                        for (String string : advancementProgress.getObtainedCriteria()) {
+                            player
                                 .getAdvancementTracker()
-                                .getProgress(advancement);
-                        if (advancementProgress.isAnyObtained()) {
-                            for (String string : advancementProgress.getObtainedCriteria()) {
-                                player
-                                        .getAdvancementTracker()
-                                        .revokeCriterion(advancement, string);
-                            }
+                                .revokeCriterion(advancement, string);
                         }
                     }
-
-                    player.getInventory().clear();
-                    player.getEnderChestInventory().clear();
-                    player.setHealth(player.getMaxHealth());
-                    player.getHungerManager().setFoodLevel(20);
-                    player.getHungerManager().setSaturationLevel(5f);
-                    player.clearStatusEffects();
-
-                    AttributeContainer attributes = player.getAttributes();
-
-                    attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);
-                },
-                cancelCondition
+                }
+                
+                player.getInventory().clear();
+                player.getEnderChestInventory().clear();
+                player.setHealth(player.getMaxHealth());
+                player.getHungerManager().setFoodLevel(20);
+                player.getHungerManager().setSaturationLevel(5f);
+                player.clearStatusEffects();
+                
+                AttributeContainer attributes = player.getAttributes();
+                
+                attributes.custom.values().forEach(EntityAttributeInstance::clearModifiers);
+            },
+            cancelCondition
         );
     }
-
+    
     public class OfflinePlayerException extends IllegalStateException {
         private OfflinePlayerException() {
             super(IndirectPlayer.this.getName().getLiteralString() + " could not execute the task as they are not online");
