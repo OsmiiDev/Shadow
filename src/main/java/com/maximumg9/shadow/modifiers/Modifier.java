@@ -31,7 +31,7 @@ public abstract class Modifier implements ItemRepresentable {
     public abstract Style getStyle();
     
     public NbtCompound writeNbt(NbtCompound nbt) {
-        nbt.putString("role", this.getRawName());
+        nbt.putString("name", this.getRawName());
         return nbt;
     }
     

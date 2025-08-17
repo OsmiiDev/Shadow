@@ -12,7 +12,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public enum Modifiers {
-    QUICK_START(QuickStart.FACTORY);
+    QUICK_START(QuickStart.FACTORY),
+    SONIC(Sonic.FACTORY);
     
     public final String name;
     public final ModifierFactory<?> factory;

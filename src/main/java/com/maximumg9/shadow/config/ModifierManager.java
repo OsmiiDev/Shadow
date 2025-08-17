@@ -83,9 +83,7 @@ public class ModifierManager {
         
         for (IndirectPlayer p : modifierTypes.keySet()) {
             modifierTypes.get(p).forEach(
-                modifier -> {
-                    p.modifiers.add(modifier.factory.makeModifier(p));
-                }
+                modifier -> p.modifiers.add(modifier.factory.makeModifier(p))
             );
         }
         

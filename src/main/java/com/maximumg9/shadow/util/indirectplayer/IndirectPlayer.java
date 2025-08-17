@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
@@ -38,7 +39,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.UserCache;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -129,6 +133,10 @@ public class IndirectPlayer implements ItemRepresentable {
         if (this.originalRole != null) {
             nbt.putString("original_role", this.originalRole.name);
         }
+        
+        NbtList list = new NbtList();
+        list.addAll(this.modifiers.stream().map(modifier -> modifier.writeNbt(new NbtCompound())).toList());
+        nbt.put("modifiers", list);
         
         nbt.putInt("offline_ticks", this.offlineTicks);
         nbt.put("extra_storage", this.extraStorage);

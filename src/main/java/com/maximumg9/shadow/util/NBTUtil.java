@@ -13,8 +13,8 @@ import java.util.function.UnaryOperator;
 
 public abstract class NBTUtil {
     public static final String ID_NAME = "id";
-    public static String INVISIBLE_KEY = "invisible";
-    public static String RESTRICT_MOVEMENT_KEY = "invisible";
+    public static final String INVISIBLE_KEY = "invisible";
+    public static final String RESTRICT_MOVEMENT_KEY = "invisible";
     public static NbtCompound getCustomData(@NotNull ItemStack stack) {
         NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
         if (component == null) return new NbtCompound();

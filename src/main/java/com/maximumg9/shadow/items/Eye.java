@@ -8,6 +8,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public record Eye(RegistryKey<World> worldKey, UUID item, UUID display, BlockPos
     }
     
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "Eye{" +
             "worldKey=" + worldKey +
             ", item=" + item +

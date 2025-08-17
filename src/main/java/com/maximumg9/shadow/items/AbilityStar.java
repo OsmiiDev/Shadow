@@ -20,7 +20,7 @@ import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 public class AbilityStar implements ItemUseCallback {
     @Unique
-    public static Identifier ID = MiscUtil.shadowID("ability_star");
+    public static final Identifier ID = MiscUtil.shadowID("ability_star");
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if(!(world instanceof ServerWorld)) {

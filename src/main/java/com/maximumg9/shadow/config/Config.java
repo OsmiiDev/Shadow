@@ -49,6 +49,7 @@ public class Config {
         this.chatMessageCooldown = nbt.getInt("chatMessageCooldown");
         this.cullRadius = nbt.getDouble("cullRadius");
         this.disableChat = nbt.getBoolean("disableChat");
+        this.disconnectTime = nbt.getInt("disconnectTime");
         this.gracePeriodTicks = nbt.getInt("gracePeriodTicks");
         
         this.maxCooldownManager.readNbt(nbt.getCompound("maxCooldownManager"));
@@ -68,6 +69,7 @@ public class Config {
         nbt.putInt("chatMessageCooldown", this.chatMessageCooldown);
         nbt.putDouble("cullRadius", this.cullRadius);
         nbt.putBoolean("disableChat", this.disableChat);
+        nbt.putInt("disconnectTime", this.disconnectTime);
         nbt.putInt("gracePeriodTicks", this.gracePeriodTicks);
         
         nbt.put("maxCooldownManager", this.maxCooldownManager.writeNbt(new NbtCompound()));

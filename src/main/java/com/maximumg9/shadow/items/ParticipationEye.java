@@ -21,7 +21,7 @@ import static com.maximumg9.shadow.util.MiscUtil.getShadow;
 
 public class ParticipationEye implements ItemUseCallback {
     @Unique
-    public static Identifier ID = MiscUtil.shadowID("participation_eye");
+    public static final Identifier ID = MiscUtil.shadowID("participation_eye");
     
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
