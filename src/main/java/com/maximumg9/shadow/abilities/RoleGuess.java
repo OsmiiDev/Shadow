@@ -86,6 +86,23 @@ public class RoleGuess extends Ability {
                 if (timeLeft > 0)
                     return AbilityFilterResult.FAIL("This ability is on cooldown for " + TimeUtil.ticksToText(timeLeft, true));
                 return AbilityFilterResult.PASS();
+            },
+            () -> {
+                long shadows = getShadow().indirectPlayerManager
+                    .getRecentlyOnlinePlayers(getShadow().config.disconnectTime)
+                    .stream()
+                    .filter(
+                        (player) ->
+                            player.role != null &&
+                                player.role.getFaction() == Faction.SHADOW
+                    ).count();
+                long nonShadows = (long) getShadow().indirectPlayerManager
+                    .getRecentlyOnlinePlayers(getShadow().config.disconnectTime)
+                    .size() - shadows;
+                
+                if (shadows >= nonShadows)
+                    return AbilityFilterResult.FAIL("You cannot guess when the number of shadows alive meets or exceeds the number of non-shadows alive.");
+                return AbilityFilterResult.PASS();
             }
         );
     }

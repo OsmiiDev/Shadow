@@ -1,6 +1,7 @@
 package com.maximumg9.shadow.commands;
 
 import com.maximumg9.shadow.Shadow;
+import com.maximumg9.shadow.util.WorldUtil;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -20,6 +21,7 @@ public class RolesCommand {
                     if (!src.isExecutedByPlayer()) { return -1; }
                     
                     Shadow shadow = getShadow(src.getServer());
+                    
                     shadow.config.roleManager.showRoleListIndex(Objects.requireNonNull(src.getPlayer()), src.hasPermissionLevel(3));
                     
                     ctx.getSource().sendFeedback(

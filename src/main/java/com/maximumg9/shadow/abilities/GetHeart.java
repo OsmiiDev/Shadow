@@ -91,6 +91,8 @@ public class GetHeart extends Ability {
             Text.literal("Lifeweaver Heart").styled(style -> style.withColor(Formatting.GOLD))
         );
         
+        heart.remove(DataComponentTypes.FOOD);
+        
         NBTUtil.applyCustomDataToStack(
             heart,
             (nbt) -> {
@@ -115,6 +117,7 @@ public class GetHeart extends Ability {
                     -2.0,
                     EntityAttributeModifier.Operation.ADD_VALUE
                 ));
+                
             } else {
                 double oldValue = modifier.value();
                 if (
@@ -132,7 +135,7 @@ public class GetHeart extends Ability {
             
             this.player.sendMessageNow(
                 TextUtil.success("You got a heart! Your max health is now ")
-                    .append(TextUtil.hearts(player.getMaxHealth()))
+                    .append(TextUtil.hearts(player.getMaxHealth() / 2))
                     .append(Text.literal(".").styled(style -> style.withColor(Formatting.GREEN)))
             );
             return AbilityResult.NO_CLOSE;

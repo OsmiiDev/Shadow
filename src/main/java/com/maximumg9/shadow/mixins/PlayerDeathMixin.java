@@ -86,21 +86,24 @@ public abstract class PlayerDeathMixin extends PlayerEntity {
                                 .append(
                                     Text.literal(")").styled(style -> style.withColor(Formatting.GRAY))
                                 )
-                        
+                                .append(Text.literal(".").styled(style -> style.withColor(Formatting.GRAY)))
                         );
                     } else {
-                        player.sendMessage(name);
+                        player.sendMessage(name.copy()
+                            .append(Text.literal(".").styled(style -> style.withColor(Formatting.GRAY))));
                     }
                 });
             } else {
                 name
                     .setStyle(factionStyle)
-                    .append(Text.of(" died. They were a "))
+                    .append(Text.of(" died. They were " + iPlayer.role.aOrAn() + " "))
                     .append(
                         iPlayer.role == null ?
                             Text.literal("Null").styled(style -> style.withColor(Formatting.RED)) :
                             iPlayer.role.getName()
-                    );
+                    )
+                    .append(Text.literal(".").setStyle(factionStyle));
+                ;
                 
                 shadow.broadcast(name);
             }

@@ -3,6 +3,7 @@ package com.maximumg9.shadow.commands;
 import com.maximumg9.shadow.GamePhase;
 import com.maximumg9.shadow.Shadow;
 import com.maximumg9.shadow.util.FakeStructureWorldAccess;
+import com.maximumg9.shadow.util.WorldUtil;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -33,11 +34,13 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.chunk.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.gen.chunk.placement.StructurePlacement;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureKeys;
 
+import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -148,8 +151,9 @@ public class LocationCommand {
         overworld.getWorldBorder().setSize(shadow.config.worldBorderSize);
         World nether = server.getWorld(World.NETHER);
         if (nether != null) {
-            nether.getWorldBorder().setCenter(0, 0);
-            nether.getWorldBorder().setSize(WorldBorder.STATIC_AREA_SIZE);
+            double scale = DimensionType.getCoordinateScaleFactor(overworld.getDimension(), nether.getDimension());
+            nether.getWorldBorder().setCenter(shadow.state.currentLocation.getX() * scale, shadow.state.currentLocation.getZ() * scale);
+            nether.getWorldBorder().setSize(shadow.config.worldBorderSize);
         }
         World end = server.getWorld(World.END);
         if (end != null) {
@@ -364,45 +368,9 @@ public class LocationCommand {
             double x = xOffset + centerPos.x;
             double z = zOffset + centerPos.z;
             
-            int y = 1 + getTopYForBoundingBox(world, player.getBoundingBox(player.getPose()).offset(x, 0, z), Heightmap.Type.MOTION_BLOCKING);
+            int y = 1 + WorldUtil.getTopYForBoundingBox(world, player.getBoundingBox(player.getPose()).offset(x, 0, z), Heightmap.Type.MOTION_BLOCKING);
             
             player.teleport(world, x, y, z, currentAngle * 180 / MathHelper.PI, 0);
         }
-    }
-    
-    public static int getTopYForBoundingBox(ServerWorld world, Box bb, Heightmap.Type heightMap) {
-        int minX = MathHelper.floor(bb.minX);
-        int maxX = MathHelper.floor(bb.maxX);
-        int minZ = MathHelper.floor(bb.minZ);
-        int maxZ = MathHelper.floor(bb.maxZ);
-        
-        LogUtils.getLogger().info("minX: {},maxX: {},minZ: {},maxZ: {}", bb.minX, bb.maxX, bb.minZ, bb.maxZ);
-        
-        int highest = world.getChunk(ChunkSectionPos.getSectionCoord(minX), ChunkSectionPos.getSectionCoord(minZ)).sampleHeightmap(heightMap, minX, minZ);
-        int nhighest;
-        
-        if (minX != maxX) {
-            nhighest = world.getChunk(ChunkSectionPos.getSectionCoord(maxX), ChunkSectionPos.getSectionCoord(minZ)).sampleHeightmap(heightMap, maxX, minZ);
-            if (nhighest > highest) {
-                highest = nhighest;
-            }
-        }
-        if (minZ != maxZ) {
-            nhighest = world.getChunk(ChunkSectionPos.getSectionCoord(minX), ChunkSectionPos.getSectionCoord(maxZ)).sampleHeightmap(heightMap, minX, maxZ);
-            if (nhighest > highest) {
-                highest = nhighest;
-            }
-            
-            if (minX != maxX) {
-                nhighest = world.getChunk(ChunkSectionPos.getSectionCoord(maxX), ChunkSectionPos.getSectionCoord(maxZ)).sampleHeightmap(heightMap, maxX, maxZ);
-                if (nhighest > highest) {
-                    highest = nhighest;
-                }
-            }
-        }
-        
-        LogUtils.getLogger().info("y: {}", highest);
-        
-        return highest;
     }
 }

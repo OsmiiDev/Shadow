@@ -7,6 +7,7 @@ import com.maximumg9.shadow.config.Config;
 import com.maximumg9.shadow.items.*;
 import com.maximumg9.shadow.roles.Faction;
 import com.maximumg9.shadow.roles.Spectator;
+import com.maximumg9.shadow.util.WorldUtil;
 import com.maximumg9.shadow.util.indirectplayer.CancelPredicates;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayer;
 import com.maximumg9.shadow.util.indirectplayer.IndirectPlayerManager;
@@ -355,9 +356,7 @@ public class Shadow implements Tickable {
         
         if (villagers == 0 && shadows == 0) {
             this.endGame(List.of(), null, null);
-        }
-        
-        if (villagers == 0) {
+        } else if (villagers == 0) {
             this.endGame(
                 this.indirectPlayerManager
                     .getRecentlyOnlinePlayers(this.config.disconnectTime)
@@ -369,8 +368,7 @@ public class Shadow implements Tickable {
                 Faction.SHADOW,
                 null
             );
-        }
-        if (shadows == 0) {
+        } else if (shadows == 0) {
             this.endGame(
                 this.indirectPlayerManager
                     .getRecentlyOnlinePlayers(this.config.disconnectTime)

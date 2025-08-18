@@ -61,9 +61,7 @@ public abstract class Ability implements ItemRepresentable {
     }
     public abstract AbilityResult apply();
     
-    public void init() {
-        this.lastActivated = this.getShadow().getServer().getOverworld().getTime();
-    }
+    public void init() { this.lastActivated = -Integer.MAX_VALUE; }
     public void deInit() { }
     
     public void onNight() { }
