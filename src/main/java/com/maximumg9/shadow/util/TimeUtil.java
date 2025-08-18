@@ -12,7 +12,7 @@ public abstract class TimeUtil {
     public static String secondToText(int seconds, boolean leadingZeros) {
         if (leadingZeros)
             return
-                padLeft(String.valueOf(seconds / 60), ' ', 2) +
+                padLeft(String.valueOf(seconds / 60), '0', 2) +
                     ":" +
                     padLeft(String.valueOf(seconds % 60), '0', 2);
         
