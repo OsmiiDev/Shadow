@@ -30,7 +30,6 @@ public abstract class MiscUtil {
                 .append(item.toHoverableText())
         );
     private static final Style DEFAULT_STYLE = Style.EMPTY.withColor(Formatting.WHITE).withItalic(false);
-    
     public static String padLeft(String original, char padding, int desiredLength) {
         if (original.length() >= desiredLength) return original;
         StringBuilder builder = new StringBuilder(original);
@@ -39,15 +38,9 @@ public abstract class MiscUtil {
         }
         return builder.toString();
     }
-    
-    public static Shadow getShadow(MinecraftServer server) {
-        return ((ShadowProvider) server).shadow$getShadow();
-    }
-    
     public static Identifier shadowID(String id) {
         return Identifier.of("shadow", id);
     }
-    
     public static LoreComponent makeLore(MutableText... texts) {
         List<Text> lore = Arrays.stream(texts)
             .map(
@@ -55,7 +48,9 @@ public abstract class MiscUtil {
             ).toList();
         return new LoreComponent(lore, lore);
     }
-    
+    public static Shadow getShadow(MinecraftServer server) {
+        return ((ShadowProvider) server).shadow$getShadow();
+    }
     public static ItemStack getItemWithContext(ItemRepresentable item, ScreenHandlerContext context) {
         return context.get(
                 (world, blockPos) -> world.getRegistryManager()
@@ -63,7 +58,6 @@ public abstract class MiscUtil {
             .map(item::getAsItem)
             .orElse(getErrorItem());
     }
-    
     public static ItemStack getErrorItem() {
         ItemStack item = Items.BARRIER.getDefaultStack();
         item.set(

@@ -124,9 +124,9 @@ public class GetHeart extends Ability {
                     modifier.operation() !=
                         EntityAttributeModifier.Operation.ADD_VALUE
                 ) {
-                    getShadow().ERROR("Existing lifeweaver attribute modifier is not add value");
+                    getShadow().ERROR("Existing Lifeweaver attribute modifier is not add value");
                 }
-                attr.updateModifier(new EntityAttributeModifier(
+                attr.overwritePersistentModifier(new EntityAttributeModifier(
                     ATTR_ID,
                     oldValue - 2.0,
                     EntityAttributeModifier.Operation.ADD_VALUE
