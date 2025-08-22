@@ -62,6 +62,7 @@ public class SheriffBow extends Ability {
             DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
             true
         );
+        
         NBTUtil.flagRestrictMovement(item);
         return item;
     }
@@ -73,6 +74,7 @@ public class SheriffBow extends Ability {
             MiscUtil.DELETE_WARN,
             CancelPredicates.cancelOnPhaseChange(player.getShadow().state.phase)
         );
+        
         super.init();
     }
     @Override
@@ -97,11 +99,6 @@ public class SheriffBow extends Ability {
     
     @Override
     public ItemStack getAsItem(RegistryWrapper.WrapperLookup registries) {
-        ItemStack item = ITEM_STACK.copy();
-        item.set(
-            DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
-            true
-        );
-        return item;
+        return ITEM_STACK.copy();
     }
 }

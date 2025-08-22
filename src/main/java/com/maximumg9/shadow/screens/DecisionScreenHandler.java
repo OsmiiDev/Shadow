@@ -34,7 +34,7 @@ public class DecisionScreenHandler<V extends ItemRepresentable> extends ShadowSc
     protected DecisionScreenHandler(int syncId, @Nullable Callback<V> resultCallback, List<V> values, PlayerInventory playerInventory, ScreenHandlerContext context, boolean autoClose) {
         super(getTypeForSize(values.size()), syncId, playerInventory);
         
-        inventorySize = Math.ceilDiv(values.size(), 9) * 9;
+        inventorySize = Math.ceilDiv(Math.max(values.size(), 1), 9) * 9;
         this.resultCallback = resultCallback;
         
         this.inventory = new SimpleInventory(inventorySize);

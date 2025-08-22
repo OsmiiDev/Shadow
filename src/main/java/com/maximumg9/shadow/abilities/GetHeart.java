@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 public class GetHeart extends Ability {
     public static final Identifier ATTR_ID = MiscUtil.shadowID("lifeweaver_max_health");
-    private static final ItemStack ITEM_STACK = new ItemStack(Items.ENCHANTED_GOLDEN_APPLE);
+    private static final ItemStack ITEM_STACK = new ItemStack(Items.GOLDEN_APPLE);
     
     static {
         ITEM_STACK.set(

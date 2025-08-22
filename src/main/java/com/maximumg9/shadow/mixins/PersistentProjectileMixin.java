@@ -16,6 +16,9 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -108,6 +111,13 @@ public abstract class PersistentProjectileMixin extends ProjectileEntity {
                 }
             }
             
+            System.out.println("A");
+            player.playSoundToPlayer(
+                SoundEvent.of(Identifier.of("minecraft", "entity.item.break")),
+                SoundCategory.PLAYERS,
+                1.0f,
+                1.0f
+            );
             return Float.MAX_VALUE;
         }
         

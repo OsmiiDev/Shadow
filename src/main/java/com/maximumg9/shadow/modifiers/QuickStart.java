@@ -49,33 +49,12 @@ public class QuickStart extends Modifier {
         triggered = true;
         
         ItemStack pickaxe = new ItemStack(Items.STONE_PICKAXE);
-        pickaxe.set(
-            DataComponentTypes.ATTRIBUTE_MODIFIERS,
-            new AttributeModifiersComponent(
-                List.of(),
-                true
-            )
-        );
         player.giveItemNow(pickaxe, MiscUtil.DELETE_WARN);
         
         ItemStack axe = new ItemStack(Items.STONE_AXE);
-        axe.set(
-            DataComponentTypes.ATTRIBUTE_MODIFIERS,
-            new AttributeModifiersComponent(
-                List.of(),
-                true
-            )
-        );
         player.giveItemNow(axe, MiscUtil.DELETE_WARN);
         
         ItemStack shovel = new ItemStack(Items.STONE_SHOVEL);
-        shovel.set(
-            DataComponentTypes.ATTRIBUTE_MODIFIERS,
-            new AttributeModifiersComponent(
-                List.of(),
-                true
-            )
-        );
         player.giveItemNow(shovel, MiscUtil.DELETE_WARN);
     }
     @Override

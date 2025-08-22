@@ -69,6 +69,7 @@ public class StartCommand {
         Shadow shadow = getShadow(server);
         
         shadow.addTickable(new StartTicker(shadow));
+        shadow.addTickable(new GracePeriodTicker(shadow));
         
         for (IndirectPlayer player : shadow.getOnlinePlayers()) {
             ServerPlayerEntity entity = player.getPlayerOrThrow();
@@ -249,6 +250,45 @@ class StartTicker implements Tickable {
         Eye eye = new Eye(world.getRegistryKey(), item.getUuid(), display.getUuid(), pos);
         
         shadow.state.eyes.add(eye);
+    }
+    
+    @Override
+    public boolean shouldEnd() {
+        return ticksLeft <= 0;
+    }
+}
+
+
+class GracePeriodTicker implements Tickable {
+    final Shadow shadow;
+    
+    int ticksLeft = 0;
+    
+    GracePeriodTicker(Shadow shadow) {
+        this.shadow = shadow;
+        if (shadow.config.gracePeriodTicks >= 0) {
+            ticksLeft = shadow.config.gracePeriodTicks;
+            shadow.getServer().setPvpEnabled(false);
+            for (IndirectPlayer player : this.shadow.getOnlinePlayers()) {
+                player.sendMessageNow(
+                    Text.literal("There is a " + TimeUtil.ticksToText(shadow.config.gracePeriodTicks, true) + " grace period. All PVP and any killing-related abilities are disabled during this time!").styled(style -> style.withColor(Formatting.GREEN))
+                );
+            }
+        }
+    }
+    @Override
+    public void tick() {
+        ticksLeft--;
+    }
+    
+    @Override
+    public void onEnd() {
+        shadow.getServer().setPvpEnabled(true);
+        for (IndirectPlayer player : this.shadow.getOnlinePlayers()) {
+            player.sendMessageNow(
+                Text.literal("The grace period has ended!").styled(style -> style.withColor(Formatting.GOLD))
+            );
+        }
     }
     
     @Override

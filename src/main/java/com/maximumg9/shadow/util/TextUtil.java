@@ -6,7 +6,7 @@ import net.minecraft.util.Formatting;
 
 public class TextUtil {
     public static MutableText gray(String text) {
-        return Text.literal(text).styled(style -> style.withColor(Formatting.GRAY));
+        return Text.literal(text).styled(style -> style.withColor(Formatting.GRAY).withItalic(false));
     }
     
     public static MutableText error(String message) {

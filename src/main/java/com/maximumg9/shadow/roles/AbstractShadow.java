@@ -38,7 +38,7 @@ public abstract class AbstractShadow extends Role {
                         player.playerUUID != this.player.playerUUID
             )) {
             this.player.sendMessage(
-                Text.literal("The are no other Shadows (good luck!)"),
+                Text.literal("The are no other shadows (good luck!)"),
                 CancelPredicates.cancelOnPhaseChange(this.player.getShadow().state.phase)
             );
         } else {
