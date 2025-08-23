@@ -40,7 +40,6 @@ import net.minecraft.world.gen.chunk.placement.StructurePlacement;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureKeys;
 
-import java.awt.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -162,18 +161,20 @@ public class LocationCommand {
         }
         
         
-        List<Entity> nonPlayers = new ArrayList<>();
-        
+        List<Entity> toKill = new ArrayList<>();
         server.getWorlds().forEach(
             world ->
                 world.collectEntitiesByType(
                     TypeFilter.instanceOf(Entity.class),
-                    (entity) -> entity.getType() != EntityType.PLAYER,
-                    nonPlayers
+                    (entity) -> !List.of(
+                        EntityType.END_CRYSTAL,
+                        EntityType.PLAYER
+                    ).contains(entity.getType()),
+                    toKill
                 )
         );
         
-        nonPlayers.forEach(Entity::discard);
+        toKill.forEach(Entity::discard);
         
         src.sendFeedback(
             () ->
