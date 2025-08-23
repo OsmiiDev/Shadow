@@ -98,7 +98,11 @@ public class RoleGuess extends Ability {
                     ).count();
                 long nonShadows = (long) getShadow().indirectPlayerManager
                     .getRecentlyOnlinePlayers(getShadow().config.disconnectTime)
-                    .size() - shadows;
+                    .stream().filter(
+                        (player) -> player.role != null &&
+                            player.role.getFaction() != Faction.SPECTATOR
+                    )
+                    .count() - shadows;
                 
                 if (shadows >= nonShadows)
                     return AbilityFilterResult.FAIL("You cannot guess when the number of shadows alive meets or exceeds the number of non-shadows alive.");
