@@ -15,14 +15,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Sonic extends Modifier {
-    public static final ModifierFactory<Sonic> FACTORY = new Factory();
+public class ShadowTheHedgehog extends Modifier {
+    public static final ModifierFactory<ShadowTheHedgehog> FACTORY = new Factory();
     
     private static final ItemStack ITEM_STACK = new ItemStack(Items.WIND_CHARGE);
     private static final Style STYLE = Style.EMPTY.withColor(Formatting.WHITE);
     
     static {
-        ITEM_STACK.set(DataComponentTypes.ITEM_NAME, new Sonic(null).getName());
+        ITEM_STACK.set(DataComponentTypes.ITEM_NAME, new ShadowTheHedgehog(null).getName());
         ITEM_STACK.set(
             DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP,
             Unit.INSTANCE
@@ -35,12 +35,12 @@ public class Sonic extends Modifier {
     
     boolean triggered = false;
     
-    Sonic(IndirectPlayer player) {
+    ShadowTheHedgehog(IndirectPlayer player) {
         super(player);
     }
     @Override
     public String getRawName() {
-        return "Sonic (The Hedgehog)";
+        return "Shadow (The Hedgehog)";
     }
     @Override
     public boolean isStackable() { return false; }
@@ -65,10 +65,10 @@ public class Sonic extends Modifier {
         return ITEM_STACK.copy();
     }
     
-    private static class Factory implements ModifierFactory<Sonic> {
+    private static class Factory implements ModifierFactory<ShadowTheHedgehog> {
         @Override
-        public Sonic makeModifier(@Nullable IndirectPlayer player) {
-            return new Sonic(player);
+        public ShadowTheHedgehog makeModifier(@Nullable IndirectPlayer player) {
+            return new ShadowTheHedgehog(player);
         }
     }
     
