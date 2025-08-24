@@ -69,7 +69,7 @@ public class ModifierManager {
             if (!modifierSlot.shouldAppear()) continue;
             
             boolean stackable = modifierSlot.modifier.factory.makeModifier(null).isStackable();
-            List<IndirectPlayer> candidates = new ArrayList<>(shadow.getOnlinePlayers().stream()
+            List<IndirectPlayer> candidates = new ArrayList<>(modifierTypes.keySet().stream()
                 .filter((player -> stackable || !modifierTypes.get(player).contains(modifierSlot.modifier)))
                 .unordered()
                 .toList());

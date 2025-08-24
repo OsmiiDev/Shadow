@@ -96,7 +96,7 @@ public class RoleGuess extends Ability {
                             player.role != null &&
                                 player.role.getFaction() == Faction.SHADOW
                     ).count();
-                long nonShadows = (long) getShadow().indirectPlayerManager
+                long nonShadows = getShadow().indirectPlayerManager
                     .getRecentlyOnlinePlayers(getShadow().config.disconnectTime)
                     .stream().filter(
                         (player) -> player.role != null &&
